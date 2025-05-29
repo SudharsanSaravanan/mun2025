@@ -7,7 +7,7 @@ import Image from 'next/image';
 
 const links = [
   { href: "/", label: "Home" },
-  { href: "/committee", label: "Committees" },
+  { href: "/committees", label: "Committees" },
   { href: "/team", label: "Team" },
   { href: "/contact", label: "Contact" },
 ];
@@ -48,7 +48,7 @@ export function Navbar() {
                 </Link>
               );
             })}
-              <Link href="/committee" className="flex items-center text-decoration-none">
+              <Link href="/committees" className="flex items-center text-decoration-none">
                 <button className="bg-[#00B7FF] hover:bg-sky-700 text-white rounded-lg px-2 py-1 -mt-1">Register Now</button>
               </Link>
           </div>
