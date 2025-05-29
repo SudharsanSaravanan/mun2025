@@ -10,7 +10,7 @@ export function Footer() {
           <div className="lg:col-span-1 space-y-4 text-center md:text-left">
             <div className="flex items-center justify-center md:justify-start space-x-3">
               <Image
-                src="/images/AMRITA_MUN25.png"
+                src="/images/AMUN25_Logo.png"
                 alt="Amrita MUN Logo"
                 width={48}
                 height={48}

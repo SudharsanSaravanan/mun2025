@@ -22,7 +22,7 @@ export function Navbar() {
         <div className="flex items-center justify-between h-20">
           <Link href="/" className="flex justify-center items-center gap-2 text-decoration-none">
             <Image className="mt-0"
-              src="/images/mun_nav.png"
+              src="/images/AMUN25_Navbar.png"
               alt="MUN Logo"
               width={190}
               height={190}
