@@ -189,7 +189,7 @@ export default function CommitteePage() {
                   <h2 className="text-xl font-semibold text-sky-800">{selectedCommittee.name}</h2>
                   <button
                     onClick={closeModal}
-                    className="text-sky-800 text-2xl font-bold hover:text-sky-600"
+                    className="text-sky-800 text-3xl font-bold hover:text-sky-600 cursor-pointer pr-2"
                   >
                     &times;
                   </button>
@@ -222,13 +222,13 @@ export default function CommitteePage() {
                   <div className="flex flex-col sm:flex-row gap-4 mt-4">
                     <button
                       onClick={() => handleRegister(selectedCommittee.id)}
-                      className="bg-sky-600 hover:bg-sky-700 text-white font-medium py-2 px-6 rounded-lg w-full sm:w-auto"
+                      className="bg-sky-600 cursor-pointer text-white font-medium py-2 px-6 rounded-lg w-full sm:w-auto transform transition-all duration-300 ease-out hover:bg-[#0077FF] hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-[#00B7FF] focus:ring-opacity-50 active:scale-99"
                     >
                       Register Now
                     </button>
                     <button
                       onClick={() => handleCountryMatrix(selectedCommittee.id)}
-                      className="bg-white hover:bg-gray-100 text-sky-700 border border-sky-300 font-medium py-2 px-6 rounded-lg w-full sm:w-auto"
+                      className="bg-white cursor-pointer hover:bg-gray-100 text-sky-700 border border-sky-300 font-medium py-2 px-6 rounded-lg w-full sm:w-auto"
                     >
                       View Country Matrix
                     </button>

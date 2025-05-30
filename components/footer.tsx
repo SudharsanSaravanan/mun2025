@@ -3,14 +3,14 @@ import Image from "next/image";
 
 export function Footer() {
   return (
-    <footer className="bg-gray-900 text-white py-12 font-inter">
+    <footer className="bg-gray-900 text-white pt-12 pb-6 font-inter">
       <div className="container mx-auto px-6 lg:px-8">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-12">
           
           <div className="lg:col-span-1 space-y-4 text-center md:text-left">
             <div className="flex items-center justify-center md:justify-start space-x-3">
               <Image
-                src="/images/AMRITA_MUN25.png"
+                src="/images/AMUNSO_Logo.png"
                 alt="Amrita MUN Logo"
                 width={48}
                 height={48}
