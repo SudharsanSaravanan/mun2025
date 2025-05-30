@@ -4,11 +4,12 @@ import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import Image from 'next/image';
+import { motion, AnimatePresence } from "framer-motion";
 
 const links = [
   { href: "/", label: "Home" },
   { href: "/committees", label: "Committees" },
-  { href: "/team", label: "Team" },
+  { href: "/team", label: "Secretariat" },
   { href: "/contact", label: "Contact" },
 ];
 
@@ -30,7 +31,6 @@ export function Navbar() {
             />
           </Link>
 
-
           {/* Desktop Navigation */}
           <div className="hidden md:flex gap-8">
             {links.map((link) => {
@@ -48,16 +48,16 @@ export function Navbar() {
                 </Link>
               );
             })}
-              <Link href="/committees" className="flex items-center text-decoration-none">
-                <button className="bg-[#00B7FF] cursor-pointer text-white rounded-lg px-4 py-1 -mt-1 transform transition-all duration-300 ease-out hover:bg-[#0077FF] hover:scale-102 hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-[#00B7FF] focus:ring-opacity-50 active:scale-95">Register</button>
-              </Link>
-          </div>
-
+            <Link href="/committees" className="flex items-center text-decoration-none">
+              <button className="bg-[#00B7FF] cursor-pointer text-white rounded-lg px-4 py-1 -mt-1 transform transition-all duration-300 ease-out hover:bg-[#0077FF] hover:scale-102 hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-[#00B7FF] focus:ring-opacity-50 active:scale-95">Register</button>
+            </Link>
+          </div>          
+          
           {/* Mobile Menu Button */}
-          <div className="md:hidden">
+          <div className="md:hidden flex items-center">
             <button
               onClick={() => setIsOpen(!isOpen)}
-              className="text-gray-600 hover:text-[#009EDB] focus:outline-none focus:ring-2 focus:ring-[#009EDB]"
+              className="text-gray-600 hover:text-[#009EDB] focus:outline-none focus:ring-2 focus:ring-[#009EDB] rounded-lg p-2"
               aria-label="Toggle menu"
             >
               {/* Hamburger Icon */}
@@ -90,26 +90,50 @@ export function Navbar() {
       </div>
 
       {/* Mobile Navigation Menu */}
-      {isOpen && (
-        <div className="md:hidden">
-          <div className="px-2 pt-2 pb-3 space-y-1 bg-white border-b border-gray-200">
-            {links.map((link) => {
-              const isActive = pathname === link.href;
-              return (
-                <Link
-                  key={link.href}
-                  href={link.href}
-                  className={`block px-3 py-2 rounded-md text-base font-medium
-                    ${isActive ? 'text-[#009EDB] bg-blue-100' : 'text-gray-600 hover:text-[#009EDB] hover:bg-blue-50'}`}
-                  onClick={() => setIsOpen(false)}
-                >
-                  {link.label}
-                </Link>
-              );
-            })}
-          </div>
-        </div>
-      )}
+      <AnimatePresence>
+        {isOpen && (
+          <motion.div 
+            className="md:hidden"
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: "auto" }}
+            exit={{ opacity: 0, height: 0 }}
+            transition={{ duration: 0.3, ease: "easeInOut" }}
+          >
+            <motion.div 
+              className="px-2 pt-2 pb-3 space-y-1 bg-white border-b border-gray-200"
+              initial={{ y: -20 }}
+              animate={{ y: 0 }}
+              exit={{ y: -20 }}
+              transition={{ duration: 0.3, ease: "easeInOut" }}
+            >              
+              {links.map((link, index) => {
+                const isActive = pathname === link.href;
+                return (
+                  <motion.div
+                    key={link.href}
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0 }}
+                    transition={{ 
+                      duration: 0.2,
+                      delay: index * 0.05,
+                      ease: "easeOut"
+                    }}
+                  >
+                    <Link
+                      href={link.href}
+                      className={`block px-3 py-2 rounded-md text-base font-medium transform transition-all duration-200 ${isActive ? 'text-[#009EDB] bg-blue-100' : 'text-gray-600 hover:text-[#009EDB] hover:bg-blue-50'}`}
+                      onClick={() => setIsOpen(false)}
+                    >
+                      {link.label}
+                    </Link>
+                  </motion.div>
+                );
+              })}
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </nav>
   );
 }
