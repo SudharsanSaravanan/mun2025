@@ -5,9 +5,9 @@ import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image"
 
 const images = [
-  "/images/AMUN25_Logo.png",
-  "/images/un_logo.png",
-  "/images/watermelon_head.jpg"
+  "/images/temp-image-1.JPG",
+  "/images/temp-image-2.JPG",
+  "/images/temp-image-3.JPG"
 ];
 
 export default function Home() {
@@ -61,25 +61,30 @@ export default function Home() {
     <div className="pt-16">
       <section className="relative min-h-[95vh] flex items-center justify-center overflow-hidden">
         <div className="absolute top-0 left-0 w-full h-full z-0">
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={images[currentImageIndex]}
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 1.2 }}
-              className="absolute top-0 left-0 w-full h-full bg-cover bg-center bg-no-repeat"
-            >
-              <Image
-                src={images[currentImageIndex]}
-                alt="Background"
-                layout="fill"
-                objectFit="cover"
-                priority
-              />
-              <div className="absolute inset-0 bg-black opacity-60" />
-            </motion.div>
-          </AnimatePresence>
+          <div className="absolute top-0 left-0 w-full h-full bg-[#202020]">
+            <AnimatePresence initial={false} mode="sync">
+              <motion.div
+                key={images[currentImageIndex]}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ 
+                  duration: 1,
+                  ease: "easeInOut"
+                }}
+                className="absolute top-0 left-0 w-full h-full"
+              >                
+                <Image
+                  src={images[currentImageIndex]}
+                  alt="Background"
+                  layout="fill"
+                  objectFit="cover"
+                  priority
+                />
+                <div className="absolute inset-0 bg-gradient-to-b from-black/65 via-black/55 to-black/65" />
+              </motion.div>
+            </AnimatePresence>
+          </div>
         </div>
 
         <div className="container max-w-7xl px-4 z-10">
@@ -87,43 +92,82 @@ export default function Home() {
             initial={{ opacity: 0, y: 40, scale: 0.98 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             transition={{ duration: 1 }}
-            className="text-center space-y-8 relative z-10"
-          >
-            <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold text-grey-900 leading-tight">
-              AMRITA -{" "}
-              <span className="bg-[#00B7FF] bg-clip-text text-transparent">
-                MUN 2025
-              </span>
-            </h1>
+            className="text-center space-y-12 relative z-10"
+          >              
+            <div className="space-y-4">                
+              <div>
+                <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold tracking-tight leading-none">
+                  <span className="text-white">AMRITA</span>{" "}
+                  <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#00B7FF] via-[#33C7FF] to-[#00B7FF]">
+                    MUN 2025
+                  </span>
+                </h1>
+              </div>
 
-            <h2 className="text-2xl md:text-3xl font-black text-[#00B7FF]">
-              AUGUST 1-3, 2025
-            </h2>
+              <div className="space-y-3">
+                <h2 className="text-lg md:text-xl font-semibold tracking-wider text-white/90">
+                  AUGUST 1-3, 2025
+                </h2>
 
-            <p className="text-2xl md:text-2xl font-extrabold text-grey-800 max-w-3xl mx-auto">
-              WHERE DIPLOMACY MEETS PROGRESS
-            </p>
-            <br />
-            <div className="text-white px-6 sm:px-10 py-10 max-w-4xl mx-auto">
-              <div className="grid grid-cols-4 sm:grid-cols-4 text-lg sm:text-xl font-medium text-center">
-                <div>
-                  <p className="text-5xl font-bold">{String(days).padStart(2, "0")}</p>
-                  <p className="mt-2">Days</p>
+                <p className="text-base md:text-md font-medium text-[#00B7FF] max-w-2xl mx-auto tracking-wider">
+                  WHERE DIPLOMACY MEETS PROGRESS
+                </p>
+              </div>
+            </div>  
+
+            <div className="backdrop-blur-md bg-gradient-to-b from-black/40 to-black/60 rounded-lg px-4 py-3 inline-block mx-auto border border-white/10 shadow-xl shadow-black/50">
+              <div className="flex gap-x-8 text-base font-medium text-center">
+                <div className="relative">
+                  <div className="absolute inset-0 bg-gradient-to-b from-[#00B7FF]/10 to-transparent blur-lg"></div>
+                    <div className="relative">
+                      <p className="text-2xl sm:text-3xl font-bold text-white leading-none mb-1">
+                        {String(days).padStart(2, "0")}
+                      </p>
+                      <p className="text-[10px] font-semibold tracking-wider text-[#00B7FF] leading-none">DAYS</p>
+                    </div>
+                </div>        
+
+                <div className="relative">
+                  <div className="absolute inset-0 bg-gradient-to-b from-[#00B7FF]/10 to-transparent blur-lg"></div>
+                  <div className="relative">
+                    <p className="text-2xl sm:text-3xl font-bold text-white leading-none mb-1">
+                      {String(hours).padStart(2, "0")}
+                    </p>
+                    <p className="text-[10px] font-semibold tracking-wider text-[#00B7FF] leading-none">HOURS</p>
+                  </div>
                 </div>
-                <div>
-                  <p className="text-5xl font-bold">{String(hours).padStart(2, "0")}</p>
-                  <p className="mt-2">Hours</p>
+
+                <div className="relative">
+                  <div className="absolute inset-0 bg-gradient-to-b from-[#00B7FF]/10 to-transparent blur-lg"></div>
+                  <div className="relative">
+                    <p className="text-2xl sm:text-3xl font-bold text-white leading-none mb-1">
+                      {String(minutes).padStart(2, "0")}
+                    </p>
+                    <p className="text-[10px] font-semibold tracking-wider text-[#00B7FF] leading-none">MINUTES</p>
+                  </div>
                 </div>
-                <div>
-                  <p className="text-5xl font-bold">{String(minutes).padStart(2, "0")}</p>
-                  <p className="mt-2">Minutes</p>
-                </div>
-                <div>
-                  <p className="text-5xl font-bold">{String(seconds).padStart(2, "0")}</p>
-                  <p className="mt-2">Seconds</p>
-                </div>
+
+                <div className="relative">
+                  <div className="absolute inset-0 bg-gradient-to-b from-[#00B7FF]/10 to-transparent blur-lg"></div>
+                  <div className="relative">
+                    <p className="text-2xl sm:text-3xl font-bold text-white leading-none mb-1">
+                      {String(seconds).padStart(2, "0")}
+                    </p>
+                    <p className="text-[10px] font-semibold tracking-wider text-[#00B7FF] leading-none">SECONDS</p>
+                  </div>
+                </div>              
               </div>
             </div>
+
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.5, duration: 0.5 }}
+            >
+              <button className="mt-2 px-6 py-2 bg-[#00B7FF] cursor-pointer text-white text-lg font-medium rounded-lg transform transition-all duration-300 ease-out hover:bg-[#0077FF] hover:scale-102 hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-[#00B7FF] focus:ring-opacity-50 active:scale-95">
+                Register Now
+              </button>
+            </motion.div>
           </motion.div>
         </div>
       </section>
@@ -138,7 +182,7 @@ export default function Home() {
             className="space-y-12"
           >
             <h2 className="text-3xl md:text-4xl font-bold text-center text-gray-900">
-              Welcome to Amrita-MUN'25
+              Welcome to Amrita MUN'25
             </h2>
             <h2 className="text-lg md:text-2xl font-bold text-gray-900 max-w-4xl mx-auto">
               Dear Delegates,

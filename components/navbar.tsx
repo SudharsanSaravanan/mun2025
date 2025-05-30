@@ -16,8 +16,8 @@ export function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
   const pathname = usePathname();
 
-  return (
-    <nav className="fixed top-0 w-full bg-white/80 backdrop-blur-md z-50 border-b border-gray-200">
+  return (    
+    <nav className="fixed top-0 w-full bg-white backdrop-blur-xl z-50 border-b border-gray-200 shadow-sm">
       <div className="max-w-screen-xl mx-auto px-4 md:px-2">
         <div className="flex items-center justify-between h-20">
           <Link href="/" className="flex justify-center items-center gap-2 text-decoration-none">
@@ -49,7 +49,7 @@ export function Navbar() {
               );
             })}
               <Link href="/committees" className="flex items-center text-decoration-none">
-                <button className="bg-[#00B7FF] hover:bg-sky-700 text-white rounded-lg px-2 py-1 -mt-1">Register Now</button>
+                <button className="bg-[#00B7FF] cursor-pointer text-white rounded-lg px-4 py-1 -mt-1 transform transition-all duration-300 ease-out hover:bg-[#0077FF] hover:scale-102 hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-[#00B7FF] focus:ring-opacity-50 active:scale-95">Register</button>
               </Link>
           </div>
 
