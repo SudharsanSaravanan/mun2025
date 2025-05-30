@@ -48,8 +48,10 @@ export function Navbar() {
                 </Link>
               );
             })}
-            <Link href="/committees" className="flex items-center text-decoration-none">
-              <button className="bg-[#00B7FF] cursor-pointer text-white rounded-lg px-4 py-1 -mt-1 transform transition-all duration-300 ease-out hover:bg-[#0077FF] hover:scale-102 hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-[#00B7FF] focus:ring-opacity-50 active:scale-95">Register</button>
+            <Link href="/signup" className="flex items-center text-decoration-none">
+              <button className="bg-[#00B7FF] cursor-pointer text-white rounded-lg px-4 py-1 -mt-1 transform transition-all duration-300 ease-out hover:bg-[#0077FF] hover:scale-102 hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-[#00B7FF] focus:ring-opacity-50 active:scale-95">
+                Register
+              </button>
             </Link>
           </div>          
           

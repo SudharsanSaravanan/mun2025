@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import { Tilt } from "react-tilt";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -123,7 +124,6 @@ export default function CommitteePage() {
   const openModal = (committee: Committee) => setSelectedCommittee(committee);
   const closeModal = () => setSelectedCommittee(null);
 
-  const handleRegister = (committeeId: number) => console.log(`Registering for committee ${committeeId}`);
   const handleCountryMatrix = (committeeId: number) => console.log(`Opening country matrix for committee ${committeeId}`);
 
   const scrollToEnd = () => {
@@ -220,12 +220,11 @@ export default function CommitteePage() {
                   <p className="text-gray-700">{selectedCommittee.description}</p>
 
                   <div className="flex flex-col sm:flex-row gap-4 mt-4">
-                    <button
-                      onClick={() => handleRegister(selectedCommittee.id)}
-                      className="bg-sky-600 cursor-pointer text-white font-medium py-2 px-6 rounded-lg w-full sm:w-auto transform transition-all duration-300 ease-out hover:bg-[#0077FF] hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-[#00B7FF] focus:ring-opacity-50 active:scale-99"
-                    >
-                      Register Now
-                    </button>
+                    <Link href="/signup">
+                      <button className="bg-sky-600 cursor-pointer text-white font-medium py-2 px-6 rounded-lg w-full sm:w-auto transform transition-all duration-300 ease-out hover:bg-[#0077FF] hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-[#00B7FF] focus:ring-opacity-50 active:scale-99">
+                        Register Now
+                      </button>
+                    </Link>
                     <button
                       onClick={() => handleCountryMatrix(selectedCommittee.id)}
                       className="bg-white cursor-pointer hover:bg-gray-100 text-sky-700 border border-sky-300 font-medium py-2 px-6 rounded-lg w-full sm:w-auto"

@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image"
+import Link from "next/link";
 
 const images = [
   "/images/temp-image-1.JPG",
@@ -164,9 +165,11 @@ export default function Home() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.5, duration: 0.5 }}
             >
-              <button className="mt-2 px-6 py-2 bg-[#00B7FF] cursor-pointer text-white text-lg font-medium rounded-lg transform transition-all duration-300 ease-out hover:bg-[#0077FF] hover:scale-102 hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-[#00B7FF] focus:ring-opacity-50 active:scale-95">
-                Register Now
-              </button>
+              <Link href="/signup">
+                <button className="mt-2 px-6 py-2 bg-[#00B7FF] cursor-pointer text-white text-lg font-medium rounded-lg transform transition-all duration-300 ease-out hover:bg-[#0077FF] hover:scale-102 hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-[#00B7FF] focus:ring-opacity-50 active:scale-95">
+                  Register Now
+                </button>
+              </Link>
             </motion.div>
           </motion.div>
         </div>
