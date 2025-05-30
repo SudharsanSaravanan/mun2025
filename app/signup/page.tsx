@@ -4,9 +4,9 @@ import { motion } from "framer-motion";
 
 export default function SignUpPage() {
     return (
-        <div className="min-h-screen flex items-center justify-center bg-[#00B7FF]">
+        <div className="min-h-screen flex items-center justify-center bg-gradient-to-r from-[#00B7FF] to-[#00B7FF]/50">
             <motion.div
-                className="bg-white/80 text-gray-800 backdrop-blur-md rounded-xl shadow-lg p-8 w-full max-w-md"
+                className="bg-white/80 text-gray-800 backdrop-blur-md rounded-xl shadow-lg p-8 m-10 w-full max-w-md"
                 initial={{ opacity: 0, y: 40 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6, ease: "easeOut" }}
