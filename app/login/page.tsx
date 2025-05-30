@@ -6,7 +6,7 @@ export default function LoginPage() {
     return (
         <div className="min-h-screen flex items-center justify-center bg-[#00B7FF]">
             <motion.div
-                className="bg-white rounded-xl shadow-lg p-8 w-full max-w-md"
+                className="bg-white/80 backdrop-blur-md rounded-xl shadow-lg p-8 w-full max-w-md"
                 initial={{ opacity: 0, y: 40 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6, ease: "easeOut" }}
@@ -17,7 +17,7 @@ export default function LoginPage() {
                 <form className="space-y-5">
                     <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">
-                            Email address
+                            Email
                         </label>
                         <input
                             type="email"
