@@ -1,10 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import Image from 'next/image';
 import { motion, AnimatePresence } from "framer-motion";
+import { supabase } from "@/lib/supabase";
 
 const links = [
   { href: "/", label: "Home" },
@@ -15,7 +16,25 @@ const links = [
 
 export function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const pathname = usePathname();
+
+  useEffect(() => {
+    const checkAuth = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      setIsAuthenticated(!!session);
+    };
+    
+    checkAuth();
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setIsAuthenticated(!!session);
+    });
+
+    return () => {
+      subscription.unsubscribe();
+    };
+  }, []);
 
   return (    
     <nav className="fixed top-0 w-full bg-white backdrop-blur-xl z-50 border-b border-gray-200 shadow-sm">
@@ -48,10 +67,21 @@ export function Navbar() {
                 </Link>
               );
             })}
-            <Link href="/committees" className="flex items-center text-decoration-none">
-              <button className="bg-[#00B7FF] cursor-pointer text-white rounded-lg px-4 py-1 -mt-1 transform transition-all duration-300 ease-out hover:bg-[#0077FF] hover:scale-102 hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-[#00B7FF] focus:ring-opacity-50 active:scale-95">Register</button>
-            </Link>
-          </div>          
+            
+            {isAuthenticated ? (
+              <Link href="/dashboard" className="flex items-center text-decoration-none">
+                <button className="bg-[#00B7FF] cursor-pointer text-white rounded-lg px-4 py-1 -mt-1 transform transition-all duration-300 ease-out hover:bg-[#0077FF] hover:scale-102 hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-[#00B7FF] focus:ring-opacity-50 active:scale-95">
+                  Dashboard
+                </button>
+              </Link>
+            ) : (
+              <Link href="/signup" className="flex items-center text-decoration-none">
+                <button className="bg-[#00B7FF] cursor-pointer text-white rounded-lg px-4 py-1 -mt-1 transform transition-all duration-300 ease-out hover:bg-[#0077FF] hover:scale-102 hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-[#00B7FF] focus:ring-opacity-50 active:scale-95">
+                  Register
+                </button>
+              </Link>
+            )}
+          </div>
           
           {/* Mobile Menu Button */}
           <div className="md:hidden flex items-center">
