@@ -21,7 +21,7 @@ export default function LoginPage() {
                         </label>
                         <input
                             type="email"
-                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#00B7FF]"
+                            className="w-full px-4 py-2 border text-black border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#00B7FF]"
                             placeholder="you@example.com"
                             required
                         />
@@ -32,8 +32,8 @@ export default function LoginPage() {
                         </label>
                         <input
                             type="password"
-                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#00B7FF]"
-                            placeholder="••••••••"
+                            className="w-full px-4 py-2 border text-black border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#00B7FF]"
+                            placeholder=""
                             required
                         />
                     </div>
@@ -62,7 +62,7 @@ export default function LoginPage() {
                 </form>
                 <p className="mt-6 text-center text-sm text-gray-600">
                     Don't have an account?{" "}
-                    <a href="#" className="text-[#00B7FF] hover:underline font-medium">
+                    <a href="/signup" className="text-[#00B7FF] hover:underline font-medium">
                         Sign up
                     </a>
                 </p>
