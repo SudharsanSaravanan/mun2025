@@ -10,6 +10,7 @@ import { Switch } from "@/components/ui/switch";
 import { Card } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { motion, AnimatePresence } from "framer-motion";
+import { continueButtonStyle, backButtonStyle, submitButtonStyle } from "./ButtonStyles";
 
 const RegistrationForm = () => {
   // Section navigation state
@@ -18,7 +19,7 @@ const RegistrationForm = () => {
   const [progress, setProgress] = useState(20);
   
   //The participant type - pls set ths to true if the participant is internal, else false ( for backend logic - pls delete comment after use)
-  const [isInternal, setIsInternal] = useState(true);
+  const [isInternal, setIsInternal] = useState(false);
   const [pref1, setPref1] = useState("delegate");
   const [pref2, setPref2] = useState("delegate");
   const [pref3, setPref3] = useState("delegate");
@@ -277,6 +278,7 @@ const RegistrationForm = () => {
                     <p className="text-base md:text-lg text-gray-700 mb-4">
                       Thank you for your interest in joining Amrita MUN'25. We're excited to have you participate!
                     </p>
+                    
                   </div>
                   
                   
@@ -286,7 +288,7 @@ const RegistrationForm = () => {
                   <Button 
                     type="button" 
                     onClick={nextStep} 
-                    className="px-6 md:px-8 text-sm md:text-base bg-[#00B7FF] hover:bg-[#009FE0] transition-colors"
+                    className={continueButtonStyle}
                   >
                     Begin Registration
                   </Button>
@@ -300,11 +302,13 @@ const RegistrationForm = () => {
                 {isInternal ? (
                   <div className="flex-grow grid grid-cols-1 gap-3 py-2">
                     <div>
+                      <Label htmlFor="fullName" className="text-sm md:text-base mb-1 block">Full Name</Label>
                       <Input 
+                        id="fullName"
                         name="fullName"
                         value={formData.fullName}
                         onChange={handleInputChange}
-                        placeholder="Full Name" 
+                        placeholder="Enter your full name" 
                         required 
                         className={formErrors.fullName ? "border-red-500" : ""}
                       />
@@ -313,11 +317,13 @@ const RegistrationForm = () => {
                       )}
                     </div>
                     <div>
+                      <Label htmlFor="phoneNumber" className="text-sm md:text-base mb-1 block">Phone Number</Label>
                       <Input 
+                        id="phoneNumber"
                         name="phoneNumber"
                         value={formData.phoneNumber}
                         onChange={handleInputChange}
-                        placeholder="Phone Number" 
+                        placeholder="Enter your phone number" 
                         required 
                         className={formErrors.phoneNumber ? "border-red-500" : ""}
                       />
@@ -326,11 +332,13 @@ const RegistrationForm = () => {
                       )}
                     </div>
                     <div>
+                      <Label htmlFor="email" className="text-sm md:text-base mb-1 block">Email ID</Label>
                       <Input 
+                        id="email"
                         name="email"
                         value={formData.email}
                         onChange={handleInputChange}
-                        placeholder="Email ID" 
+                        placeholder="Enter your email address" 
                         required 
                         type="email"
                         className={formErrors.email ? "border-red-500" : ""} 
@@ -340,11 +348,13 @@ const RegistrationForm = () => {
                       )}
                     </div>
                     <div>
+                      <Label htmlFor="rollNumber" className="text-sm md:text-base mb-1 block">Roll Number</Label>
                       <Input 
+                        id="rollNumber"
                         name="rollNumber"
                         value={formData.rollNumber}
                         onChange={handleInputChange}
-                        placeholder="Roll Number" 
+                        placeholder="Enter your roll number" 
                         required 
                         className={formErrors.rollNumber ? "border-red-500" : ""}
                       />
@@ -355,11 +365,13 @@ const RegistrationForm = () => {
                   </div>) : (
                   <div className="flex-grow grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4 py-2">
                     <div className="md:col-span-1">
+                      <Label htmlFor="fullName-ext" className="text-sm md:text-base mb-1 block">Full Name</Label>
                       <Input 
+                        id="fullName-ext"
                         name="fullName"
                         value={formData.fullName}
                         onChange={handleInputChange}
-                        placeholder="Full Name" 
+                        placeholder="Enter your full name" 
                         required 
                         className={formErrors.fullName ? "border-red-500" : ""}
                       />
@@ -368,11 +380,13 @@ const RegistrationForm = () => {
                       )}
                     </div>
                     <div className="md:col-span-1">
+                      <Label htmlFor="phoneNumber-ext" className="text-sm md:text-base mb-1 block">Phone Number</Label>
                       <Input 
+                        id="phoneNumber-ext"
                         name="phoneNumber"
                         value={formData.phoneNumber}
                         onChange={handleInputChange}
-                        placeholder="Phone Number" 
+                        placeholder="Enter your phone number" 
                         required 
                         className={formErrors.phoneNumber ? "border-red-500" : ""}
                       />
@@ -381,45 +395,53 @@ const RegistrationForm = () => {
                       )}
                     </div>
                     <div className="md:col-span-2">
+                      <Label htmlFor="email-ext" className="text-sm md:text-base mb-1 block">Email ID</Label>
                       <Input 
+                        id="email-ext"
                         name="email"
                         value={formData.email}
                         onChange={handleInputChange}
-                        placeholder="Email ID" 
+                        placeholder="Enter your email address" 
                         required 
                         type="email" 
-                        className={`md:col-span-2 ${formErrors.email ? "border-red-500" : ""}`}
+                        className={formErrors.email ? "border-red-500" : ""}
                       />
                       {formErrors.email && (
                         <p className="text-red-500 text-xs mt-1">{formErrors.email}</p>
                       )}
                     </div>
                     <div className="md:col-span-2">
+                      <Label htmlFor="residentialAddress" className="text-sm md:text-base mb-1 block">Residential Address</Label>
                       <Input 
+                        id="residentialAddress"
                         name="residentialAddress"
                         value={formData.residentialAddress}
                         onChange={handleInputChange}
-                        placeholder="Residential Address" 
-                        className={`md:col-span-2 ${formErrors.residentialAddress ? "border-red-500" : ""}`}
+                        placeholder="Enter your residential address" 
+                        className={formErrors.residentialAddress ? "border-red-500" : ""}
                       />
                       {formErrors.residentialAddress && (
                         <p className="text-red-500 text-xs mt-1">{formErrors.residentialAddress}</p>
                       )}
                     </div>
                     <div>
+                      <Label htmlFor="residentialPincode" className="text-sm md:text-base mb-1 block">Residential Pincode</Label>
                       <Input 
+                        id="residentialPincode"
                         name="residentialPincode"
                         value={formData.residentialPincode}
                         onChange={handleInputChange}
-                        placeholder="Residential Pincode" 
+                        placeholder="Enter pincode" 
                       />
                     </div>
                     <div>
+                      <Label htmlFor="universityName" className="text-sm md:text-base mb-1 block">University Name</Label>
                       <Input 
+                        id="universityName"
                         name="universityName"
                         value={formData.universityName}
                         onChange={handleInputChange}
-                        placeholder="University Name"
+                        placeholder="Enter university name"
                         className={formErrors.universityName ? "border-red-500" : ""}
                       />
                       {formErrors.universityName && (
@@ -427,20 +449,24 @@ const RegistrationForm = () => {
                       )}
                     </div>
                     <div className="md:col-span-2">
+                      <Label htmlFor="universityAddress" className="text-sm md:text-base mb-1 block">University Address</Label>
                       <Input 
+                        id="universityAddress"
                         name="universityAddress"
                         value={formData.universityAddress}
                         onChange={handleInputChange}
-                        placeholder="University Address" 
+                        placeholder="Enter university address" 
                         className="md:col-span-2" 
                       />
                     </div>
                     <div>
+                      <Label htmlFor="universityPincode" className="text-sm md:text-base mb-1 block">University Pincode</Label>
                       <Input 
+                        id="universityPincode"
                         name="universityPincode"
                         value={formData.universityPincode}
                         onChange={handleInputChange}
-                        placeholder="University Pincode" 
+                        placeholder="Enter pincode" 
                       />
                     </div>
                     <div className="flex items-center space-x-2 md:col-span-2 mt-1">
@@ -461,10 +487,10 @@ const RegistrationForm = () => {
                   ) }
                 
                 <div className="flex justify-between mt-6 md:mt-8">
-                  <Button type="button" onClick={prevStep} variant="outline" className="text-sm md:text-base">
+                  <Button type="button" onClick={prevStep} variant="outline" className={backButtonStyle}>
                     Back
                   </Button>
-                  <Button type="button" onClick={nextStep} className="text-sm md:text-base">
+                  <Button type="button" onClick={nextStep} className={continueButtonStyle}>
                     Continue
                   </Button>
                 </div>
@@ -513,10 +539,10 @@ const RegistrationForm = () => {
                 </div>
                 
                 <div className="flex justify-between mt-6 md:mt-8">
-                  <Button type="button" onClick={prevStep} variant="outline" className="text-sm md:text-base">
+                  <Button type="button" onClick={prevStep} variant="outline" className={backButtonStyle}>
                     Back
                   </Button>
-                  <Button type="button" onClick={nextStep} className="text-sm md:text-base">
+                  <Button type="button" onClick={nextStep} className={continueButtonStyle}>
                     Continue
                   </Button>
                 </div>
@@ -551,10 +577,10 @@ const RegistrationForm = () => {
                 </div>
                 
                 <div className="flex justify-between mt-6 md:mt-8">
-                  <Button type="button" onClick={prevStep} variant="outline" className="text-sm md:text-base">
+                  <Button type="button" onClick={prevStep} variant="outline" className={backButtonStyle}>
                     Back
                   </Button>
-                  <Button type="button" onClick={nextStep} className="text-sm md:text-base">
+                  <Button type="button" onClick={nextStep} className={continueButtonStyle}>
                     Continue
                   </Button>
                 </div>
@@ -589,10 +615,10 @@ const RegistrationForm = () => {
                 </div>
                 
                 <div className="flex justify-between mt-6 md:mt-8">
-                  <Button type="button" onClick={prevStep} variant="outline" className="text-sm md:text-base">
+                  <Button type="button" onClick={prevStep} variant="outline" className={backButtonStyle}>
                     Back
                   </Button>
-                  <Button type="button" onClick={nextStep} className="text-sm md:text-base">
+                  <Button type="button" onClick={nextStep} className={continueButtonStyle}>
                     Continue
                   </Button>
                 </div>
@@ -629,10 +655,10 @@ const RegistrationForm = () => {
                 </div>
                 
                 <div className="flex justify-between mt-6 md:mt-8">
-                  <Button type="button" onClick={prevStep} variant="outline" className="text-sm md:text-base">
+                  <Button type="button" onClick={prevStep} variant="outline" className={backButtonStyle}>
                     Back
                   </Button>
-                  <Button type="button" onClick={nextStep} className="text-sm md:text-base">
+                  <Button type="button" onClick={nextStep} className={continueButtonStyle}>
                     Continue
                   </Button>
                 </div>
@@ -683,10 +709,10 @@ const RegistrationForm = () => {
                 </div>
                 
                 <div className="flex justify-between mt-6 md:mt-8">
-                  <Button type="button" onClick={prevStep} variant="outline" className="text-sm md:text-base">
+                  <Button type="button" onClick={prevStep} variant="outline" className={backButtonStyle}>
                     Back
                   </Button>
-                  <Button type="button" onClick={nextStep} className="text-sm md:text-base">
+                  <Button type="button" onClick={nextStep} className={continueButtonStyle}>
                     Continue
                   </Button>
                 </div>
