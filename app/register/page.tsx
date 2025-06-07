@@ -8,181 +8,84 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Select, SelectTrigger, SelectContent, SelectItem } from "@/components/ui/select";
-import { Switch } from "@/components/ui/switch";
 import { Card } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { motion, AnimatePresence } from "framer-motion";
 import { Loader2 } from "lucide-react";
-import { continueButtonStyle, backButtonStyle, submitButtonStyle } from "./ButtonStyles";
+import { continueButtonStyle, backButtonStyle } from "./ButtonStyles";
 
 const RegistrationForm = () => {
   const router = useRouter();
-  
   const [isLoading, setIsLoading] = useState(true);
   const [user, setUser] = useState<any>(null);
-  
-  // Section navigation state
   const [currentStep, setCurrentStep] = useState(1);
-  const [totalSteps, setTotalSteps] = useState(5);
-  const [progress, setProgress] = useState(20);
-  
-  //The participant type - pls set ths to true if the participant is internal, else false ( for backend logic - pls delete comment after use)
   const [isInternal, setIsInternal] = useState(false);
-  const [pref1, setPref1] = useState("delegate");
-  const [pref2, setPref2] = useState("delegate");
-  const [pref3, setPref3] = useState("delegate");
-  const [role1, setRole1] = useState("reporter");
-  const [role2, setRole2] = useState("reporter");
-  const [role3, setRole3] = useState("reporter");
   const [groupDelegation, setGroupDelegation] = useState(false);
   const [isHeadOfDelegation, setIsHeadOfDelegation] = useState(false);
-  
-  // Form validation state
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
+  
+  // Preferences state
+  const [prefs, setPrefs] = useState({
+    pref1: "delegate", pref2: "delegate", pref3: "delegate",
+    role1: "reporter", role2: "reporter", role3: "reporter"
+  });
+
   const [formData, setFormData] = useState({
-    // Personal details
-    fullName: "",
-    phoneNumber: "",
-    email: "",
-    rollNumber: "",
-    
-    // External participant fields
-    residentialAddress: "",
-    residentialPincode: "",
-    universityName: "",
-    universityAddress: "",
-    universityPincode: "",
-    accommodation: false,
-    
-    // Committee preferences
-    committee1: "",
-    country1: "",
-    country2: "",
-    country3: "",
-    
-    // Delegation details
-    delegationName: "",
-    
-    // Payment details
-    paymentId: "",
-    termsAccepted: false,
-    
-    // File fields
-    collegeIdFile: null as File | null,
-    delegateExperienceFile: null as File | null,
-    idProofFile: null as File | null,
-    delegationSheetFile: null as File | null,
-    paymentProofFile: null as File | null,  });
+    fullName: "", phoneNumber: "", email: "", rollNumber: "",
+    residentialAddress: "", residentialPincode: "", universityName: "",
+    universityAddress: "", universityPincode: "", accommodation: false,
+    committee1: "", country1: "", country2: "", country3: "",
+    delegationName: "", paymentId: "", termsAccepted: false,
+    collegeIdFile: null as File | null, delegateExperienceFile: null as File | null,
+    idProofFile: null as File | null, delegationSheetFile: null as File | null,
+    paymentProofFile: null as File | null
+  });
+
+  const totalSteps = isInternal ? 5 : 6;
+  const progress = Math.round((currentStep / totalSteps) * 100);
 
   useEffect(() => {
     const fetchUser = async () => {
-      try {
-        const { data: authUser, error: authError } = await supabase.auth.getUser();
-        
-        if (!authUser?.user) {
-          router.replace("/login");
-          return;
-        }
-
-        const { data: userData, error: userError } = await supabase
-          .from("users")
-          .select("*")
-          .eq("id", authUser.user.id)
-          .single();
-
-        if (userError || !userData) {
-          console.error("Error fetching user data:", userError);
-          router.replace("/login");
-          return;
-        }
-
-        setUser(userData);
-        setIsInternal(userData.is_internal);
-      } catch (error) {
-        console.error("Authentication error:", error);
-        router.replace("/login");
-      } finally {
         setIsLoading(false);
-      }
-    };    
-    
+    };
     fetchUser();
   }, [router]);
 
-  useEffect(() => {
-    if (user) {
-      setFormData(prevData => ({
-        ...prevData,
-        fullName: user.name || "",
-        email: user.email || "",
-        phoneNumber: user.phone_number || "",
-      }));
-    }
-  }, [user]);
-
-  useEffect(() => {
-    const steps = isInternal ? 5 : 6;
-    setTotalSteps(steps);
-
-    setProgress(Math.round((currentStep / steps) * 100));
-  }, [currentStep, isInternal]);
-
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value, type, checked } = e.target;
-    setFormData({
-      ...formData,
-      [name]: type === 'checkbox' ? checked : value,
-    });
-    
+    setFormData(prev => ({ ...prev, [name]: type === 'checkbox' ? checked : value }));
     if (formErrors[name]) {
-      setFormErrors({
-        ...formErrors,
-        [name]: '',
-      });
+      setFormErrors(prev => ({ ...prev, [name]: '' }));
     }
   };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>, fieldName: string) => {
-    if (e.target.files && e.target.files.length > 0) {
-      setFormData({
-        ...formData,
-        [fieldName]: e.target.files[0],
-      });
-
+    if (e.target.files?.[0]) {
+      setFormData(prev => ({ ...prev, [fieldName]: e.target.files![0] }));
       if (formErrors[fieldName]) {
-        setFormErrors({
-          ...formErrors,
-          [fieldName]: '',
-        });
+        setFormErrors(prev => ({ ...prev, [fieldName]: '' }));
       }
     }
   };
 
-  const nextStep = () => {
+  const validateStep = (step: number): Record<string, string> => {
     const errors: Record<string, string> = {};
-
-    if (currentStep === 2) { 
-      if (isInternal) {
-        if (!formData.fullName) errors.fullName = "Name is required";
-        if (!formData.phoneNumber) errors.phoneNumber = "Phone number is required";
-        if (!formData.email) errors.email = "Email is required";
-        if (!/^\S+@\S+\.\S+$/.test(formData.email)) errors.email = "Valid email is required";
-        if (!formData.rollNumber) errors.rollNumber = "Roll number is required";
-      } else {
-        if (!formData.fullName) errors.fullName = "Name is required";
-        if (!formData.phoneNumber) errors.phoneNumber = "Phone number is required";
-        if (!formData.email) errors.email = "Email is required";
-        if (!/^\S+@\S+\.\S+$/.test(formData.email)) errors.email = "Valid email is required";
-        if (!formData.residentialAddress) errors.residentialAddress = "Address is required";
-        if (!formData.universityName) errors.universityName = "University name is required";
+    
+    if (step === 2) {
+      const required = isInternal 
+        ? [['fullName', 'Name'], ['phoneNumber', 'Phone number'], ['email', 'Email'], ['rollNumber', 'Roll number']]
+        : [['fullName', 'Name'], ['phoneNumber', 'Phone number'], ['email', 'Email'], ['residentialAddress', 'Address'], ['universityName', 'University name']];
+      
+      required.forEach(([field, label]) => {
+        if (!formData[field as keyof typeof formData]) errors[field] = `${label} is required`;
+      });
+      
+      if (formData.email && !/^\S+@\S+\.\S+$/.test(formData.email)) {
+        errors.email = "Valid email is required";
       }
-    }
-
-    else if (currentStep === 3 && !isInternal && groupDelegation) {
+    } else if (step === 3 && !isInternal && groupDelegation) {
       if (!formData.delegationName) errors.delegationName = "Delegation name is required";
-    }
-
-    else if ((currentStep === 4 && isInternal) || (currentStep === 5 && !isInternal)) {
+    } else if ((step === 4 && isInternal) || (step === 5 && !isInternal)) {
       if (isInternal) {
         if (!formData.collegeIdFile) errors.collegeIdFile = "College ID is required";
         if (!formData.delegateExperienceFile) errors.delegateExperienceFile = "Delegate experience is required";
@@ -191,18 +94,21 @@ const RegistrationForm = () => {
         if (!formData.delegateExperienceFile) errors.delegateExperienceFile = "Delegate experience is required";
         if (isHeadOfDelegation && !formData.delegationSheetFile) errors.delegationSheetFile = "Delegation sheet is required";
       }
-    }
-    else if ((currentStep === 5 && isInternal) || (currentStep === 6 && !isInternal)) {
+    } else if ((step === 5 && isInternal) || (step === 6 && !isInternal)) {
       if (!formData.paymentId) errors.paymentId = "Payment ID is required";
       if (!formData.paymentProofFile) errors.paymentProofFile = "Payment proof is required";
       if (!formData.termsAccepted) errors.termsAccepted = "Please accept the terms";
     }
     
+    return errors;
+  };
+
+  const nextStep = () => {
+    const errors = validateStep(currentStep);
     if (Object.keys(errors).length > 0) {
       setFormErrors(errors);
       return;
     }
-    
     if (currentStep < totalSteps) {
       setCurrentStep(currentStep + 1);
       window.scrollTo(0, 0);
@@ -223,18 +129,36 @@ const RegistrationForm = () => {
     }
   };
 
-  const PreferenceSection = ({ 
-    num, 
-    pref, 
-    setPref, 
-    role, 
-    setRole 
-  }: { 
-    num: number; 
-    pref: string; 
-    setPref: (value: string) => void; 
-    role: string; 
-    setRole: (value: string) => void; 
+  // Render form field helper
+  const renderField = (name: string, label: string, props: any = {}) => (
+    <div className={props.className || ""}>
+      <Label htmlFor={name} className="text-sm md:text-base mb-1 block">{label}</Label>
+      <Input
+        id={name}
+        name={name}
+        value={formData[name as keyof typeof formData] as string}
+        onChange={handleInputChange}
+        className={formErrors[name] ? "border-red-500" : ""}
+        {...props}
+      />
+      {formErrors[name] && <p className="text-red-500 text-xs mt-1">{formErrors[name]}</p>}
+    </div>
+  );
+
+  const renderFileField = (name: string, label: string) => (
+    <div className="space-y-2">
+      <Label className="text-sm md:text-base">{label}</Label>
+      <Input
+        type="file"
+        onChange={(e) => handleFileChange(e, name)}
+        className={`file:mr-4 file:py-1.5 file:px-4 file:rounded-md file:border-0 file:bg-blue-50 file:text-[#00B7FF] hover:file:bg-blue-100 ${formErrors[name] ? "border-red-500" : ""}`}
+      />
+      {formErrors[name] && <p className="text-red-500 text-xs mt-1">{formErrors[name]}</p>}
+    </div>
+  );
+
+  const PreferenceSection = ({ num, pref, setPref, role, setRole }: {
+    num: number; pref: string; setPref: (value: string) => void; role: string; setRole: (value: string) => void;
   }) => (
     <div className="space-y-3 md:space-y-4 border border-gray-100 p-3 md:p-4 rounded-lg">
       <Label className="text-sm md:text-base font-medium">Preference {num}</Label>
@@ -259,9 +183,7 @@ const RegistrationForm = () => {
           {role === "reporter" && (
             <div className="grid grid-cols-1 gap-2 mt-3">
               <Label className="text-sm md:text-base">Committee Preferences</Label>
-              <Input placeholder="Committee 1" className="mt-1" />
-              <Input placeholder="Committee 2" />
-              <Input placeholder="Committee 3" />
+              {[1, 2, 3].map(i => <Input key={i} placeholder={`Committee ${i}`} className={i === 1 ? "mt-1" : ""} />)}
             </div>
           )}
         </div>
@@ -272,13 +194,201 @@ const RegistrationForm = () => {
           <Label className="text-sm md:text-base">Committee Preference</Label>
           <Input placeholder="Committee" className="mt-1" />
           <Label className="text-sm md:text-base mt-1">Country Preferences</Label>
-          <Input placeholder="Country 1" className="mt-1" />
-          <Input placeholder="Country 2" />
-          <Input placeholder="Country 3" />
+          {["Country 1", "Country 2", "Country 3"].map((placeholder, i) => (
+            <Input key={i} placeholder={placeholder} className={i === 0 ? "mt-1" : ""} />
+          ))}
         </div>
       )}
     </div>
   );
+
+  const renderStepContent = () => {
+    const stepConfigs = [
+      {
+        step: 1,
+        title: "Welcome to Amrita MUN'25",
+        content: (
+          <div className="flex-grow flex flex-col justify-center items-center">
+            <div className="text-center mb-5 md:mb-8">
+              <p className="text-base md:text-lg text-gray-700 mb-4">
+                Thank you for your interest in joining Amrita MUN'25. We're excited to have you participate!
+              </p>
+            </div>
+          </div>
+        ),
+        buttonText: "Begin Registration"
+      },
+      {
+        step: 2,
+        title: "Personal Details",
+        content: isInternal ? (
+          <div className="flex-grow grid grid-cols-1 gap-3 py-2">
+            {renderField("fullName", "Full Name", { placeholder: "Enter your full name", required: true })}
+            {renderField("phoneNumber", "Phone Number", { placeholder: "Enter your phone number", required: true })}
+            {renderField("email", "Email ID", { placeholder: "Enter your email address", required: true, type: "email" })}
+            {renderField("rollNumber", "Roll Number", { placeholder: "Enter your roll number", required: true })}
+          </div>
+        ) : (
+          <div className="flex-grow grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4 py-2">
+            {renderField("fullName", "Full Name", { placeholder: "Enter your full name", required: true, className: "md:col-span-1" })}
+            {renderField("phoneNumber", "Phone Number", { placeholder: "Enter your phone number", required: true, className: "md:col-span-1" })}
+            {renderField("email", "Email ID", { placeholder: "Enter your email address", required: true, type: "email", className: "md:col-span-2" })}
+            {renderField("residentialAddress", "Residential Address", { placeholder: "Enter your residential address", className: "md:col-span-2" })}
+            {renderField("residentialPincode", "Residential Pincode", { placeholder: "Enter pincode" })}
+            {renderField("universityName", "University Name", { placeholder: "Enter university name" })}
+            {renderField("universityAddress", "University Address", { placeholder: "Enter university address", className: "md:col-span-2" })}
+            {renderField("universityPincode", "University Pincode", { placeholder: "Enter pincode" })}
+            <div className="flex items-center space-x-2 md:col-span-2 mt-1">
+              <Checkbox
+                id="accommodation"
+                name="accommodation"
+                checked={formData.accommodation}
+                onCheckedChange={(checked) => setFormData(prev => ({ ...prev, accommodation: !!checked }))}
+              />
+              <Label htmlFor="accommodation">Accommodation needed?</Label>
+            </div>
+          </div>
+        )
+      }
+    ];
+
+    // Delegation Details Step (only for external)
+    if (!isInternal && currentStep === 3) {
+      return (
+        <>
+          <h2 className="text-xl md:text-2xl font-bold mb-4 md:mb-6 text-[#00B7FF]">Delegation Details</h2>
+          <div className="flex-grow space-y-4 md:space-y-6 py-2">
+            <div>
+              <Label className="mb-2 block text-sm md:text-base">Are you participating as an individual or part of a group?</Label>
+              <Select onValueChange={(val) => setGroupDelegation(val === "group")}>
+                <SelectTrigger>{groupDelegation ? "Group Delegation" : "Individual Delegate"}</SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="individual">Individual Delegate</SelectItem>
+                  <SelectItem value="group">Group Delegation</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            {groupDelegation && (
+              <div className="space-y-4 mt-3">
+                <div>
+                  <Input
+                    name="delegationName"
+                    value={formData.delegationName}
+                    onChange={handleInputChange}
+                    placeholder="Delegation Name"
+                    className={formErrors.delegationName ? "border-red-500" : ""}
+                  />
+                  {formErrors.delegationName && <p className="text-red-500 text-xs mt-1">{formErrors.delegationName}</p>}
+                </div>
+                <div className="flex items-center space-x-2">
+                  <Checkbox
+                    id="headOfDelegation"
+                    checked={isHeadOfDelegation}
+                    onCheckedChange={(checked) => setIsHeadOfDelegation(!!checked)}
+                  />
+                  <Label htmlFor="headOfDelegation" className="text-sm md:text-base">Are you Head of Delegation?</Label>
+                </div>
+              </div>
+            )}
+          </div>
+        </>
+      );
+    }
+
+    // Committee Preferences Step
+    const isCommitteeStep = (currentStep === 3 && isInternal) || (currentStep === 4 && !isInternal);
+    if (isCommitteeStep) {
+      return (
+        <>
+          <h2 className="text-xl md:text-2xl font-bold mb-4 md:mb-6 text-[#00B7FF]">Committee Preferences</h2>
+          <div className="flex-grow space-y-4 md:space-y-6 py-2">
+            <PreferenceSection num={1} pref={prefs.pref1} setPref={(val) => setPrefs(prev => ({...prev, pref1: val}))} role={prefs.role1} setRole={(val) => setPrefs(prev => ({...prev, role1: val}))} />
+            <PreferenceSection num={2} pref={prefs.pref2} setPref={(val) => setPrefs(prev => ({...prev, pref2: val}))} role={prefs.role2} setRole={(val) => setPrefs(prev => ({...prev, role2: val}))} />
+            <PreferenceSection num={3} pref={prefs.pref3} setPref={(val) => setPrefs(prev => ({...prev, pref3: val}))} role={prefs.role3} setRole={(val) => setPrefs(prev => ({...prev, role3: val}))} />
+          </div>
+        </>
+      );
+    }
+
+    // Documents Step
+    const isDocumentsStep = (currentStep === 4 && isInternal) || (currentStep === 5 && !isInternal);
+    if (isDocumentsStep) {
+      return (
+        <>
+          <h2 className="text-xl md:text-2xl font-bold mb-4 md:mb-6 text-[#00B7FF]">Required Documents</h2>
+          <div className="flex-grow space-y-4 md:space-y-6 py-2">
+            {isInternal ? (
+              <>
+                {renderFileField("collegeIdFile", "College ID")}
+                {renderFileField("delegateExperienceFile", "Delegate Experience (PDF)")}
+              </>
+            ) : (
+              <>
+                {renderFileField("idProofFile", "ID Proof (Aadhar/Passport)")}
+                {renderFileField("delegateExperienceFile", "Delegate Experience (PDF)")}
+                {isHeadOfDelegation && renderFileField("delegationSheetFile", "Delegation Sheet")}
+              </>
+            )}
+          </div>
+        </>
+      );
+    }
+
+    // Payment Step
+    const isPaymentStep = (currentStep === 5 && isInternal) || (currentStep === 6 && !isInternal);
+    if (isPaymentStep) {
+      const termsId = `terms-${isInternal ? 'internal' : 'external'}`;
+      return (
+        <>
+          <h2 className="text-xl md:text-2xl font-bold mb-4 md:mb-6 text-[#00B7FF]">Payment</h2>
+          <div className="flex-grow space-y-4 md:space-y-6 py-2">
+            <div className="space-y-2">
+              <Label className="text-sm md:text-base">Payment ID</Label>
+              <Input
+                name="paymentId"
+                value={formData.paymentId}
+                onChange={handleInputChange}
+                placeholder="Enter payment reference ID"
+                className={formErrors.paymentId ? "border-red-500" : ""}
+              />
+              {formErrors.paymentId && <p className="text-red-500 text-xs mt-1">{formErrors.paymentId}</p>}
+            </div>
+            {renderFileField("paymentProofFile", "Payment Proof")}
+            <div className="flex items-center space-x-2 mt-4">
+              <Checkbox
+                id={termsId}
+                name="termsAccepted"
+                checked={formData.termsAccepted}
+                onCheckedChange={(checked) => {
+                  setFormData(prev => ({ ...prev, termsAccepted: !!checked }));
+                  if (formErrors.termsAccepted) {
+                    setFormErrors(prev => ({ ...prev, termsAccepted: '' }));
+                  }
+                }}
+              />
+              <Label htmlFor={termsId} className={`text-xs md:text-sm ${formErrors.termsAccepted ? "text-red-500" : "text-gray-600"}`}>
+                I agree to receive emails and opportunities from Amrita MUN'25 and its official partners
+              </Label>
+            </div>
+            {formErrors.termsAccepted && <p className="text-red-500 text-xs mt-1">{formErrors.termsAccepted}</p>}
+          </div>
+        </>
+      );
+    }
+
+    // Default steps (1 and 2)
+    const config = stepConfigs.find(s => s.step === currentStep);
+    if (config) {
+      return (
+        <>
+          <h2 className="text-xl md:text-3xl font-bold mt-4 md:mt-6 text-center text-[#00B7FF]">{config.title}</h2>
+          {config.content}
+        </>
+      );
+    }
+
+    return null;
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -296,17 +406,18 @@ const RegistrationForm = () => {
     );
   }
 
+  const isLastStep = (currentStep === 5 && isInternal) || (currentStep === 6 && !isInternal);
+
   return (
     <div className="min-h-screen flex flex-col px-2 md:px-4 pt-20 md:pt-24 pb-6 max-w-4xl mx-auto">
-      
       {/* Progress bar and step indicators */}
       <div className="fixed top-0 left-0 right-0 bg-white z-50 p-3 md:p-4 shadow">
         <div className="max-w-4xl mx-auto">
           <Progress value={progress} className="mb-1 md:mb-2" />
           <div className="flex justify-between text-sm text-gray-500 px-1 md:px-0">
             {[...Array(totalSteps)].map((_, i) => (
-              <button 
-                key={i} 
+              <button
+                key={i}
                 className={`w-6 h-6 md:w-8 md:h-8 rounded-full flex items-center justify-center text-xs md:text-sm 
                   ${currentStep > i+1 ? "bg-[#00B7FF] text-white" : 
                     currentStep === i+1 ? "bg-blue-50 text-[#00B7FF] border-2 border-[#00B7FF]" : 
@@ -319,7 +430,7 @@ const RegistrationForm = () => {
           </div>
         </div>
       </div>
-      
+
       <form onSubmit={handleSubmit} className="flex-grow flex flex-col justify-center mt-16">
         <AnimatePresence mode="wait">
           <motion.div
@@ -330,600 +441,25 @@ const RegistrationForm = () => {
             transition={{ duration: 0.3 }}
             className="min-h-[65vh] md:min-h-[75vh] flex flex-col"
           >
-            {currentStep === 1 && (
-              <Card className="p-3 md:p-6 flex-grow flex flex-col">
-
-                <h2 className="text-xl md:text-3xl font-bold mt-4 md:mt-6 text-center text-[#00B7FF]">
-                  Welcome to Amrita MUN'25
-                </h2>
-                
-                <div className="flex-grow flex flex-col justify-center items-center">
-                  <div className="text-center mb-5 md:mb-8">
-                    <p className="text-base md:text-lg text-gray-700 mb-4">
-                      Thank you for your interest in joining Amrita MUN'25. We're excited to have you participate!
-                    </p>
-                    
-                  </div>
-                  
-                  
-                </div>
-                
-                <div className="flex justify-end mt-6 md:mt-8">
-                  <Button 
-                    type="button" 
-                    onClick={nextStep} 
-                    className={continueButtonStyle}
-                  >
-                    Begin Registration
-                  </Button>
-                </div>
-              </Card>
-            )}
-
-            {currentStep === 2 && (
-              <Card className="p-3 md:p-6 flex-grow flex flex-col">
-                <h2 className="text-xl md:text-2xl font-bold mb-4 md:mb-6 text-[#00B7FF]">Personal Details</h2>
-                {isInternal ? (
-                  <div className="flex-grow grid grid-cols-1 gap-3 py-2">
-                    <div>
-                      <Label htmlFor="fullName" className="text-sm md:text-base mb-1 block">Full Name</Label>
-                      <Input 
-                        id="fullName"
-                        name="fullName"
-                        value={formData.fullName}
-                        onChange={handleInputChange}
-                        placeholder="Enter your full name" 
-                        required 
-                        className={formErrors.fullName ? "border-red-500" : ""}
-                      />
-                      {formErrors.fullName && (
-                        <p className="text-red-500 text-xs mt-1">{formErrors.fullName}</p>
-                      )}
-                    </div>
-                    <div>
-                      <Label htmlFor="phoneNumber" className="text-sm md:text-base mb-1 block">Phone Number</Label>
-                      <Input 
-                        id="phoneNumber"
-                        name="phoneNumber"
-                        value={formData.phoneNumber}
-                        onChange={handleInputChange}
-                        placeholder="Enter your phone number" 
-                        required 
-                        className={formErrors.phoneNumber ? "border-red-500" : ""}
-                      />
-                      {formErrors.phoneNumber && (
-                        <p className="text-red-500 text-xs mt-1">{formErrors.phoneNumber}</p>
-                      )}
-                    </div>
-                    <div>
-                      <Label htmlFor="email" className="text-sm md:text-base mb-1 block">Email ID</Label>
-                      <Input 
-                        id="email"
-                        name="email"
-                        value={formData.email}
-                        onChange={handleInputChange}
-                        placeholder="Enter your email address" 
-                        required 
-                        type="email"
-                        className={formErrors.email ? "border-red-500" : ""} 
-                      />
-                      {formErrors.email && (
-                        <p className="text-red-500 text-xs mt-1">{formErrors.email}</p>
-                      )}
-                    </div>
-                    <div>
-                      <Label htmlFor="rollNumber" className="text-sm md:text-base mb-1 block">Roll Number</Label>
-                      <Input 
-                        id="rollNumber"
-                        name="rollNumber"
-                        value={formData.rollNumber}
-                        onChange={handleInputChange}
-                        placeholder="Enter your roll number" 
-                        required 
-                        className={formErrors.rollNumber ? "border-red-500" : ""}
-                      />
-                      {formErrors.rollNumber && (
-                        <p className="text-red-500 text-xs mt-1">{formErrors.rollNumber}</p>
-                      )}
-                    </div>
-                  </div>) : (
-                  <div className="flex-grow grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4 py-2">
-                    <div className="md:col-span-1">
-                      <Label htmlFor="fullName-ext" className="text-sm md:text-base mb-1 block">Full Name</Label>
-                      <Input 
-                        id="fullName-ext"
-                        name="fullName"
-                        value={formData.fullName}
-                        onChange={handleInputChange}
-                        placeholder="Enter your full name" 
-                        required 
-                        className={formErrors.fullName ? "border-red-500" : ""}
-                      />
-                      {formErrors.fullName && (
-                        <p className="text-red-500 text-xs mt-1">{formErrors.fullName}</p>
-                      )}
-                    </div>
-                    <div className="md:col-span-1">
-                      <Label htmlFor="phoneNumber-ext" className="text-sm md:text-base mb-1 block">Phone Number</Label>
-                      <Input 
-                        id="phoneNumber-ext"
-                        name="phoneNumber"
-                        value={formData.phoneNumber}
-                        onChange={handleInputChange}
-                        placeholder="Enter your phone number" 
-                        required 
-                        className={formErrors.phoneNumber ? "border-red-500" : ""}
-                      />
-                      {formErrors.phoneNumber && (
-                        <p className="text-red-500 text-xs mt-1">{formErrors.phoneNumber}</p>
-                      )}
-                    </div>
-                    <div className="md:col-span-2">
-                      <Label htmlFor="email-ext" className="text-sm md:text-base mb-1 block">Email ID</Label>
-                      <Input 
-                        id="email-ext"
-                        name="email"
-                        value={formData.email}
-                        onChange={handleInputChange}
-                        placeholder="Enter your email address" 
-                        required 
-                        type="email" 
-                        className={formErrors.email ? "border-red-500" : ""}
-                      />
-                      {formErrors.email && (
-                        <p className="text-red-500 text-xs mt-1">{formErrors.email}</p>
-                      )}
-                    </div>
-                    <div className="md:col-span-2">
-                      <Label htmlFor="residentialAddress" className="text-sm md:text-base mb-1 block">Residential Address</Label>
-                      <Input 
-                        id="residentialAddress"
-                        name="residentialAddress"
-                        value={formData.residentialAddress}
-                        onChange={handleInputChange}
-                        placeholder="Enter your residential address" 
-                        className={formErrors.residentialAddress ? "border-red-500" : ""}
-                      />
-                      {formErrors.residentialAddress && (
-                        <p className="text-red-500 text-xs mt-1">{formErrors.residentialAddress}</p>
-                      )}
-                    </div>
-                    <div>
-                      <Label htmlFor="residentialPincode" className="text-sm md:text-base mb-1 block">Residential Pincode</Label>
-                      <Input 
-                        id="residentialPincode"
-                        name="residentialPincode"
-                        value={formData.residentialPincode}
-                        onChange={handleInputChange}
-                        placeholder="Enter pincode" 
-                      />
-                    </div>
-                    <div>
-                      <Label htmlFor="universityName" className="text-sm md:text-base mb-1 block">University Name</Label>
-                      <Input 
-                        id="universityName"
-                        name="universityName"
-                        value={formData.universityName}
-                        onChange={handleInputChange}
-                        placeholder="Enter university name"
-                        className={formErrors.universityName ? "border-red-500" : ""}
-                      />
-                      {formErrors.universityName && (
-                        <p className="text-red-500 text-xs mt-1">{formErrors.universityName}</p>
-                      )}
-                    </div>
-                    <div className="md:col-span-2">
-                      <Label htmlFor="universityAddress" className="text-sm md:text-base mb-1 block">University Address</Label>
-                      <Input 
-                        id="universityAddress"
-                        name="universityAddress"
-                        value={formData.universityAddress}
-                        onChange={handleInputChange}
-                        placeholder="Enter university address" 
-                        className="md:col-span-2" 
-                      />
-                    </div>
-                    <div>
-                      <Label htmlFor="universityPincode" className="text-sm md:text-base mb-1 block">University Pincode</Label>
-                      <Input 
-                        id="universityPincode"
-                        name="universityPincode"
-                        value={formData.universityPincode}
-                        onChange={handleInputChange}
-                        placeholder="Enter pincode" 
-                      />
-                    </div>
-                    <div className="flex items-center space-x-2 md:col-span-2 mt-1">
-                      <Checkbox 
-                        id="accommodation" 
-                        name="accommodation"
-                        checked={formData.accommodation}
-                        onCheckedChange={(checked) => {
-                          setFormData({
-                            ...formData,
-                            accommodation: !!checked
-                          });
-                        }}
-                      />
-                      <Label htmlFor="accommodation">Accommodation needed?</Label>
-                    </div>
-                  </div>
-                  ) }
-                
-                <div className="flex justify-between mt-6 md:mt-8">
-                  <Button type="button" onClick={prevStep} variant="outline" className={backButtonStyle}>
+            <Card className="p-3 md:p-6 flex-grow flex flex-col">
+              {renderStepContent()}
+              
+              <div className="flex justify-between mt-6 md:mt-8">
+                {currentStep > 1 && (
+                  <Button type="button" onClick={prevStep} variant="outline" className={currentStep === 1 ? "" : backButtonStyle}>
                     Back
                   </Button>
-                  <Button type="button" onClick={nextStep} className={continueButtonStyle}>
-                    Continue
-                  </Button>
-                </div>
-              </Card>
-            )}
-
-            {currentStep === 3 && !isInternal && (
-              <Card className="p-3 md:p-6 flex-grow flex flex-col">
-                <h2 className="text-xl md:text-2xl font-bold mb-4 md:mb-6 text-[#00B7FF]">Delegation Details</h2>
-                <div className="flex-grow space-y-4 md:space-y-6 py-2">
-                  <div>
-                    <Label className="mb-2 block text-sm md:text-base">Are you participating as an individual or part of a group?</Label>
-                    <Select onValueChange={(val) => setGroupDelegation(val === "group")}>
-                      <SelectTrigger>{groupDelegation ? "Group Delegation" : "Individual Delegate"}</SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="individual">Individual Delegate</SelectItem>
-                        <SelectItem value="group">Group Delegation</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  
-                  {groupDelegation && (
-                    <div className="space-y-4 mt-3">
-                      <div>
-                        <Input 
-                          name="delegationName"
-                          value={formData.delegationName}
-                          onChange={handleInputChange}
-                          placeholder="Delegation Name" 
-                          className={formErrors.delegationName ? "border-red-500" : ""}
-                        />
-                        {formErrors.delegationName && (
-                          <p className="text-red-500 text-xs mt-1">{formErrors.delegationName}</p>
-                        )}
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        <Checkbox 
-                          id="headOfDelegation" 
-                          checked={isHeadOfDelegation}
-                          onCheckedChange={(checked) => setIsHeadOfDelegation(!!checked)} 
-                        />
-                        <Label htmlFor="headOfDelegation" className="text-sm md:text-base">Are you Head of Delegation?</Label>
-                      </div>
-                    </div>
-                  )}
-                </div>
-                
-                <div className="flex justify-between mt-6 md:mt-8">
-                  <Button type="button" onClick={prevStep} variant="outline" className={backButtonStyle}>
-                    Back
-                  </Button>
-                  <Button type="button" onClick={nextStep} className={continueButtonStyle}>
-                    Continue
-                  </Button>
-                </div>
-              </Card>
-            )}
-
-            {currentStep === 3 && isInternal && (
-              <Card className="p-3 md:p-6 flex-grow flex flex-col">
-                <h2 className="text-xl md:text-2xl font-bold mb-4 md:mb-6 text-[#00B7FF]">Committee Preferences</h2>
-                <div className="flex-grow space-y-4 md:space-y-6 py-2">
-                  <PreferenceSection
-                    num={1}
-                    pref={pref1}
-                    setPref={setPref1}
-                    role={role1}
-                    setRole={setRole1}
-                  />
-                  <PreferenceSection
-                    num={2}
-                    pref={pref2}
-                    setPref={setPref2}
-                    role={role2}
-                    setRole={setRole2}
-                  />
-                  <PreferenceSection
-                    num={3}
-                    pref={pref3}
-                    setPref={setPref3}
-                    role={role3}
-                    setRole={setRole3}
-                  />
-                </div>
-                
-                <div className="flex justify-between mt-6 md:mt-8">
-                  <Button type="button" onClick={prevStep} variant="outline" className={backButtonStyle}>
-                    Back
-                  </Button>
-                  <Button type="button" onClick={nextStep} className={continueButtonStyle}>
-                    Continue
-                  </Button>
-                </div>
-              </Card>
-            )}
-
-            {currentStep === 4 && !isInternal && (
-              <Card className="p-3 md:p-6 flex-grow flex flex-col">
-                <h2 className="text-xl md:text-2xl font-bold mb-4 md:mb-6 text-[#00B7FF]">Committee Preferences</h2>
-                <div className="flex-grow space-y-4 md:space-y-6 py-2">
-                  <PreferenceSection
-                    num={1}
-                    pref={pref1}
-                    setPref={setPref1}
-                    role={role1}
-                    setRole={setRole1}
-                  />
-                  <PreferenceSection
-                    num={2}
-                    pref={pref2}
-                    setPref={setPref2}
-                    role={role2}
-                    setRole={setRole2}
-                  />
-                  <PreferenceSection
-                    num={3}
-                    pref={pref3}
-                    setPref={setPref3}
-                    role={role3}
-                    setRole={setRole3}
-                  />
-                </div>
-                
-                <div className="flex justify-between mt-6 md:mt-8">
-                  <Button type="button" onClick={prevStep} variant="outline" className={backButtonStyle}>
-                    Back
-                  </Button>
-                  <Button type="button" onClick={nextStep} className={continueButtonStyle}>
-                    Continue
-                  </Button>
-                </div>
-              </Card>
-            )}
-
-            {currentStep === 4 && isInternal && (
-              <Card className="p-3 md:p-6 flex-grow flex flex-col">
-                <h2 className="text-xl md:text-2xl font-bold mb-4 md:mb-6 text-[#00B7FF]">Required Documents</h2>
-                <div className="flex-grow space-y-4 md:space-y-6 py-2">
-                  <div className="space-y-2">
-                    <Label className="text-sm md:text-base">College ID</Label>
-                    <Input 
-                      type="file"
-                      onChange={(e) => handleFileChange(e, "collegeIdFile")}
-                      className={`file:mr-4 file:py-1.5 file:px-4 file:rounded-md file:border-0 file:bg-blue-50 file:text-[#00B7FF] hover:file:bg-blue-100 ${formErrors.collegeIdFile ? "border-red-500" : ""}`} 
-                    />
-                    {formErrors.collegeIdFile && (
-                      <p className="text-red-500 text-xs mt-1">{formErrors.collegeIdFile}</p>
-                    )}
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <Label className="text-sm md:text-base">Delegate Experience (PDF)</Label>
-                    <Input 
-                      type="file"
-                      onChange={(e) => handleFileChange(e, "delegateExperienceFile")}
-                      className={`file:mr-4 file:py-1.5 file:px-4 file:rounded-md file:border-0 file:bg-blue-50 file:text-[#00B7FF] hover:file:bg-blue-100 ${formErrors.delegateExperienceFile ? "border-red-500" : ""}`} 
-                    />
-                    {formErrors.delegateExperienceFile && (
-                      <p className="text-red-500 text-xs mt-1">{formErrors.delegateExperienceFile}</p>
-                    )}
-                  </div>
-                </div>
-                
-                <div className="flex justify-between mt-6 md:mt-8">
-                  <Button type="button" onClick={prevStep} variant="outline" className={backButtonStyle}>
-                    Back
-                  </Button>
-                  <Button type="button" onClick={nextStep} className={continueButtonStyle}>
-                    Continue
-                  </Button>
-                </div>
-              </Card>
-            )}
-
-            {currentStep === 5 && !isInternal && (
-              <Card className="p-3 md:p-6 flex-grow flex flex-col">
-                <h2 className="text-xl md:text-2xl font-bold mb-4 md:mb-6 text-[#00B7FF]">Required Documents</h2>
-                <div className="flex-grow space-y-4 md:space-y-6 py-2">
-                  <div className="space-y-2">
-                    <Label className="text-sm md:text-base">ID Proof (Aadhar/Passport)</Label>
-                    <Input 
-                      type="file"
-                      onChange={(e) => handleFileChange(e, "idProofFile")}
-                      className={`file:mr-4 file:py-1.5 file:px-4 file:rounded-md file:border-0 file:bg-blue-50 file:text-[#00B7FF] hover:file:bg-blue-100 ${formErrors.idProofFile ? "border-red-500" : ""}`} 
-                    />
-                    {formErrors.idProofFile && (
-                      <p className="text-red-500 text-xs mt-1">{formErrors.idProofFile}</p>
-                    )}
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <Label className="text-sm md:text-base">Delegate Experience (PDF)</Label>
-                    <Input 
-                      type="file"
-                      onChange={(e) => handleFileChange(e, "delegateExperienceFile")}
-                      className={`file:mr-4 file:py-1.5 file:px-4 file:rounded-md file:border-0 file:bg-blue-50 file:text-[#00B7FF] hover:file:bg-blue-100 ${formErrors.delegateExperienceFile ? "border-red-500" : ""}`} 
-                    />
-                    {formErrors.delegateExperienceFile && (
-                      <p className="text-red-500 text-xs mt-1">{formErrors.delegateExperienceFile}</p>
-                    )}
-                  </div>
-                  
-                  {isHeadOfDelegation && (
-                    <div className="space-y-2">
-                      <Label className="text-sm md:text-base">Delegation Sheet</Label>
-                      <Input 
-                        type="file"
-                        onChange={(e) => handleFileChange(e, "delegationSheetFile")}
-                        className={`file:mr-4 file:py-1.5 file:px-4 file:rounded-md file:border-0 file:bg-blue-50 file:text-[#00B7FF] hover:file:bg-blue-100 ${formErrors.delegationSheetFile ? "border-red-500" : ""}`} 
-                      />
-                      {formErrors.delegationSheetFile && (
-                        <p className="text-red-500 text-xs mt-1">{formErrors.delegationSheetFile}</p>
-                      )}
-                    </div>
-                  )}
-                </div>
-                
-                <div className="flex justify-between mt-6 md:mt-8">
-                  <Button type="button" onClick={prevStep} variant="outline" className={backButtonStyle}>
-                    Back
-                  </Button>
-                  <Button type="button" onClick={nextStep} className={continueButtonStyle}>
-                    Continue
-                  </Button>
-                </div>
-              </Card>
-            )}
-
-            {currentStep === 5 && isInternal && (
-              <Card className="p-3 md:p-6 flex-grow flex flex-col">
-                <h2 className="text-xl md:text-2xl font-bold mb-4 md:mb-6 text-[#00B7FF]">Payment</h2>
-                <div className="flex-grow space-y-4 md:space-y-6 py-2">
-                  <div className="space-y-2">
-                    <Label className="text-sm md:text-base">Payment ID</Label>
-                    <Input 
-                      name="paymentId"
-                      value={formData.paymentId}
-                      onChange={handleInputChange}
-                      placeholder="Enter payment reference ID" 
-                      className={formErrors.paymentId ? "border-red-500" : ""}
-                    />
-                    {formErrors.paymentId && (
-                      <p className="text-red-500 text-xs mt-1">{formErrors.paymentId}</p>
-                    )}
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <Label className="text-sm md:text-base">Payment Proof</Label>
-                    <Input 
-                      type="file"
-                      onChange={(e) => handleFileChange(e, "paymentProofFile")}
-                      className={`file:mr-4 file:py-1.5 file:px-4 file:rounded-md file:border-0 file:bg-blue-50 file:text-[#00B7FF] hover:file:bg-blue-100 ${formErrors.paymentProofFile ? "border-red-500" : ""}`} 
-                    />
-                    {formErrors.paymentProofFile && (
-                      <p className="text-red-500 text-xs mt-1">{formErrors.paymentProofFile}</p>
-                    )}
-                  </div>
-                  
-                  <div className="flex items-center space-x-2 mt-4">
-                    <Checkbox 
-                      id="terms-internal" 
-                      name="termsAccepted"
-                      checked={formData.termsAccepted}
-                      onCheckedChange={(checked) => {
-                        setFormData({
-                          ...formData,
-                          termsAccepted: !!checked
-                        });
-                        if (formErrors.termsAccepted) {
-                          setFormErrors({
-                            ...formErrors,
-                            termsAccepted: ''
-                          });
-                        }
-                      }}
-                    />
-                    <Label 
-                      htmlFor="terms-internal" 
-                      className={`text-xs md:text-sm ${formErrors.termsAccepted ? "text-red-500" : "text-gray-600"}`}
-                    >
-                      I agree to receive emails and opportunities from Amrita MUN'25 and its official partners
-                    </Label>
-                  </div>
-                  {formErrors.termsAccepted && (
-                    <p className="text-red-500 text-xs mt-1">{formErrors.termsAccepted}</p>
-                  )}
-                </div>
-                
-                <div className="flex justify-between mt-6 md:mt-8">
-                  <Button type="button" onClick={prevStep} variant="outline" className="text-sm md:text-base">
-                    Back
-                  </Button>
-                  <Button type="submit" className="bg-green-600 hover:bg-green-700 text-sm md:text-base">
-                    Submit Application
-                  </Button>
-                </div>
-              </Card>
-            )}
-            
-            {currentStep === 6 && !isInternal && (
-              <Card className="p-3 md:p-6 flex-grow flex flex-col">
-                <h2 className="text-xl md:text-2xl font-bold mb-4 md:mb-6 text-[#00B7FF]">Payment</h2>
-                <div className="flex-grow space-y-4 md:space-y-6 py-2">
-                  <div className="space-y-2">
-                    <Label className="text-sm md:text-base">Payment ID</Label>
-                    <Input 
-                      name="paymentId"
-                      value={formData.paymentId}
-                      onChange={handleInputChange}
-                      placeholder="Enter payment reference ID"
-                      className={formErrors.paymentId ? "border-red-500" : ""}
-                    />
-                    {formErrors.paymentId && (
-                      <p className="text-red-500 text-xs mt-1">{formErrors.paymentId}</p>
-                    )}
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <Label className="text-sm md:text-base">Payment Proof</Label>
-                    <Input 
-                      type="file"
-                      onChange={(e) => handleFileChange(e, "paymentProofFile")}
-                      className={`file:mr-4 file:py-1.5 file:px-4 file:rounded-md file:border-0 file:bg-blue-50 file:text-[#00B7FF] hover:file:bg-blue-100 ${formErrors.paymentProofFile ? "border-red-500" : ""}`}
-                    />
-                    {formErrors.paymentProofFile && (
-                      <p className="text-red-500 text-xs mt-1">{formErrors.paymentProofFile}</p>
-                    )}
-                  </div>
-                  
-                  <div className="flex items-center space-x-2 mt-4">
-                    <Checkbox 
-                      id="terms-external"
-                      name="termsAccepted"
-                      checked={formData.termsAccepted}
-                      onCheckedChange={(checked) => {
-                        setFormData({
-                          ...formData,
-                          termsAccepted: !!checked
-                        });
-                        if (formErrors.termsAccepted) {
-                          setFormErrors({
-                            ...formErrors,
-                            termsAccepted: ''
-                          });
-                        }
-                      }}
-                    />
-                    <Label 
-                      htmlFor="terms-external" 
-                      className={`text-xs md:text-sm ${formErrors.termsAccepted ? "text-red-500" : "text-gray-600"}`}
-                    >
-                      I agree to receive emails and opportunities from Amrita MUN'25 and its official partners
-                    </Label>
-                  </div>
-                  {formErrors.termsAccepted && (
-                    <p className="text-red-500 text-xs mt-1">{formErrors.termsAccepted}</p>
-                  )}
-                </div>
-                
-                <div className="flex justify-between mt-6 md:mt-8">
-                  <Button type="button" onClick={prevStep} variant="outline" className="text-sm md:text-base">
-                    Back
-                  </Button>
-                  <Button type="submit" className="bg-green-600 hover:bg-green-700 text-sm md:text-base">
-                    Submit Application
-                  </Button>
-                </div>
-              </Card>
-            )}
+                )}
+                {currentStep === 1 && <div />}
+                <Button
+                  type={isLastStep ? "submit" : "button"}
+                  onClick={isLastStep ? undefined : nextStep}
+                  className={isLastStep ? "bg-green-600 hover:bg-green-700 text-sm md:text-base" : continueButtonStyle}
+                >
+                  {currentStep === 1 ? "Begin Registration" : isLastStep ? "Submit Application" : "Continue"}
+                </Button>
+              </div>
+            </Card>
           </motion.div>
         </AnimatePresence>
       </form>
