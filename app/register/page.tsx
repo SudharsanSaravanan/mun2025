@@ -467,25 +467,16 @@ const RegistrationForm = () => {
       
       <div className="flex flex-col px-2 md:px-4 pt-32 md:pt-36 pb-6 max-w-4xl mx-auto">
         {/* Progress bar and step indicators */}
-        <div className="fixed top-20 left-0 right-0 bg-white z-40 p-3 md:p-4 shadow">
-          <div className="max-w-4xl mx-auto">
-          <Progress value={progress} className="mb-1 md:mb-2" />
-          <div className="flex justify-between text-sm text-gray-500 px-1 md:px-0">
-            {[...Array(totalSteps)].map((_, i) => (
-              <button
-                key={i}
-                className={`w-6 h-6 md:w-8 md:h-8 rounded-full flex items-center justify-center text-xs md:text-sm 
-                  ${currentStep > i+1 ? "bg-[#00B7FF] text-white" : 
-                    currentStep === i+1 ? "bg-blue-50 text-[#00B7FF] border-2 border-[#00B7FF]" : 
-                    "bg-gray-100 text-gray-400"}`}
-                onClick={() => goToStep(i+1)}
-              >
-                {i+1}
-              </button>
-            ))}
+        <div className="fixed top-20 left-0 right-0 z-40 bg-blue/60 backdrop-blur-md">
+          <div className="max-w-5xl mx-auto py-3 px-4">
+            <div className="flex items-center gap-3">
+              <Progress value={progress} className="flex-grow" />
+              <span className="text-md text-gray-500 font-medium whitespace-nowrap">
+                Step {currentStep}/{totalSteps}
+              </span>
+            </div>
           </div>
         </div>
-      </div>
 
       <form onSubmit={handleSubmit} className="flex-grow flex flex-col justify-center mt-16">
         <AnimatePresence mode="wait">
