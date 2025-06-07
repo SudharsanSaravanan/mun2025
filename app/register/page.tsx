@@ -12,6 +12,7 @@ import { Card } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { motion, AnimatePresence } from "framer-motion";
 import { Loader2 } from "lucide-react";
+import { DashboardNavbar } from "@/components/DashboardNavbar";
 import { continueButtonStyle, backButtonStyle } from "./ButtonStyles";
 
 const RegistrationForm = () => {
@@ -46,10 +47,49 @@ const RegistrationForm = () => {
 
   useEffect(() => {
     const fetchUser = async () => {
+        try {
+        const { data: authUser, error: authError } = await supabase.auth.getUser();
+
+        if (!authUser?.user) {
+          router.replace("/login");
+          return;
+        }
+
+        const { data: userData, error: userError } = await supabase
+          .from("users")
+          .select("*")
+          .eq("id", authUser.user.id)
+          .single();
+
+        if (userError || !userData) {
+          console.error("Error fetching user data:", userError);
+          router.replace("/login");
+          return;
+        }
+
+        setUser(userData);
+        setIsInternal(userData.is_internal);
+      } catch (error) {
+        console.error("Authentication error:", error);
+        router.replace("/login");
+      } finally {
         setIsLoading(false);
+      }
     };
+    
     fetchUser();
   }, [router]);
+
+   useEffect(() => {
+    if (user) {
+      setFormData(prevData => ({
+        ...prevData,
+        fullName: user.name || "",
+        email: user.email || "",
+        phoneNumber: user.phone_number || "",
+      }));
+    }
+  }, [user]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value, type, checked } = e.target;
@@ -130,20 +170,26 @@ const RegistrationForm = () => {
   };
 
   // Render form field helper
-  const renderField = (name: string, label: string, props: any = {}) => (
-    <div className={props.className || ""}>
-      <Label htmlFor={name} className="text-sm md:text-base mb-1 block">{label}</Label>
-      <Input
-        id={name}
-        name={name}
-        value={formData[name as keyof typeof formData] as string}
-        onChange={handleInputChange}
-        className={formErrors[name] ? "border-red-500" : ""}
-        {...props}
-      />
-      {formErrors[name] && <p className="text-red-500 text-xs mt-1">{formErrors[name]}</p>}
-    </div>
-  );
+  const renderField = (name: string, label: string, props: any = {}) => {
+    const isPrePopulated = ["fullName", "phoneNumber", "email"].includes(name);
+    const disabled = isPrePopulated;
+    
+    return (
+      <div className={props.className || ""}>
+        <Label htmlFor={name} className="text-sm md:text-base mb-1 block">{label}</Label>
+        <Input
+          id={name}
+          name={name}
+          value={formData[name as keyof typeof formData] as string}
+          onChange={handleInputChange}
+          disabled={disabled}
+          className={`${formErrors[name] ? "border-red-500" : ""} ${disabled ? "bg-gray-100 text-gray-600 cursor-not-allowed" : ""}`}
+          {...props}
+        />
+        {formErrors[name] && <p className="text-red-500 text-xs mt-1">{formErrors[name]}</p>}
+      </div>
+    );
+  };
 
   const renderFileField = (name: string, label: string) => (
     <div className="space-y-2">
@@ -395,6 +441,13 @@ const RegistrationForm = () => {
     console.log("Form submitted");
   };
 
+  const handleLogout = async () => {
+    const { error } = await supabase.auth.signOut();
+    if (!error) {
+      router.push("/login");
+    }
+  };
+
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
@@ -409,10 +462,13 @@ const RegistrationForm = () => {
   const isLastStep = (currentStep === 5 && isInternal) || (currentStep === 6 && !isInternal);
 
   return (
-    <div className="min-h-screen flex flex-col px-2 md:px-4 pt-20 md:pt-24 pb-6 max-w-4xl mx-auto">
-      {/* Progress bar and step indicators */}
-      <div className="fixed top-0 left-0 right-0 bg-white z-50 p-3 md:p-4 shadow">
-        <div className="max-w-4xl mx-auto">
+    <div className="min-h-screen bg-blue-50">
+      <DashboardNavbar onLogout={handleLogout} />
+      
+      <div className="flex flex-col px-2 md:px-4 pt-32 md:pt-36 pb-6 max-w-4xl mx-auto">
+        {/* Progress bar and step indicators */}
+        <div className="fixed top-20 left-0 right-0 bg-white z-40 p-3 md:p-4 shadow">
+          <div className="max-w-4xl mx-auto">
           <Progress value={progress} className="mb-1 md:mb-2" />
           <div className="flex justify-between text-sm text-gray-500 px-1 md:px-0">
             {[...Array(totalSteps)].map((_, i) => (
@@ -463,6 +519,7 @@ const RegistrationForm = () => {
           </motion.div>
         </AnimatePresence>
       </form>
+      </div>
     </div>
   );
 };
