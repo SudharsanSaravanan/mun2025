@@ -112,13 +112,35 @@ const RegistrationForm = () => {
     const errors: Record<string, string> = {};
     
     if (step === 2) {
-      const required = isInternal 
-        ? [['fullName', 'Name'], ['phoneNumber', 'Phone number'], ['email', 'Email'], ['rollNumber', 'Roll number']]
-        : [['fullName', 'Name'], ['phoneNumber', 'Phone number'], ['email', 'Email'], ['residentialAddress', 'Address'], ['universityName', 'University name']];
-      
-      required.forEach(([field, label]) => {
-        if (!formData[field as keyof typeof formData]) errors[field] = `${label} is required`;
-      });
+      if (isInternal) {
+        const requiredFields = [
+          ['fullName', 'Name'],
+          ['phoneNumber', 'Phone number'],
+          ['email', 'Email'],
+          ['rollNumber', 'Roll number']
+        ];
+        requiredFields.forEach(([field, label]) => {
+          if (!formData[field as keyof typeof formData]) {
+            errors[field] = `${label} is required`;
+          }
+        });
+      } else {
+        const requiredFields = [
+          ['fullName', 'Name'],
+          ['phoneNumber', 'Phone number'],
+          ['email', 'Email'],
+          ['residentialAddress', 'Residential address'],
+          ['residentialPincode', 'Residential pincode'],
+          ['universityName', 'University name'],
+          ['universityAddress', 'University address'],
+          ['universityPincode', 'University pincode']
+        ];
+        requiredFields.forEach(([field, label]) => {
+          if (!formData[field as keyof typeof formData]) {
+            errors[field] = `${label} is required`;
+          }
+        });
+      }
       
       if (formData.email && !/^\S+@\S+\.\S+$/.test(formData.email)) {
         errors.email = "Valid email is required";
@@ -305,19 +327,22 @@ const RegistrationForm = () => {
             {renderField("fullName", "Full Name", { placeholder: "Enter your full name", required: true, className: "md:col-span-1" })}
             {renderField("phoneNumber", "Phone Number", { placeholder: "Enter your phone number", required: true, className: "md:col-span-1" })}
             {renderField("email", "Email ID", { placeholder: "Enter your email address", required: true, type: "email", className: "md:col-span-2" })}
-            {renderField("residentialAddress", "Residential Address", { placeholder: "Enter your residential address", className: "md:col-span-2" })}
-            {renderField("residentialPincode", "Residential Pincode", { placeholder: "Enter pincode" })}
-            {renderField("universityName", "University Name", { placeholder: "Enter university name" })}
-            {renderField("universityAddress", "University Address", { placeholder: "Enter university address", className: "md:col-span-2" })}
-            {renderField("universityPincode", "University Pincode", { placeholder: "Enter pincode" })}
-            <div className="flex items-center space-x-2 md:col-span-2 mt-1">
-              <Checkbox
-                id="accommodation"
-                name="accommodation"
-                checked={formData.accommodation}
-                onCheckedChange={(checked) => setFormData(prev => ({ ...prev, accommodation: !!checked }))}
-              />
-              <Label htmlFor="accommodation">Accommodation needed?</Label>
+            {renderField("residentialAddress", "Residential Address", { placeholder: "Enter your residential address", required: true, className: "md:col-span-2" })}
+            {renderField("residentialPincode", "Residential Pincode", { placeholder: "Enter pincode", required: true })}
+            {renderField("universityName", "University Name", { placeholder: "Enter university name", required: true })}
+            {renderField("universityAddress", "University Address", { placeholder: "Enter university address", required: true, className: "md:col-span-2" })}
+            {renderField("universityPincode", "University Pincode", { placeholder: "Enter pincode", required: true })}
+            <div className="md:col-span-2 mt-1">
+              <Label className="mb-2 block text-sm md:text-base">Accommodation needed?</Label>
+              <Select 
+                value={formData.accommodation ? "yes" : "no"} 
+                onValueChange={(value) => setFormData(prev => ({ ...prev, accommodation: value === "yes" }))}>
+                <SelectTrigger>{formData.accommodation ? "Yes" : "No"}</SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="yes">Yes</SelectItem>
+                  <SelectItem value="no">No</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
           </div>
         )
@@ -354,13 +379,17 @@ const RegistrationForm = () => {
                   />
                   {formErrors.delegationName && <p className="text-red-500 text-xs mt-1">{formErrors.delegationName}</p>}
                 </div>
-                <div className="flex items-center space-x-2">
-                  <Checkbox
-                    id="headOfDelegation"
-                    checked={isHeadOfDelegation}
-                    onCheckedChange={(checked) => setIsHeadOfDelegation(!!checked)}
-                  />
-                  <Label htmlFor="headOfDelegation" className="text-sm md:text-base">Are you Head of Delegation?</Label>
+                <div>
+                  <Label className="mb-2 block text-sm md:text-base">Are you Head of Delegation?</Label>
+                  <Select 
+                    value={isHeadOfDelegation ? "yes" : "no"} 
+                    onValueChange={(value) => setIsHeadOfDelegation(value === "yes")}>
+                    <SelectTrigger>{isHeadOfDelegation ? "Yes" : "No"}</SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="yes">Yes</SelectItem>
+                      <SelectItem value="no">No</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
               </div>
             )}
@@ -398,7 +427,7 @@ const RegistrationForm = () => {
               </>
             ) : (
               <>
-                {renderFileField("idProofFile", "ID Proof (Aadhar/Passport)")}
+                {renderFileField("idProofFile", "ID Proof (Any Valid ID)")}
                 {renderFileField("delegateExperienceFile", "Delegate Experience (PDF)")}
                 {isHeadOfDelegation && renderFileField("delegationSheetFile", "Delegation Sheet")}
               </>
