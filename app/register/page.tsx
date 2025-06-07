@@ -15,6 +15,19 @@ import { Loader2 } from "lucide-react";
 import { DashboardNavbar } from "@/components/DashboardNavbar";
 import { continueButtonStyle, backButtonStyle } from "./ButtonStyles";
 
+const UNIVERSITIES = [
+  "Amrita Vishwa Vidyapeetham, Chennai",
+  "Amrita Vishwa Vidyapeetham, Amritapuri",
+  "Amrita Vishwa Vidyapeetham, Bengaluru",
+  "Vellore Institute of Technology (VIT)",
+  "Vellore Institute of Technology, Chennai (VIT-C)",
+  "PSG College of Technology",
+  "SSN College of Engineering",
+  "Shiv Nadar University (SNU)",
+  "Kumaraguru College of Technology (KCT)",
+  "SRM Institute of Science and Technology",
+];
+
 const RegistrationForm = () => {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(true);
@@ -329,9 +342,51 @@ const RegistrationForm = () => {
             {renderField("email", "Email ID", { placeholder: "Enter your email address", required: true, type: "email", className: "md:col-span-2" })}
             {renderField("residentialAddress", "Residential Address", { placeholder: "Enter your residential address", required: true, className: "md:col-span-2" })}
             {renderField("residentialPincode", "Residential Pincode", { placeholder: "Enter pincode", required: true })}
-            {renderField("universityName", "University Name", { placeholder: "Enter university name", required: true })}
+            
+            <div className={`relative ${formErrors.universityName ? "text-red-500" : ""}`}>
+              <Label className="text-sm md:text-base mb-1 block">University Name</Label>
+              <Input
+                type="text"
+                placeholder="Enter university name"
+                value={formData.universityName}
+                onChange={(e) => {
+                  const value = e.target.value;
+                  setFormData(prev => ({ ...prev, universityName: value }));
+                  if (formErrors.universityName) {
+                    setFormErrors(prev => ({ ...prev, universityName: "" }));
+                  }
+                }}
+                autoComplete="off"
+                className={`${formErrors.universityName ? "border-red-500" : ""}`}
+              />
+              {formData.universityName && UNIVERSITIES.filter(college => 
+                college.toLowerCase().includes(formData.universityName.toLowerCase())
+              ).length > 0 && (
+                <div className="absolute w-full mt-1 max-h-60 overflow-auto rounded-md bg-white py-1 shadow-lg border border-gray-200 z-50">
+                  {UNIVERSITIES.filter(college => 
+                    college.toLowerCase().includes(formData.universityName.toLowerCase())
+                  ).map((college, index) => (
+                    <div
+                      key={index}
+                      className="px-3 py-2 text-sm cursor-pointer hover:bg-gray-100"
+                      onClick={() => {
+                        setFormData(prev => ({ ...prev, universityName: college }));
+                        if (formErrors.universityName) {
+                          setFormErrors(prev => ({ ...prev, universityName: "" }));
+                        }
+                      }}
+                    >
+                      {college}
+                    </div>
+                  ))}
+                </div>
+              )}
+              {formErrors.universityName && <p className="text-red-500 text-xs mt-1">{formErrors.universityName}</p>}
+            </div>
+
             {renderField("universityAddress", "University Address", { placeholder: "Enter university address", required: true, className: "md:col-span-2" })}
             {renderField("universityPincode", "University Pincode", { placeholder: "Enter pincode", required: true })}
+
             <div className="md:col-span-2 mt-1">
               <Label className="mb-2 block text-sm md:text-base">Accommodation needed?</Label>
               <Select 
