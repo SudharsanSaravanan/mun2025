@@ -197,7 +197,7 @@ const RegistrationForm = () => {
       <Input
         type="file"
         onChange={(e) => handleFileChange(e, name)}
-        className={`file:mr-4 file:py-1.5 file:px-4 file:rounded-md file:border-0 file:bg-blue-50 file:text-[#00B7FF] hover:file:bg-blue-100 ${formErrors[name] ? "border-red-500" : ""}`}
+        className={`file:mr-4 file:py-1 file:px-4 file:rounded-md file:border-0 file:bg-blue-50 file:text-[#00B7FF] hover:file:bg-blue-100 ${formErrors[name] ? "border-red-500" : ""}`}
       />
       {formErrors[name] && <p className="text-red-500 text-xs mt-1">{formErrors[name]}</p>}
     </div>
@@ -206,7 +206,7 @@ const RegistrationForm = () => {
   const PreferenceSection = ({ num, pref, setPref, role, setRole }: {
     num: number; pref: string; setPref: (value: string) => void; role: string; setRole: (value: string) => void;
   }) => (
-    <div className="space-y-3 md:space-y-4 border border-gray-100 p-3 md:p-4 rounded-lg">
+    <div className="space-y-2 md:space-y-3">
       <Label className="text-sm md:text-base font-medium">Preference {num}</Label>
       <Select value={pref} onValueChange={setPref}>
         <SelectTrigger>{pref === "delegate" ? "Delegate" : "IP"}</SelectTrigger>
@@ -255,14 +255,34 @@ const RegistrationForm = () => {
         title: "Welcome to Amrita MUN'25",
         content: (
           <div className="flex-grow flex flex-col justify-center items-center">
-            <div className="text-center mb-5 md:mb-8">
-              <p className="text-base md:text-lg text-gray-700 mb-4">
+            <div className="w-full text-center">
+              <p className="mt-2 md:mt-4 text-lg md:text-xl text-gray-700 leading-relaxed mb-8">
                 Thank you for your interest in joining Amrita MUN'25. We're excited to have you participate!
+              </p>
+              <div className="bg-blue-50 p-6 rounded-lg border border-blue-100 mb-8">
+                <h3 className="text-lg md:text-lg font-semibold text-gray-800 mb-3">Read the Guidelines</h3>
+                <ul className="text-gray-700 text-left space-y-3">
+                  <li className="flex items-start">
+                    <span className="text-[#00B7FF] mr-2">•</span>
+                    Guideline 1
+                  </li>
+                  <li className="flex items-start">
+                    <span className="text-[#00B7FF] mr-2">•</span>
+                    Guideline 2
+                  </li>
+                  <li className="flex items-start">
+                    <span className="text-[#00B7FF] mr-2">•</span>
+                    Guideline 3
+                  </li>
+                </ul>
+              </div>
+              <p className="text-sm md:text-base text-gray-600">
+                Please complete this registration form to secure your spot in Amrita MUN'25
               </p>
             </div>
           </div>
         ),
-        buttonText: "Begin Registration"
+        buttonText: "Start Registration"
       },
       {
         step: 2,
@@ -302,17 +322,19 @@ const RegistrationForm = () => {
     if (!isInternal && currentStep === 3) {
       return (
         <>
-          <h2 className="text-xl md:text-2xl font-bold mb-4 md:mb-6 text-[#00B7FF]">Delegation Details</h2>
+          <h2 className="text-2xl md:text-3xl font-bold mb-4 text-[#00B7FF]">Delegation Details</h2>
           <div className="flex-grow space-y-4 md:space-y-6 py-2">
             <div>
               <Label className="mb-2 block text-sm md:text-base">Are you participating as an individual or part of a group?</Label>
-              <Select onValueChange={(val) => setGroupDelegation(val === "group")}>
-                <SelectTrigger>{groupDelegation ? "Group Delegation" : "Individual Delegate"}</SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="individual">Individual Delegate</SelectItem>
-                  <SelectItem value="group">Group Delegation</SelectItem>
-                </SelectContent>
-              </Select>
+              <div className="relative isolate">
+                <Select onValueChange={(val) => setGroupDelegation(val === "group")}>
+                  <SelectTrigger>{groupDelegation ? "Group Delegation" : "Individual Delegate"}</SelectTrigger>
+                  <SelectContent className="relative">
+                    <SelectItem value="individual">Individual Delegate</SelectItem>
+                    <SelectItem value="group">Group Delegation</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
             {groupDelegation && (
               <div className="space-y-4 mt-3">
@@ -341,13 +363,13 @@ const RegistrationForm = () => {
       );
     }
 
-    // Committee Preferences Step
+    // Preferences Step
     const isCommitteeStep = (currentStep === 3 && isInternal) || (currentStep === 4 && !isInternal);
     if (isCommitteeStep) {
       return (
-        <>
-          <h2 className="text-xl md:text-2xl font-bold mb-4 md:mb-6 text-[#00B7FF]">Committee Preferences</h2>
-          <div className="flex-grow space-y-4 md:space-y-6 py-2">
+        <>          
+          <h2 className="text-2xl md:text-3xl font-bold mb-2 text-[#00B7FF]">Preferences</h2>
+          <div className="flex-grow space-y-3 md:space-y-4 py-2">
             <PreferenceSection num={1} pref={prefs.pref1} setPref={(val) => setPrefs(prev => ({...prev, pref1: val}))} role={prefs.role1} setRole={(val) => setPrefs(prev => ({...prev, role1: val}))} />
             <PreferenceSection num={2} pref={prefs.pref2} setPref={(val) => setPrefs(prev => ({...prev, pref2: val}))} role={prefs.role2} setRole={(val) => setPrefs(prev => ({...prev, role2: val}))} />
             <PreferenceSection num={3} pref={prefs.pref3} setPref={(val) => setPrefs(prev => ({...prev, pref3: val}))} role={prefs.role3} setRole={(val) => setPrefs(prev => ({...prev, role3: val}))} />
@@ -361,7 +383,7 @@ const RegistrationForm = () => {
     if (isDocumentsStep) {
       return (
         <>
-          <h2 className="text-xl md:text-2xl font-bold mb-4 md:mb-6 text-[#00B7FF]">Required Documents</h2>
+          <h2 className="text-2xl md:text-3xl font-bold mb-4 text-[#00B7FF]">Required Documents</h2>
           <div className="flex-grow space-y-4 md:space-y-6 py-2">
             {isInternal ? (
               <>
@@ -386,7 +408,7 @@ const RegistrationForm = () => {
       const termsId = `terms-${isInternal ? 'internal' : 'external'}`;
       return (
         <>
-          <h2 className="text-xl md:text-2xl font-bold mb-4 md:mb-6 text-[#00B7FF]">Payment</h2>
+          <h2 className="text-2xl md:text-3xl font-bold mb-4 text-[#00B7FF]">Payment</h2>
           <div className="flex-grow space-y-4 md:space-y-6 py-2">
             <div className="space-y-2">
               <Label className="text-sm md:text-base">Payment ID</Label>
@@ -427,7 +449,11 @@ const RegistrationForm = () => {
     if (config) {
       return (
         <>
-          <h2 className="text-xl md:text-3xl font-bold mt-4 md:mt-6 text-center text-[#00B7FF]">{config.title}</h2>
+          {config.step === 1 ? (
+            <h2 className="text-2xl md:text-3xl font-bold mb-4 mt-4 text-[#00B7FF] text-center">{config.title}</h2>
+          ) : (
+            <h2 className="text-2xl md:text-3xl font-bold mb-2 text-[#00B7FF]">{config.title}</h2>
+          )}
           {config.content}
         </>
       );
@@ -462,10 +488,10 @@ const RegistrationForm = () => {
   const isLastStep = (currentStep === 5 && isInternal) || (currentStep === 6 && !isInternal);
 
   return (
-    <div className="min-h-screen bg-blue-50">
+    <div className="min-h-screen bg-blue-50 overflow-y-auto">
       <DashboardNavbar onLogout={handleLogout} />
       
-      <div className="flex flex-col px-2 md:px-4 pt-32 md:pt-36 pb-6 max-w-4xl mx-auto">
+      <div className="flex flex-col px-2 md:px-4 pt-22 md:pt-18 pb-6 max-w-5xl mx-auto relative">
         {/* Progress bar and step indicators */}
         <div className="fixed top-20 left-0 right-0 z-40 bg-blue/60 backdrop-blur-md">
           <div className="max-w-5xl mx-auto py-3 px-4">
@@ -478,7 +504,7 @@ const RegistrationForm = () => {
           </div>
         </div>
 
-      <form onSubmit={handleSubmit} className="flex-grow flex flex-col justify-center mt-16">
+      <form onSubmit={handleSubmit} className="flex-grow flex flex-col justify-center mt-16 px-2 md:px-4">
         <AnimatePresence mode="wait">
           <motion.div
             key={currentStep}
@@ -488,10 +514,10 @@ const RegistrationForm = () => {
             transition={{ duration: 0.3 }}
             className="min-h-[65vh] md:min-h-[75vh] flex flex-col"
           >
-            <Card className="p-3 md:p-6 flex-grow flex flex-col">
+            <Card className="p-4 md:p-6 flex-grow flex flex-col bg-white">
               {renderStepContent()}
               
-              <div className="flex justify-between mt-6 md:mt-8">
+              <div className="flex justify-between mt-4">
                 {currentStep > 1 && (
                   <Button type="button" onClick={prevStep} variant="outline" className={currentStep === 1 ? "" : backButtonStyle}>
                     Back
@@ -501,9 +527,9 @@ const RegistrationForm = () => {
                 <Button
                   type={isLastStep ? "submit" : "button"}
                   onClick={isLastStep ? undefined : nextStep}
-                  className={isLastStep ? "bg-green-600 hover:bg-green-700 text-sm md:text-base" : continueButtonStyle}
+                  className={isLastStep ? "bg-green-500 hover:bg-green-400 text-sm cursor-pointer md:text-base" : continueButtonStyle}
                 >
-                  {currentStep === 1 ? "Begin Registration" : isLastStep ? "Submit Application" : "Continue"}
+                  {currentStep === 1 ? "Start Registration" : isLastStep ? "Submit" : "Continue"}
                 </Button>
               </div>
             </Card>
