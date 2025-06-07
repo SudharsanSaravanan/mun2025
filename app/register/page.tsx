@@ -1,6 +1,8 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { supabase } from "@/lib/supabase";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
@@ -10,9 +12,15 @@ import { Switch } from "@/components/ui/switch";
 import { Card } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { motion, AnimatePresence } from "framer-motion";
+import { Loader2 } from "lucide-react";
 import { continueButtonStyle, backButtonStyle, submitButtonStyle } from "./ButtonStyles";
 
 const RegistrationForm = () => {
+  const router = useRouter();
+  
+  const [isLoading, setIsLoading] = useState(true);
+  const [user, setUser] = useState<any>(null);
+  
   // Section navigation state
   const [currentStep, setCurrentStep] = useState(1);
   const [totalSteps, setTotalSteps] = useState(5);
@@ -64,8 +72,53 @@ const RegistrationForm = () => {
     delegateExperienceFile: null as File | null,
     idProofFile: null as File | null,
     delegationSheetFile: null as File | null,
-    paymentProofFile: null as File | null,
-  });
+    paymentProofFile: null as File | null,  });
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const { data: authUser, error: authError } = await supabase.auth.getUser();
+        
+        if (!authUser?.user) {
+          router.replace("/login");
+          return;
+        }
+
+        const { data: userData, error: userError } = await supabase
+          .from("users")
+          .select("*")
+          .eq("id", authUser.user.id)
+          .single();
+
+        if (userError || !userData) {
+          console.error("Error fetching user data:", userError);
+          router.replace("/login");
+          return;
+        }
+
+        setUser(userData);
+        setIsInternal(userData.is_internal);
+      } catch (error) {
+        console.error("Authentication error:", error);
+        router.replace("/login");
+      } finally {
+        setIsLoading(false);
+      }
+    };    
+    
+    fetchUser();
+  }, [router]);
+
+  useEffect(() => {
+    if (user) {
+      setFormData(prevData => ({
+        ...prevData,
+        fullName: user.name || "",
+        email: user.email || "",
+        phoneNumber: user.phone_number || "",
+      }));
+    }
+  }, [user]);
 
   useEffect(() => {
     const steps = isInternal ? 5 : 6;
@@ -231,6 +284,17 @@ const RegistrationForm = () => {
     e.preventDefault();
     console.log("Form submitted");
   };
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="text-center">
+          <Loader2 className="h-14 w-14 animate-spin text-blue-600 mx-auto" />
+          <p className="mt-3 text-gray-800 text-md">Loading...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen flex flex-col px-2 md:px-4 pt-20 md:pt-24 pb-6 max-w-4xl mx-auto">

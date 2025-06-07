@@ -1,5 +1,5 @@
-import { useRouter } from 'next/navigation';
-import { Button } from '@/components/ui/button';
+import { useRouter } from "next/navigation";
+import { Button } from "@/components/ui/button";
 
 interface UserData {
   id: string;
@@ -25,7 +25,7 @@ export default function UserDashboard({ user, registrationStatus }: UserDashboar
   const router = useRouter();
   
   const handleRegister = () => {
-    router.push('/register');
+    router.push("/register");
   };
 
   return (
