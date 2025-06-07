@@ -191,14 +191,20 @@ const RegistrationForm = () => {
     );
   };
 
-  const renderFileField = (name: string, label: string) => (
-    <div className="space-y-2">
-      <Label className="text-sm md:text-base">{label}</Label>
-      <Input
-        type="file"
-        onChange={(e) => handleFileChange(e, name)}
-        className={`file:mr-4 file:py-1 file:px-4 file:rounded-md file:border-0 file:bg-blue-50 file:text-[#00B7FF] hover:file:bg-blue-100 ${formErrors[name] ? "border-red-500" : ""}`}
-      />
+  const renderFileField = (name: keyof typeof formData, label: string) => (
+    <div className="space-y-1">
+      <Label className="text-sm font-medium text-gray-700">{label}</Label>
+      <div className="relative">
+        <Input
+          id={name}
+          type="file"
+          onChange={(e) => handleFileChange(e, name)}
+          className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+        />
+        <div className="block w-full text-sm text-gray-600 border border-gray-300 rounded-md cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500 px-4 py-2">
+          {formData[name] instanceof File ? (formData[name] as File).name : "No file chosen"}
+        </div>
+      </div>
       {formErrors[name] && <p className="text-red-500 text-xs mt-1">{formErrors[name]}</p>}
     </div>
   );
