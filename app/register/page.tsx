@@ -183,7 +183,7 @@ const RegistrationForm = () => {
           value={formData[name as keyof typeof formData] as string}
           onChange={handleInputChange}
           disabled={disabled}
-          className={`${formErrors[name] ? "border-red-500" : ""} ${disabled ? "bg-gray-100 text-gray-600 cursor-not-allowed" : ""}`}
+          className={`${formErrors[name] ? "border-red-500" : ""}`}
           {...props}
         />
         {formErrors[name] && <p className="text-red-500 text-xs mt-1">{formErrors[name]}</p>}
