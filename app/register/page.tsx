@@ -37,6 +37,7 @@ const RegistrationForm = () => {
   const [groupDelegation, setGroupDelegation] = useState(false);
   const [isHeadOfDelegation, setIsHeadOfDelegation] = useState(false);
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
+  const [showCollegeDropdown, setShowCollegeDropdown] = useState(false);
   
   // Preferences state
   const [prefs, setPrefs] = useState({
@@ -352,14 +353,19 @@ const RegistrationForm = () => {
                 onChange={(e) => {
                   const value = e.target.value;
                   setFormData(prev => ({ ...prev, universityName: value }));
+                  setShowCollegeDropdown(true);
                   if (formErrors.universityName) {
                     setFormErrors(prev => ({ ...prev, universityName: "" }));
                   }
                 }}
+                onFocus={() => setShowCollegeDropdown(true)}
+                onBlur={() => {
+                  setTimeout(() => setShowCollegeDropdown(false), 200);
+                }}
                 autoComplete="off"
                 className={`${formErrors.universityName ? "border-red-500" : ""}`}
               />
-              {formData.universityName && UNIVERSITIES.filter(college => 
+              {showCollegeDropdown && (formData.universityName || "").length > 0 && UNIVERSITIES.filter(college => 
                 college.toLowerCase().includes(formData.universityName.toLowerCase())
               ).length > 0 && (
                 <div className="absolute w-full mt-1 max-h-60 overflow-auto rounded-md bg-white py-1 shadow-lg border border-gray-200 z-50">
@@ -371,6 +377,7 @@ const RegistrationForm = () => {
                       className="px-3 py-2 text-sm cursor-pointer hover:bg-gray-100"
                       onClick={() => {
                         setFormData(prev => ({ ...prev, universityName: college }));
+                        setShowCollegeDropdown(false);
                         if (formErrors.universityName) {
                           setFormErrors(prev => ({ ...prev, universityName: "" }));
                         }
