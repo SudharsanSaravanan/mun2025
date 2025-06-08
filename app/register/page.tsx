@@ -551,6 +551,7 @@ const RegistrationForm = () => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     console.log("Form submitted");
+    console.log(formData);
   };
 
   const handleLogout = async () => {
