@@ -14,6 +14,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Loader2 } from "lucide-react";
 import { DashboardNavbar } from "@/components/DashboardNavbar";
 import { continueButtonStyle, backButtonStyle } from "./ButtonStyles";
+import { PreferenceSection } from "./PreferenceSection";
 
 const UNIVERSITIES = [
   "Amrita Vishwa Vidyapeetham, Chennai",
@@ -49,14 +50,17 @@ const RegistrationForm = () => {
     fullName: "", phoneNumber: "", email: "", rollNumber: "",
     residentialAddress: "", residentialPincode: "", universityName: "",
     universityAddress: "", universityPincode: "", accommodation: false,
-    committee1: "", country1: "", country2: "", country3: "",
+    committee1: "", committee2: "", committee3: "",
+    country1_1: "", country1_2: "", country1_3: "",
+    country2_1: "", country2_2: "", country2_3: "",
+    country3_1: "", country3_2: "", country3_3: "",
     delegationName: "", paymentId: "", termsAccepted: false,
     collegeIdFile: null as File | null, delegateExperienceFile: null as File | null,
     idProofFile: null as File | null, delegationSheetFile: null as File | null,
     paymentProofFile: null as File | null
   });
 
-  const totalSteps = isInternal ? 5 : 6;
+  const totalSteps = isInternal ? 7 : 8;
   const progress = Math.round((currentStep / totalSteps) * 100);
 
   useEffect(() => {
@@ -124,67 +128,66 @@ const RegistrationForm = () => {
 
   const validateStep = (step: number): Record<string, string> => {
     const errors: Record<string, string> = {};
-    
-    if (step === 2) {
-      if (isInternal) {
-        const requiredFields = [
-          ['fullName', 'Name'],
-          ['phoneNumber', 'Phone number'],
-          ['email', 'Email'],
-          ['rollNumber', 'Roll number']
-        ];
-        requiredFields.forEach(([field, label]) => {
-          if (!formData[field as keyof typeof formData]) {
-            errors[field] = `${label} is required`;
-          }
-        });
-      } else {
-        const requiredFields = [
-          ['fullName', 'Name'],
-          ['phoneNumber', 'Phone number'],
-          ['email', 'Email'],
-          ['residentialAddress', 'Residential address'],
-          ['residentialPincode', 'Residential pincode'],
-          ['universityName', 'University name'],
-          ['universityAddress', 'University address'],
-          ['universityPincode', 'University pincode']
-        ];
-        requiredFields.forEach(([field, label]) => {
-          if (!formData[field as keyof typeof formData]) {
-            errors[field] = `${label} is required`;
-          }
-        });
-      }
-      
-      if (formData.email && !/^\S+@\S+\.\S+$/.test(formData.email)) {
-        errors.email = "Valid email is required";
-      }
-    } else if (step === 3 && !isInternal && groupDelegation) {
-      if (!formData.delegationName) errors.delegationName = "Delegation name is required";
-    } else if ((step === 4 && isInternal) || (step === 5 && !isInternal)) {
-      if (isInternal) {
+
+    if (isInternal) {
+      if (step === 2) {
+        if (!formData.rollNumber) errors.rollNumber = "Roll number is required";
+      } else if (step == 3 || step == 4 || step == 5) {
+        // Preferences Validation
+      } else if (step == 6) {
         if (!formData.collegeIdFile) errors.collegeIdFile = "College ID is required";
         if (!formData.delegateExperienceFile) errors.delegateExperienceFile = "Delegate experience is required";
-      } else {
+      } else if (step === 7) {
+        const paymentFields = [
+          ["paymentId", "Payment ID"],
+          ["paymentProofFile", "Payment proof"],
+          ["termsAccepted", "Terms acceptance"]
+        ];
+        
+        paymentFields.forEach(([field, label]) => {
+          const value = formData[field as keyof typeof formData];
+          if (!value || (typeof value === "boolean" && !value)) {
+            errors[field] = `${label} is required`;
+          }
+        });
+      }
+    } else {
+      if (step === 2) {
+        const requiredFields = [
+          ["residentialAddress", "Residential address"],
+          ["residentialPincode", "Residential pincode"],
+          ["universityName", "University name"],
+          ["universityAddress", "University address"],
+          ["universityPincode", "University pincode"]
+        ];
+        requiredFields.forEach(([field, label]) => {
+          if (!formData[field as keyof typeof formData]) {
+            errors[field] = `${label} is required`;
+          }
+        });
+      } else if (step === 3 && groupDelegation) {
+        if (!formData.delegationName) errors.delegationName = "Delegation name is required";
+      } else if (step === 4 || step === 5 || step === 6) {
+        // Preferences Validation
+      } else if (step === 7) {
         if (!formData.idProofFile) errors.idProofFile = "ID proof is required";
         if (!formData.delegateExperienceFile) errors.delegateExperienceFile = "Delegate experience is required";
         if (isHeadOfDelegation && !formData.delegationSheetFile) errors.delegationSheetFile = "Delegation sheet is required";
+      } else if (step === 8) {
+        const paymentFields = [
+          ["paymentId", "Payment ID"],
+          ["paymentProofFile", "Payment proof"],
+          ["termsAccepted", "Terms acceptance"]
+        ];
+        
+        paymentFields.forEach(([field, label]) => {
+          const value = formData[field as keyof typeof formData];
+          if (!value || (typeof value === "boolean" && !value)) {
+            errors[field] = `${label} is required`;
+          }
+        });
       }
-    } else if ((step === 5 && isInternal) || (step === 6 && !isInternal)) {
-      const paymentFields = [
-        ['paymentId', 'Payment ID'],
-        ['paymentProofFile', 'Payment proof'],
-        ['termsAccepted', 'Terms acceptance']
-      ];
-      
-      paymentFields.forEach(([field, label]) => {
-        const value = formData[field as keyof typeof formData];
-        if (!value || (typeof value === 'boolean' && !value)) {
-          errors[field] = `${label} is required`;
-        }
-      });
-    }
-    
+      }
     return errors;
   };
 
@@ -260,51 +263,6 @@ const RegistrationForm = () => {
         </div>
       </div>
       {formErrors[name] && <p className="text-red-500 text-xs mt-1">{formErrors[name]}</p>}
-    </div>
-  );
-
-  const PreferenceSection = ({ num, pref, setPref, role, setRole }: {
-    num: number; pref: string; setPref: (value: string) => void; role: string; setRole: (value: string) => void;
-  }) => (
-    <div className="space-y-2 md:space-y-3">
-      <Label className="text-sm md:text-base font-medium">Preference {num}</Label>
-      <Select value={pref} onValueChange={setPref}>
-        <SelectTrigger>{pref === "delegate" ? "Delegate" : "IP"}</SelectTrigger>
-        <SelectContent>
-          <SelectItem value="delegate">Delegate</SelectItem>
-          <SelectItem value="ip">IP</SelectItem>
-        </SelectContent>
-      </Select>
-
-      {pref === "ip" && (
-        <div className="mt-2">
-          <Label className="text-sm md:text-base">Preferred Role</Label>
-          <Select value={role} onValueChange={setRole}>
-            <SelectTrigger className="mt-1">{role === "reporter" ? "Reporter" : "Photojournalist"}</SelectTrigger>
-            <SelectContent>
-              <SelectItem value="reporter">Reporter</SelectItem>
-              <SelectItem value="photojournalist">Photojournalist</SelectItem>
-            </SelectContent>
-          </Select>
-          {role === "reporter" && (
-            <div className="grid grid-cols-1 gap-2 mt-3">
-              <Label className="text-sm md:text-base">Committee Preferences</Label>
-              {[1, 2, 3].map(i => <Input key={i} placeholder={`Committee ${i}`} className={i === 1 ? "mt-1" : ""} />)}
-            </div>
-          )}
-        </div>
-      )}
-
-      {pref === "delegate" && (
-        <div className="grid grid-cols-1 gap-3 mt-2">
-          <Label className="text-sm md:text-base">Committee Preference</Label>
-          <Input placeholder="Committee" className="mt-1" />
-          <Label className="text-sm md:text-base mt-1">Country Preferences</Label>
-          {["Country 1", "Country 2", "Country 3"].map((placeholder, i) => (
-            <Input key={i} placeholder={placeholder} className={i === 0 ? "mt-1" : ""} />
-          ))}
-        </div>
-      )}
     </div>
   );
 
@@ -478,23 +436,36 @@ const RegistrationForm = () => {
       );
     }
 
-    // Preferences Step
-    const isCommitteeStep = (currentStep === 3 && isInternal) || (currentStep === 4 && !isInternal);
-    if (isCommitteeStep) {
+    // Preference Steps
+    const isPref1Step = (currentStep === 3 && isInternal) || (currentStep === 4 && !isInternal);
+    const isPref2Step = (currentStep === 4 && isInternal) || (currentStep === 5 && !isInternal);
+    const isPref3Step = (currentStep === 5 && isInternal) || (currentStep === 6 && !isInternal);
+
+    if (isPref1Step || isPref2Step || isPref3Step) {
+      const prefNum = isPref1Step ? 1 : isPref2Step ? 2 : 3;
+      const prefKey = `pref${prefNum}` as keyof typeof prefs;
+      const roleKey = `role${prefNum}` as keyof typeof prefs;
+      
       return (
         <>          
-          <h2 className="text-2xl md:text-3xl font-bold mb-2 text-[#00B7FF]">Preferences</h2>
+          <h2 className="text-2xl md:text-3xl font-bold mb-2 text-[#00B7FF]">Preference {prefNum}</h2>
           <div className="flex-grow space-y-3 md:space-y-4 py-2">
-            <PreferenceSection num={1} pref={prefs.pref1} setPref={(val) => setPrefs(prev => ({...prev, pref1: val}))} role={prefs.role1} setRole={(val) => setPrefs(prev => ({...prev, role1: val}))} />
-            <PreferenceSection num={2} pref={prefs.pref2} setPref={(val) => setPrefs(prev => ({...prev, pref2: val}))} role={prefs.role2} setRole={(val) => setPrefs(prev => ({...prev, role2: val}))} />
-            <PreferenceSection num={3} pref={prefs.pref3} setPref={(val) => setPrefs(prev => ({...prev, pref3: val}))} role={prefs.role3} setRole={(val) => setPrefs(prev => ({...prev, role3: val}))} />
+            <PreferenceSection 
+              num={prefNum} 
+              pref={prefs[prefKey]} 
+              setPref={(val) => setPrefs(prev => ({...prev, [prefKey]: val}))} 
+              role={prefs[roleKey]} 
+              setRole={(val) => setPrefs(prev => ({...prev, [roleKey]: val}))} 
+              formData={formData}
+              handleInputChange={handleInputChange}
+            />
           </div>
         </>
       );
     }
 
     // Documents Step
-    const isDocumentsStep = (currentStep === 4 && isInternal) || (currentStep === 5 && !isInternal);
+    const isDocumentsStep = (currentStep === 6 && isInternal) || (currentStep === 7 && !isInternal);
     if (isDocumentsStep) {
       return (
         <>
@@ -518,7 +489,7 @@ const RegistrationForm = () => {
     }
 
     // Payment Step
-    const isPaymentStep = (currentStep === 5 && isInternal) || (currentStep === 6 && !isInternal);
+    const isPaymentStep = (currentStep === 7 && isInternal) || (currentStep === 8 && !isInternal);
     if (isPaymentStep) {
       const termsId = `terms-${isInternal ? 'internal' : 'external'}`;
       return (
@@ -600,7 +571,7 @@ const RegistrationForm = () => {
     );
   }
 
-  const isLastStep = (currentStep === 5 && isInternal) || (currentStep === 6 && !isInternal);
+  const isLastStep = (currentStep === 7 && isInternal) || (currentStep === 8 && !isInternal);
 
   return (
     <div className="min-h-screen bg-blue-50 overflow-y-auto">
