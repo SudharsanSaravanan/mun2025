@@ -171,12 +171,30 @@ const RegistrationForm = () => {
         if (isHeadOfDelegation && !formData.delegationSheetFile) errors.delegationSheetFile = "Delegation sheet is required";
       }
     } else if ((step === 5 && isInternal) || (step === 6 && !isInternal)) {
-      if (!formData.paymentId) errors.paymentId = "Payment ID is required";
-      if (!formData.paymentProofFile) errors.paymentProofFile = "Payment proof is required";
-      if (!formData.termsAccepted) errors.termsAccepted = "Please accept the terms";
+      const paymentFields = [
+        ['paymentId', 'Payment ID'],
+        ['paymentProofFile', 'Payment proof'],
+        ['termsAccepted', 'Terms acceptance']
+      ];
+      
+      paymentFields.forEach(([field, label]) => {
+        const value = formData[field as keyof typeof formData];
+        if (!value || (typeof value === 'boolean' && !value)) {
+          errors[field] = `${label} is required`;
+        }
+      });
     }
     
     return errors;
+  };
+
+  const validateSubmission = () => {
+    let allErrors = {};
+    for (let step = 1; step <= totalSteps; step++) {
+      const stepErrors = validateStep(step);
+      allErrors = { ...allErrors, ...stepErrors };
+    }
+    return Object.keys(allErrors).length === 0;
   };
 
   const nextStep = () => {
@@ -621,13 +639,21 @@ const RegistrationForm = () => {
                   </Button>
                 )}
                 {currentStep === 1 && <div />}
-                <Button
-                  type={isLastStep ? "submit" : "button"}
-                  onClick={isLastStep ? undefined : nextStep}
-                  className={isLastStep ? "bg-green-500 hover:bg-green-400 text-sm cursor-pointer md:text-base" : continueButtonStyle}
-                >
-                  {currentStep === 1 ? "Start Registration" : isLastStep ? "Submit" : "Continue"}
-                </Button>
+                <div className="flex items-center gap-2">
+                  {isLastStep && !validateSubmission() && (
+                    <p className="text-red-500 text-sm">
+                      Please complete all required fields
+                    </p>
+                  )}
+                  <Button
+                    type={isLastStep ? "submit" : "button"}
+                    onClick={isLastStep ? undefined : nextStep}
+                    disabled={isLastStep ? !validateSubmission() : false}
+                    className={`${isLastStep ? "bg-green-500 hover:bg-green-400 text-sm cursor-pointer md:text-base" : continueButtonStyle}`}
+                  >
+                    {currentStep === 1 ? "Start Registration" : isLastStep ? "Submit" : "Continue"}
+                  </Button>
+                </div>
               </div>
             </Card>
           </motion.div>
