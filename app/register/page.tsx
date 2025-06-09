@@ -597,6 +597,9 @@ const RegistrationForm = () => {
       return;
     }
 
+    const successfulOperations: string[] = [];
+    const uploadedFilePaths: string[] = [];
+
     try {
       setIsSubmitting(true);
       
@@ -612,6 +615,7 @@ const RegistrationForm = () => {
 
         if (uploadError) throw uploadError;
 
+        uploadedFilePaths.push(filePath);
         return uploadData.path;
       };
 
@@ -625,121 +629,140 @@ const RegistrationForm = () => {
           : null,
       }
 
-      const { data: transaction, error: transactionError } = await supabase.rpc('start_transaction');
-      if (transactionError) throw transactionError;
+      successfulOperations.push("fileUploads");
 
-      try {
-        if (isInternal) {
-          const { error: internalRegError } = await supabase
-            .from('internal_registrations')
-            .insert({
-              user_id: user.id,
-              roll_number: formData.rollNumber,
-              college_id_photo_url: fileUploads.collegeIdUrl,
-              delegate_experience_doc_url: fileUploads.experienceUrl,
-              payment_id: formData.paymentId,
-              payment_proof_url: fileUploads.paymentProofUrl,
-            });
-          
+      if (isInternal) {
+        const { error: internalRegError } = await supabase
+          .from('internal_registrations')
+          .insert({
+            user_id: user.id,
+            roll_number: formData.rollNumber,
+            college_id_photo_url: fileUploads.collegeIdUrl,
+            delegate_experience_doc_url: fileUploads.experienceUrl,
+            payment_id: formData.paymentId,
+            payment_proof_url: fileUploads.paymentProofUrl,
+          });
+
           if (internalRegError) throw internalRegError;
-        } else { 
-          const { error: externalRegError } = await supabase
-            .from('external_registrations')
-            .insert({
-              user_id: user.id,
-              residential_address: formData.residentialAddress,
-              residential_pincode: formData.residentialPincode,
-              university_name: formData.universityName,
-              university_address: formData.universityAddress,
-              university_pincode: formData.universityPincode,
-              id_proof_url: fileUploads.idProofUrl,
-              accomodation_required: formData.accommodation,
-              delegation_type: groupDelegation ? 'group' : 'individual',
-              delegation_name: groupDelegation ? formData.delegationName : null,
-              is_head_of_delegation: groupDelegation ? isHeadOfDelegation : null,
-              delegation_sheet_url: fileUploads.delegationSheetUrl || null,
-              delegate_experience_doc_url: fileUploads.experienceUrl,
-              payment_id: formData.paymentId,
-              payment_proof_url: fileUploads.paymentProofUrl,
-            });
-
+          successfulOperations.push("internalReg");
+      } else { 
+        const { error: externalRegError } = await supabase
+        .from('external_registrations')
+        .insert({
+          user_id: user.id,
+          residential_address: formData.residentialAddress,
+          residential_pincode: formData.residentialPincode,
+            university_name: formData.universityName,
+            university_address: formData.universityAddress,
+            university_pincode: formData.universityPincode,
+            id_proof_url: fileUploads.idProofUrl,
+            accomodation_required: formData.accommodation,
+            delegation_type: groupDelegation ? 'group' : 'individual',
+            delegation_name: groupDelegation ? formData.delegationName : null,
+            is_head_of_delegation: groupDelegation ? isHeadOfDelegation : null,
+            delegation_sheet_url: fileUploads.delegationSheetUrl || null,
+            delegate_experience_doc_url: fileUploads.experienceUrl,
+            payment_id: formData.paymentId,
+            payment_proof_url: fileUploads.paymentProofUrl,
+          });
+          
           if (externalRegError) throw externalRegError;
+          successfulOperations.push("externalReg");
         }
 
-        for (let i = 1; i <= 3; i++) {
-          const prefKey = `pref${i}` as keyof typeof prefs;
-          const roleKey = `role${i}` as keyof typeof prefs;
+      for (let i = 1; i <= 3; i++) {
+        const prefKey = `pref${i}` as keyof typeof prefs;
+        const roleKey = `role${i}` as keyof typeof prefs;
 
-          const { data: prefData, error: prefError } = await supabase
-            .from('user_preferences')
-            .insert({
-              user_id: user.id,
-              preference_order: i,
-              role: prefs[prefKey],
-              ip_subrole: prefs[prefKey] === 'IP' ? prefs[roleKey] : null,
-              committee_id: prefs[prefKey] === 'delegate' ? formData[`committee${i}` as keyof typeof formData] as string : null
-            })
-            .select()
-            .single();
-
-          if (prefError) throw prefError;
-
-          if (prefs[prefKey] === 'delegate') {
-            const countryPrefs = [];
-            for (let j = 1; j <= 3; j++) {
-              const countryId = formData[`country${i}_${j}` as keyof typeof formData];
-              if (countryId) {
-                countryPrefs.push({
-                  user_id: user.id,
-                  preference_order: i,
-                  country_order: j,
-                  country_id: countryId
-                });
-              }
-            }
-
-            if (countryPrefs.length > 0) {
-              const { error: countryError } = await supabase
-                .from('delegate_country_preferences')
-                .insert(countryPrefs);
-
-              if (countryError) throw countryError;
+        const { data: prefData, error: prefError } = await supabase
+          .from('user_preferences')
+          .insert({
+            user_id: user.id,
+            preference_order: i,
+            role: prefs[prefKey],
+            ip_subrole: prefs[prefKey] === 'IP' ? prefs[roleKey] : null,
+            committee_id: prefs[prefKey] === 'delegate' ? formData[`committee${i}` as keyof typeof formData] as string : null
+          })
+          .select()
+          .single();
+    
+        if (prefError) throw prefError;
+        
+        if (prefs[prefKey] === 'delegate') {
+          const countryPrefs = [];
+          for (let j = 1; j <= 3; j++) {
+            const countryId = formData[`country${i}_${j}` as keyof typeof formData];
+            if (countryId) {
+              countryPrefs.push({
+                user_id: user.id,
+                preference_order: i,
+                country_order: j,
+                country_id: countryId
+              });
             }
           }
 
-          if (prefs[prefKey] === 'IP' && prefs[roleKey] === 'reporter') {
-            const committeePrefs = [];
-            for (let j = 1; j <= 3; j++) {
-              const committeeId = formData[`committee${j}` as keyof typeof formData];
-              if (committeeId) {
-                committeePrefs.push({
-                  user_id: user.id,
-                  preference_order: i,
-                  committee_order: j,
-                  committee_id: committeeId
-                });
-              }
-            }
+          if (countryPrefs.length > 0) {
+            const { error: countryError } = await supabase
+              .from('delegate_country_preferences')
+              .insert(countryPrefs);
 
-            if (committeePrefs.length > 0) {
-              const { error: reporterError } = await supabase
-                .from('ip_reporter_preferences')
-                .insert(committeePrefs);
-
-              if (reporterError) throw reporterError;
-            }
+            if (countryError) throw countryError;
           }
         }
-        const { error: commitError } = await supabase.rpc('commit_transaction', { transaction_id: transaction.id });
-        if (commitError) throw commitError;
 
-        router.push('/dashboard');
-      } catch (error) {
-        await supabase.rpc('rollback_transaction', { transaction_id: transaction.id });
-        throw error;
+        if (prefs[prefKey] === 'IP' && prefs[roleKey] === 'reporter') {
+          const committeePrefs = [];
+          for (let j = 1; j <= 3; j++) {
+            const committeeId = formData[`committee${j}` as keyof typeof formData];
+            if (committeeId) {
+              committeePrefs.push({
+                user_id: user.id,
+                preference_order: i,
+                committee_order: j,
+                committee_id: committeeId
+              });
+            }
+          }
+
+          if (committeePrefs.length > 0) {
+            const { error: reporterError } = await supabase
+              .from('ip_reporter_preferences')
+              .insert(committeePrefs);
+
+            if (reporterError) throw reporterError;
+          }
+        }
       }
+
+      successfulOperations.push("userPrefs");
+      router.push('/dashboard');
     } catch (error) {
-      console.error('Error submitting form:', error);
+        console.error('Error submitting form:', error);
+
+        try {
+          if (successfulOperations.includes("userPrefs")) {
+            await supabase.from('user_preferences').delete().eq('user_id', user.id);
+            await supabase.from('delegate_country_preferences').delete().eq('user_id', user.id);
+            await supabase.from('ip_reporter_preferences').delete().eq('user_id', user.id);
+          }
+
+          if (successfulOperations.includes("internalReg")) {
+            await supabase.from('internal_registrations').delete().eq('user_id', user.id);
+          }
+
+          if (successfulOperations.includes("externalReg")) {
+            await supabase.from('external_registrations').delete().eq('user_id', user.id);
+          }
+
+          if (successfulOperations.includes("fileUploads")) {
+            for (const path of uploadedFilePaths) {
+              await supabase.storage.from('registration-files').remove([path]);
+            }
+          }
+        } catch (rollbackError) {
+          console.error('Error during rollback:', rollbackError);
+      }
     } finally {
       setIsSubmitting(false);
     }
