@@ -68,7 +68,7 @@ export const PreferenceSection = React.memo(({
     if (pref === 'delegate') {
       const committeeValue = formData[`committee${num}`];
       setSelectedCommittee(typeof committeeValue === 'string' ? committeeValue : '');
-    } else if (pref === 'ip' && role === 'reporter') {
+    } else if (pref === 'IP' && role === 'reporter') {
       const committeeValues = [1, 2, 3].map(index => {
         const value = formData[`committee${num}_${index}`];
         return typeof value === 'string' ? value : '';
@@ -191,11 +191,11 @@ export const PreferenceSection = React.memo(({
         <SelectTrigger>{pref === "delegate" ? "Delegate" : "International Press"}</SelectTrigger>
         <SelectContent>
           <SelectItem value="delegate">Delegate</SelectItem>
-          <SelectItem value="ip">International Press</SelectItem>
+          <SelectItem value="IP">International Press</SelectItem>
         </SelectContent>
       </Select>
 
-      {pref === "ip" && (
+      {pref === "IP" && (
         <div className="mt-2">
           <Label className="text-sm md:text-base">Preferred Role</Label>
           <Select value={role} onValueChange={setRole}>
