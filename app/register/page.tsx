@@ -15,6 +15,7 @@ import { Loader2 } from "lucide-react";
 import { DashboardNavbar } from "@/components/DashboardNavbar";
 import { continueButtonStyle, backButtonStyle } from "./ButtonStyles";
 import { PreferenceSection } from "./PreferenceSection";
+import type { Committee, Country } from "./PreferenceSection";
 
 const UNIVERSITIES = [
   "Amrita Vishwa Vidyapeetham, Chennai",
@@ -60,6 +61,9 @@ const RegistrationForm = () => {
     idProofFile: null as File | null, delegationSheetFile: null as File | null,
     paymentProofFile: null as File | null
   });
+
+  const [committees, setCommittees] = useState<Committee[]>([]);
+  const [countries, setCountries] = useState<Country[]>([]);
 
   const totalSteps = isInternal ? 7 : 8;
   const progress = Math.round((currentStep / totalSteps) * 100);
@@ -109,6 +113,31 @@ const RegistrationForm = () => {
       }));
     }
   }, [user]);
+
+  useEffect(() => {
+    const fetchCommitteeData = async () => {
+      try {
+        const { data: committeesData, error: committeesError } = await supabase
+          .from('committees')
+          .select('*');
+
+        if (committeesError) throw committeesError;
+
+        const { data: countriesData, error: countriesError } = await supabase
+          .from('countries')
+          .select('*');
+
+        if (countriesError) throw countriesError;
+
+        setCommittees(committeesData || []);
+        setCountries(countriesData || []);
+      } catch (error) {
+        console.error('Error fetching committee data:', error);
+      }
+    };
+
+    fetchCommitteeData();
+  }, []);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value, type, checked } = e.target;
@@ -164,6 +193,8 @@ const RegistrationForm = () => {
         requiredFields.forEach(([field, label]) => {
           if (!formData[field as keyof typeof formData]) {
             errors[field] = `${label} is required`;
+          } else if ((field === "residentialPincode" || field === "universityPincode") && !/^\d{6}$/.test(formData[field as keyof typeof formData] as string)) {
+            errors[field] = `${label} must be a valid Pin code`;
           }
         });
       } else if (step === 3 && groupDelegation) {
@@ -459,6 +490,8 @@ const RegistrationForm = () => {
               setRole={(val) => setPrefs(prev => ({...prev, [roleKey]: val}))} 
               formData={formData}
               handleInputChange={handleInputChange}
+              committees={committees}
+              countries={countries}
             />
           </div>
         </>
@@ -482,6 +515,9 @@ const RegistrationForm = () => {
                 {renderFileField("idProofFile", "ID Proof (Any Valid ID)")}
                 {renderFileField("delegateExperienceFile", "Delegate Experience (PDF)")}
                 {isHeadOfDelegation && renderFileField("delegationSheetFile", "Delegation Sheet")}
+                {isHeadOfDelegation && ( 
+                  <p className="text-sm text-gray-700 mt-4">Heads of a Delegation must submit the <strong>Delegation Sheet</strong> with details of the delegation. Reference: Google Sheets Link</p>
+                )}
               </>
             )}
           </div>
@@ -498,6 +534,12 @@ const RegistrationForm = () => {
           <h2 className="text-2xl md:text-3xl font-bold mb-4 text-[#00B7FF]">Payment</h2>
           <div className="flex-grow space-y-4 md:space-y-6 py-2">
             <div className="space-y-2">
+              {isInternal && (
+                <p className="mb-4">Please make the payment of <strong>₹1500/-</strong> for internal delegates at "PayU Link"</p>
+              )}
+              {!isInternal && (
+                <p className="mb-4">Please make the payment of <strong>₹1800/-</strong> for external delegates at "PayU Link"</p>
+              )}
               <Label className="text-sm md:text-base">Payment ID</Label>
               <Input
                 name="paymentId"
@@ -560,9 +602,9 @@ const RegistrationForm = () => {
       
       const now = Date.now()
       
-      const uploadFile = async (file: File | null, folderName: string, fieldName: string, ) => {
+      const uploadFile = async (file: File | null, fieldName: string) => {
         if (!file) return null;
-        const filePath = `${folderName}/${user.id}/${now}_${file.name}`
+        const filePath = `${user.id}/${fieldName}_${now}_${file.name}`
 
         const { data: uploadData, error: uploadError } = await supabase.storage
           .from('registration-files')
@@ -570,139 +612,132 @@ const RegistrationForm = () => {
 
         if (uploadError) throw uploadError;
 
-        // const { data: { publicUrl } } = supabase.storage
-        //   .from('registration-files')
-        //   .getPublicUrl(filePath);
-
         return uploadData.path;
       };
 
-      if (isInternal) {
-        const [collegeIdUrl, experienceUrl, paymentProofUrl] = await Promise.all([
-          uploadFile(formData.collegeIdFile, 'college-ids', 'collegeIdFile'),
-          uploadFile(formData.delegateExperienceFile, 'delegate-experience', 'delegateExperienceFile'),
-          uploadFile(formData.paymentProofFile, 'payment-proofs', 'paymentProofFile'),
-        ]);
-
-        // Internal registration
-        const { error: internalRegError } = await supabase
-          .from('internal_registrations')
-          .insert({
-            user_id: user.id,
-            roll_number: formData.rollNumber,
-            college_id_photo_url: collegeIdUrl,
-            delegate_experience_doc_url: experienceUrl,
-            payment_id: formData.paymentId,
-            payment_proof_url: paymentProofUrl,
-          });
-        
-        if (internalRegError) throw internalRegError;
-
-      } else {
-        const fileUploadsExternal = [
-          uploadFile(formData.idProofFile, 'id-proofs', 'idProofFile'),
-          uploadFile(formData.delegateExperienceFile, 'delegate-experience', 'delegateExperienceFile'),
-          uploadFile(formData.paymentProofFile, 'payment-proofs', 'paymentProofFile'),
-        ];
-
-        if (groupDelegation && isHeadOfDelegation) {
-          fileUploadsExternal.push(uploadFile(formData.delegationSheetFile, 'delegation-sheets', 'delegationSheetFile'));
-        }
-
-        const uploadedUrls = await Promise.all(fileUploadsExternal);
-        const [idProofUrl, experienceUrl, paymentProofUrl, delegationSheetUrl] = uploadedUrls;
-
-        // External registration
-        const { error: externalRegError } = await supabase
-          .from('external_registrations')
-          .insert({
-            user_id: user.id,
-            residential_address: formData.residentialAddress,
-            residential_pincode: formData.residentialPincode,
-            university_name: formData.universityName,
-            university_address: formData.universityAddress,
-            university_pincode: formData.universityPincode,
-            id_proof_url: idProofUrl,
-            accomodation_required: formData.accommodation,
-            delegation_type: groupDelegation ? 'group' : 'individual',
-            delegation_name: groupDelegation ? formData.delegationName : null,
-            is_head_of_delegation: groupDelegation ? isHeadOfDelegation : null,
-            delegation_sheet_url: delegationSheetUrl || null,
-            delegate_experience_doc_url: experienceUrl,
-            payment_id: formData.paymentId,
-            payment_proof_url: paymentProofUrl,
-          });
-
-        if (externalRegError) throw externalRegError;
+      const fileUploads = {
+        collegeIdUrl: isInternal ? await uploadFile(formData.collegeIdFile, "CollegeID") : null,
+        idProofUrl: !isInternal ? await uploadFile(formData.idProofFile, "IDProof") : null,
+        experienceUrl: await uploadFile(formData.delegateExperienceFile, "DelExperience"),
+        paymentProofUrl: await uploadFile(formData.paymentProofFile, "PaymentProof"),
+        delegationSheetUrl: groupDelegation && isHeadOfDelegation
+          ? await uploadFile(formData.delegationSheetFile, "DelegationSheet")
+          : null,
       }
 
-      for (let i = 1; i <= 3; i++) {
-        const prefKey = `pref${i}` as keyof typeof prefs;
-        const roleKey = `role${i}` as keyof typeof prefs;
+      const { data: transaction, error: transactionError } = await supabase.rpc('start_transaction');
+      if (transactionError) throw transactionError;
 
-        const { data: prefData, error: prefError } = await supabase
-          .from('user_preferences')
-          .insert({
-            user_id: user.id,
-            preference_order: i,
-            role: prefs[prefKey],
-            ip_subrole: prefs[prefKey] === 'IP' ? prefs[roleKey] : null,
-            committee_id: prefs[prefKey] === 'delegate' ? formData[`committee${i}` as keyof typeof formData] as string : null
-          })
-          .select()
-          .single();
+      try {
+        if (isInternal) {
+          const { error: internalRegError } = await supabase
+            .from('internal_registrations')
+            .insert({
+              user_id: user.id,
+              roll_number: formData.rollNumber,
+              college_id_photo_url: fileUploads.collegeIdUrl,
+              delegate_experience_doc_url: fileUploads.experienceUrl,
+              payment_id: formData.paymentId,
+              payment_proof_url: fileUploads.paymentProofUrl,
+            });
+          
+          if (internalRegError) throw internalRegError;
+        } else { 
+          const { error: externalRegError } = await supabase
+            .from('external_registrations')
+            .insert({
+              user_id: user.id,
+              residential_address: formData.residentialAddress,
+              residential_pincode: formData.residentialPincode,
+              university_name: formData.universityName,
+              university_address: formData.universityAddress,
+              university_pincode: formData.universityPincode,
+              id_proof_url: fileUploads.idProofUrl,
+              accomodation_required: formData.accommodation,
+              delegation_type: groupDelegation ? 'group' : 'individual',
+              delegation_name: groupDelegation ? formData.delegationName : null,
+              is_head_of_delegation: groupDelegation ? isHeadOfDelegation : null,
+              delegation_sheet_url: fileUploads.delegationSheetUrl || null,
+              delegate_experience_doc_url: fileUploads.experienceUrl,
+              payment_id: formData.paymentId,
+              payment_proof_url: fileUploads.paymentProofUrl,
+            });
 
-        if (prefError) throw prefError;
+          if (externalRegError) throw externalRegError;
+        }
 
-        if (prefs[prefKey] === 'delegate') {
-          const countryPrefs = [];
-          for (let j = 1; j <= 3; j++) {
-            const countryId = formData[`country${i}_${j}` as keyof typeof formData];
-            if (countryId) {
-              countryPrefs.push({
-                user_id: user.id,
-                preference_order: i,
-                country_order: j,
-                country_id: countryId
-              });
+        for (let i = 1; i <= 3; i++) {
+          const prefKey = `pref${i}` as keyof typeof prefs;
+          const roleKey = `role${i}` as keyof typeof prefs;
+
+          const { data: prefData, error: prefError } = await supabase
+            .from('user_preferences')
+            .insert({
+              user_id: user.id,
+              preference_order: i,
+              role: prefs[prefKey],
+              ip_subrole: prefs[prefKey] === 'IP' ? prefs[roleKey] : null,
+              committee_id: prefs[prefKey] === 'delegate' ? formData[`committee${i}` as keyof typeof formData] as string : null
+            })
+            .select()
+            .single();
+
+          if (prefError) throw prefError;
+
+          if (prefs[prefKey] === 'delegate') {
+            const countryPrefs = [];
+            for (let j = 1; j <= 3; j++) {
+              const countryId = formData[`country${i}_${j}` as keyof typeof formData];
+              if (countryId) {
+                countryPrefs.push({
+                  user_id: user.id,
+                  preference_order: i,
+                  country_order: j,
+                  country_id: countryId
+                });
+              }
+            }
+
+            if (countryPrefs.length > 0) {
+              const { error: countryError } = await supabase
+                .from('delegate_country_preferences')
+                .insert(countryPrefs);
+
+              if (countryError) throw countryError;
             }
           }
 
-          if (countryPrefs.length > 0) {
-            const { error: countryError } = await supabase
-              .from('delegate_country_preferences')
-              .insert(countryPrefs);
+          if (prefs[prefKey] === 'IP' && prefs[roleKey] === 'reporter') {
+            const committeePrefs = [];
+            for (let j = 1; j <= 3; j++) {
+              const committeeId = formData[`committee${j}` as keyof typeof formData];
+              if (committeeId) {
+                committeePrefs.push({
+                  user_id: user.id,
+                  preference_order: i,
+                  committee_order: j,
+                  committee_id: committeeId
+                });
+              }
+            }
 
-            if (countryError) throw countryError;
-          }
-        }
+            if (committeePrefs.length > 0) {
+              const { error: reporterError } = await supabase
+                .from('ip_reporter_preferences')
+                .insert(committeePrefs);
 
-        if (prefs[prefKey] === 'IP' && prefs[roleKey] === 'reporter') {
-          const committeePrefs = [];
-          for (let j = 1; j <= 3; j++) {
-            const committeeId = formData[`committee${j}` as keyof typeof formData];
-            if (committeeId) {
-              committeePrefs.push({
-                user_id: user.id,
-                preference_order: i,
-                committee_order: j,
-                committee_id: committeeId
-              });
+              if (reporterError) throw reporterError;
             }
           }
-
-          if (committeePrefs.length > 0) {
-            const { error: reporterError } = await supabase
-              .from('ip_reporter_preferences')
-              .insert(committeePrefs);
-
-            if (reporterError) throw reporterError;
-          }
         }
-      }
+        const { error: commitError } = await supabase.rpc('commit_transaction', { transaction_id: transaction.id });
+        if (commitError) throw commitError;
 
-      router.push('/dashboard');
-      
+        router.push('/dashboard');
+      } catch (error) {
+        await supabase.rpc('rollback_transaction', { transaction_id: transaction.id });
+        throw error;
+      }
     } catch (error) {
       console.error('Error submitting form:', error);
     } finally {

@@ -3,8 +3,6 @@
 import React, { useEffect, useState } from "react";
 import { Label } from "@/components/ui/label";
 import { Select, SelectTrigger, SelectContent, SelectItem } from "@/components/ui/select";
-import { supabase } from "@/lib/supabase";
-import { Loader2 } from "lucide-react";
 
 interface Committee {
   id: string;
@@ -27,6 +25,8 @@ interface PreferenceSectionProps {
     [key: string]: string | boolean | File | null;
   };
   handleInputChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  committees: Committee[];
+  countries: Country[];
 }
 
 export const PreferenceSection = React.memo(({ 
@@ -36,11 +36,10 @@ export const PreferenceSection = React.memo(({
   role, 
   setRole,
   formData,
-  handleInputChange 
+  handleInputChange,
+  committees,
+  countries,
 }: PreferenceSectionProps) => {
-  const [committees, setCommittees] = useState<Committee[]>([]);
-  const [countries, setCountries] = useState<Country[]>([]);
-  const [loading, setLoading] = useState(true);
   const [selectedCommittee, setSelectedCommittee] = useState<string>(
     () => {
       const value = formData[`committee${num}`];
@@ -82,33 +81,6 @@ export const PreferenceSection = React.memo(({
     });
     setSelectedCountries(countryValues);
   }, [formData, num, pref, role]);
-
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const { data: committeesData, error: committeesError } = await supabase
-          .from("committees")
-          .select("*");
-
-        if (committeesError) throw committeesError;
-
-        const { data: countriesData, error: countriesError } = await supabase
-          .from("countries")
-          .select("*");
-
-        if (countriesError) throw countriesError;
-
-        setCommittees(committeesData);
-        setCountries(countriesData);
-      } catch (error) {
-        console.error("Error fetching data:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchData();
-  }, []);
 
   const [isUserAction, setIsUserAction] = useState(false);
 
@@ -168,13 +140,6 @@ export const PreferenceSection = React.memo(({
       .filter(country => !selectedCountries.includes(country.id) || 
         selectedCountries[index - 1] === country.id);
   };
-  if (loading) {
-    return (
-      <div className="flex justify-center items-center min-h-[200px]">
-        <Loader2 className="h-12 w-12 animate-spin text-blue-500" />
-      </div>
-    );
-  }
 
   const getStringValue = (key: string) => {
     const value = formData[key];
@@ -296,3 +261,5 @@ export const PreferenceSection = React.memo(({
 });
 
 PreferenceSection.displayName = "PreferenceSection";
+
+export type { Committee, Country };
