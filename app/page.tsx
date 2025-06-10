@@ -185,8 +185,53 @@ export default function Home() {
             </motion.div>
           </div>
         </section>
+        
+        <section className="py-24 px-25 bg-white">
+          <div className=" px-4 border-black">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6 }}
+              viewport={{ once: true }}
+              className="space-y-12"
+            >
+              <h2 className="text-3xl md:text-5xl font-bold text-center text-gray-900">
+                Letter from the Secretary-General
+              </h2>
+              <p className="text-lg text-gray-700 max-w-4xl mx-auto font-serif">
+              Warm greetings,<br/><br/>
+              It is with great pride and anticipation that I welcome you to Amrita MUN 2025 — a conference built on vision, driven by purpose, and alive with possibility.<br/><br/>
+              What began as a bold new chapter last year has now grown into a conference we&apos;re proud to call one of the most potent, well-curated MUNs in the region. This year, we return with four powerful committees and the International Press Corps, a brilliant team, and a renewed commitment to create a platform where diplomacy meets progress and global conversations begin with you.<br/><br/>
+              As delegates, you are not just participants — you are changemakers. Over these three days, you will explore urgent international issues, negotiate across cultures and ideologies, and shape resolutions that reflect both intellect and empathy. You will challenge yourself, grow as leaders, and walk away with more than just awards — you&apos;ll carry forward a mindset of global citizenship.<br/><br/>
+              The Secretariat has worked tirelessly to craft a meaningful, immersive experience, and we are so excited to welcome you to our Ettimadai campus — nestled between hills, ideas, and hope.<br/><br/>
+              So come prepared. Come curious. And come ready to lead.<br/><br/>
+              On behalf of the entire team, I look forward to meeting you in person — and making Amrita MUN 2025 truly unforgettable.
+              </p>
+              <div className="flex justify-center mt-4">
+                <div className="flex flex-row items-start gap-8 max-w-4xl w-full">
+                  <div className="flex flex-col justify-start ml-100 w-[70%] text-right">
+                    <p className="text-lg text-gray-700 font-serif">
+                    With pride and pleasure,<br/><br/>
+                    </p>
+                    <img 
+                      src="images/Signature.JPG"
+                      alt="Signature"
+                      className="w-[300px] h-auto mb-4 self-end"
+                    />
+                    <p className="text-lg text-gray-700 font-serif">
+                    Shruti Sivakumar<br/>
+                    Secretary General<br/>
+                    Amrita MUN 2025<br/>
+                    Amrita Vishwa Vidyapeetham, Coimbatore
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+          </div>
+        </section>
 
-        <section className="py-24 bg-white">
+        <section className="py-24 px-25 bg-white">
           <div className="container max-w-7xl px-4">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
