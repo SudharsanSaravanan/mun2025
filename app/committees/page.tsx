@@ -23,9 +23,9 @@ interface Committee {
 const committees: Committee[] = [
   {
     id: 1,
-    name: "United Nations Security Council (UNSC)",
-    description: "Step into the shoes of global leaders within the esteemed UN Security Council. Representing diverse member states, you will navigate the complex landscape of international security through collaborative diplomacy, crafting resolutions that illuminate the path towards diplomatic solutions and safeguarding global peace.",
-    logo: "/images/un_logo.png",
+    name: "International Press Coprs",
+    description: "International press corps, constituting both reporters and photojournalists, covers committee proceedings, conducts interviews, writes articles, and captures MUN moments creatively.",
+    logo: "/committees/IPC.png",
     members: [
       { name: "Chairperson", image: "/images/watermelon_head.jpg" },
       { name: "Vice Chair", image: "/images/watermelon_head.jpg" },
@@ -34,9 +34,9 @@ const committees: Committee[] = [
   },
   {
     id: 2,
-    name: "United Nations Conference on Trade and Development (UNCTAD)",
-    description: "Join us in unraveling the complexities of international trade, investment, and sustainable development at the United Nations Conference on Trade and Development. Engage in formal discussions surrounding globalization, negotiate trade agreements, and co-create innovative solutions to foster a more equitable and prosperous future for all nations, particularly those in the developing world.",
-    logo: "/images/un_logo.png",
+    name: "Constituent Assembly",
+    description: "Constituent assembly is a historical Indian setup discussing the formation of the Indian constitution. Debates are based on national policy, rights, and governance.",
+    logo: "/committees/CA.png",
     members: [
       { name: "Chairperson", image: "/images/watermelon_head.jpg" },
       { name: "Vice Chair", image: "/images/watermelon_head.jpg" },
@@ -45,9 +45,9 @@ const committees: Committee[] = [
   },
   {
     id: 3,
-    name: "United Nations High Commissioner for Refugees (UNHCR)",
-    description: "Advocate for the rights and well-being of displaced persons worldwide as a delegate within the United Nations High Commissioner for Refugees. Delve into the complexities of refugee crises and asylum policies, striving to uphold principles of compassion, protection, and solidarity while working towards durable solutions that restore hope and dignity to those forced to flee their homes.",
-    logo: "/images/un_logo.png",
+    name: "United Nations Human Rights Council",
+    description: "United Nations Human Rights Council deals with global human rights issues, violations, and promotes fundamental freedom across countries.",
+    logo: "/committees/UNHRC.png",
     members: [
       { name: "Speaker", image: "/images/watermelon_head.jpg" },
       { name: "Deputy Speaker", image: "/images/watermelon_head.jpg" },
@@ -56,9 +56,9 @@ const committees: Committee[] = [
   },
   {
     id: 4,
-    name: "All India Political Parties Meet (AIPPM)",
-    description: "Join us at the All India Political Parties Meet, where the diverse voices of India's political landscape converge to address pressing national and global challenges. Engage in spirited debates, negotiate alliances, and craft policy positions that reflect the interests and aspirations of your constituency, driving progress and prosperity for all citizens.",
-    logo: "/images/un_logo.png",
+    name: "Economic And Social Council",
+    description: "Economic and Social Council focuses on global economic development, sustainability, and social issues like education, health, and inequality.",
+    logo: "/committees/UNSC.png",
     members: [
       { name: "Director-General", image: "/images/watermelon_head.jpg" },
       { name: "Assistant Director", image: "/images/watermelon_head.jpg" },
@@ -67,26 +67,15 @@ const committees: Committee[] = [
   },
   {
     id: 5,
-    name: "Historic Crisis Committee",
-    description: "Step back in time and immerse yourself in the intricate web of historical events and geopolitical tensions as a member of the Historic Crisis Committee. From pivotal moments in world history to fictionalized scenarios inspired by real-world dynamics, your decisions will shape the course of history and leave an indelible mark on the world stage.",
-    logo: "/images/un_logo.png",
+    name: "United Nations Security Council",
+    description: "United Nations Security Council handles international peace and security. It discusses conflicts, sanctions, peacekeeping missions, and crisis situations.",
+    logo: "/committees/UNSC.png",
     members: [
       { name: "Executive Director", image: "/images/watermelon_head.jpg" },
       { name: "Deputy Director", image: "/images/watermelon_head.jpg" },
       { name: "Programme Officer", image: "/images/watermelon_head.jpg" }
     ]
   },
-  {
-    id: 6,
-    name: "International Press",
-    description: "As members of the International Press, you hold the power to shape narratives and uncover the depths of global events. From capturing pivotal moments to delving into diplomatic discourse, your role is to foster transparency and amplify the voices of those shaping our shared future on the international stage.",
-    logo: "/images/un_logo.png",
-    members: [
-      { name: "President", image: "/images/watermelon_head.jpg" },
-      { name: "Vice President", image: "/images/watermelon_head.jpg" },
-      { name: "Registrar", image: "/images/watermelon_head.jpg" }
-    ]
-  }
 ];
 
 const defaultTiltOptions = {
