@@ -1,5 +1,7 @@
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
+import { supabase } from "@/lib/supabase";
 
 interface UserData {
   id: string;
@@ -23,7 +25,34 @@ interface UserDashboardProps {
 
 export default function UserDashboard({ user, registrationStatus }: UserDashboardProps) {
   const router = useRouter();
-  
+  const [isAllocated, setIsAllocated] = useState(false);
+  const [allocationData, setAllocationData] = useState<any>(null);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchAllocation = async () => {
+      setIsLoading(true);
+      
+      try {
+        const { data: allocationData, error: fetchAllocationError } = await supabase
+          .from('allocations')
+          .select('*')
+          .eq('user_id', user.id)
+
+          if (fetchAllocationError || !allocationData) throw fetchAllocationError;
+          
+        if (allocationData.length === 1) setIsAllocated(true);
+        setAllocationData(allocationData);
+      } catch (error) {
+        console.error("Fetching Allocation error:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    } ;
+
+    fetchAllocation();
+  }, [user])
+ 
   const handleRegister = () => {
     router.push("/register");
   };
