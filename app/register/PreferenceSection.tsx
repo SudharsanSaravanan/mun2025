@@ -46,14 +46,7 @@ export const PreferenceSection = React.memo(({
       return typeof value === 'string' ? value : '';
     }
   );
-  const [selectedCommittees, setSelectedCommittees] = useState<string[]>(
-    () => {
-      return [1, 2, 3].map(index => {
-        const value = formData[`committee${num}_${index}`];
-        return typeof value === 'string' ? value : '';
-      });
-    }
-  );
+
   const [selectedCountries, setSelectedCountries] = useState<string[]>(
     () => {
       return [1, 2, 3].map(index => {
@@ -130,9 +123,17 @@ export const PreferenceSection = React.memo(({
     return typeof value === "string" ? value : "";
   };
 
+  const parties = [
+    { name: "BJP", flagPath: "/parties/bjp.png", members: ["narendra modi", "amit shah"] },
+    { name: "Congress", flagPath: "/parties/congress.svg", members: ["rahul gandhi", "sashi tharoor"] },
+    { name: "AAP", flagPath: "/parties/aap.svg", members: ["arvind kejriwal"] },
+    { name: "AITC", flagPath: "/parties/aitc.svg", members: ["mamata banerjee"] },
+    { name: "Samajwadi Party", flagPath: "/parties/samajwadi-party.svg", members: ["akhilesh yadav"] },
+  ];
+  
   return (
     <div className="space-y-2 md:space-y-3">
-      <Label className="text-sm md:text-base font-medium">Preference {num}</Label>
+      <Label className="text-sm md:text-base font-medium">Category</Label>
       <Select 
         value={pref} 
         onValueChange={setPref}
@@ -207,8 +208,8 @@ export const PreferenceSection = React.memo(({
               </SelectContent>
             </Select>
           </div>
-
-          <Label className="text-sm md:text-base mt-1">Country Preferences</Label>
+          
+          <Label className="text-sm md:text-base mt-1">Country/Member Preferences</Label>
           {[1, 2, 3].map((index) => (
             <div key={index} className="w-[300px] sm:w-[400px]">
               <Select
@@ -219,15 +220,29 @@ export const PreferenceSection = React.memo(({
                 <SelectTrigger 
                   className={`w-full mt-1 ${!validateSelection(getStringValue(`country${num}_${index}`)) ? 'border-red-500' : ''}`}
                 >
-                  {countries.find(c => c.id === getStringValue(`country${num}_${index}`))?.name || `Select Country ${index}`}
+                  {countries.find(c => c.id === getStringValue(`country${num}_${index}`))?.name || `Select Country/Member ${index}`}
                 </SelectTrigger>
                 <SelectContent className="w-[300px] sm:w-[400px]">
-                  <SelectItem value="none">{`Select Country ${index}`}</SelectItem>
-                  {getAvailableCountries(index).map(country => (
-                    <SelectItem key={country.id} value={country.id}>
-                      {country.name}
-                    </SelectItem>
-                  ))}
+                  <SelectItem value="none">{`Select Country/Member ${index}`}</SelectItem>
+                  {getAvailableCountries(index).map(country => {
+                    const isConstituentAssembly = committees.find(c => c.id === selectedCommittee)?.name === "Constituent Assembly";
+                    const defaultFlag = `/flags/${country.name.toLowerCase()}.svg`;
+                    const party = parties.find(p => p.members.includes(country.name.toLowerCase()));
+                    const flagPath = isConstituentAssembly ? (party?.flagPath ?? defaultFlag) : defaultFlag;
+                    
+                    return (
+                      <SelectItem key={country.id} value={country.id}>
+                        <div className="flex items-center">
+                          <img 
+                            src={flagPath} 
+                            alt="flag" 
+                            className="w-6 mr-2" 
+                          />
+                          {country.name}
+                        </div>
+                      </SelectItem>
+                    );
+                  })}
                 </SelectContent>
               </Select>
             </div>
