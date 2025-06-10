@@ -163,8 +163,32 @@ const RegistrationForm = () => {
       if (step === 2) {
         if (!formData.rollNumber) errors.rollNumber = "Roll number is required";
       } else if (step == 3 || step == 4 || step == 5) {
-        // Preferences Validation
-      } else if (step == 6) {
+        const prefNum = step - 2;
+        const prefKey = `pref${prefNum}` as keyof typeof prefs;
+        const roleKey = `role${prefNum}` as keyof typeof prefs;
+
+        if (!prefs[prefKey]) {
+          errors[prefKey] = `Preference ${prefNum} is required`;
+        }
+
+        if (prefs[prefKey] === "IP" && !prefs[roleKey]) {
+          errors[roleKey] = `Role for Preference ${prefNum} is required`;
+        }
+
+        const committeeKey = `committee${prefNum}` as keyof typeof formData;
+        if (((prefs[prefKey] === "delegate") || (prefs[prefKey] === "IP" && prefs[roleKey] === "reporter")) && !formData[committeeKey]) {
+          errors[committeeKey] = `Committee for Preference ${prefNum} is required`;
+        }
+
+        if (prefs[prefKey] === "delegate") {
+          for (let i = 1; i <= 3; i++) {
+            const countryKey = `country${prefNum}_${i}` as keyof typeof formData;
+            if (!formData[countryKey]) {
+              errors[countryKey] = `Country ${i} for Preference ${prefNum} is required`;
+            }
+          }
+        }
+      } else if (step === 6) {
         if (!formData.collegeIdFile) errors.collegeIdFile = "College ID is required";
         if (!formData.delegateExperienceFile) errors.delegateExperienceFile = "Delegate experience is required";
       } else if (step === 7) {
@@ -200,7 +224,31 @@ const RegistrationForm = () => {
       } else if (step === 3 && groupDelegation) {
         if (!formData.delegationName) errors.delegationName = "Delegation name is required";
       } else if (step === 4 || step === 5 || step === 6) {
-        // Preferences Validation
+        const prefNum = step - 3;
+        const prefKey = `pref${prefNum}` as keyof typeof prefs;
+        const roleKey = `role${prefNum}` as keyof typeof prefs;
+
+        if (!prefs[prefKey]) {
+          errors[prefKey] = `Preference ${prefNum} is required`;
+        }
+
+        if (prefs[prefKey] === "IP" && !prefs[roleKey]) {
+          errors[roleKey] = `Role for Preference ${prefNum} is required`;
+        }
+
+        const committeeKey = `committee${prefNum}` as keyof typeof formData;
+         if (((prefs[prefKey] === "delegate") || (prefs[prefKey] === "IP" && prefs[roleKey] === "reporter")) && !formData[committeeKey]) {
+          errors[committeeKey] = `Committee for Preference ${prefNum} is required`;
+        }
+
+        if (prefs[prefKey] === "delegate") {
+          for (let i = 1; i <= 3; i++) {
+            const countryKey = `country${prefNum}_${i}` as keyof typeof formData;
+            if (!formData[countryKey]) {
+              errors[countryKey] = `Country ${i} for Preference ${prefNum} is required`;
+            }
+          }
+        }
       } else if (step === 7) {
         if (!formData.idProofFile) errors.idProofFile = "ID proof is required";
         if (!formData.delegateExperienceFile) errors.delegateExperienceFile = "Delegate experience is required";
@@ -681,7 +729,7 @@ const RegistrationForm = () => {
             preference_order: i,
             role: prefs[prefKey],
             ip_subrole: prefs[prefKey] === 'IP' ? prefs[roleKey] : null,
-            committee_id: prefs[prefKey] === 'delegate' ? formData[`committee${i}` as keyof typeof formData] as string : null
+            committee_id: (prefs[prefKey] === 'delegate' || (prefs[prefKey] === 'IP' && prefs[roleKey] === 'reporter')) ? formData[`committee${i}` as keyof typeof formData] as string : null
           })
           .select()
           .single();
@@ -710,29 +758,6 @@ const RegistrationForm = () => {
             if (countryError) throw countryError;
           }
         }
-
-        if (prefs[prefKey] === 'IP' && prefs[roleKey] === 'reporter') {
-          const committeePrefs = [];
-          for (let j = 1; j <= 3; j++) {
-            const committeeId = formData[`committee${j}` as keyof typeof formData];
-            if (committeeId) {
-              committeePrefs.push({
-                user_id: user.id,
-                preference_order: i,
-                committee_order: j,
-                committee_id: committeeId
-              });
-            }
-          }
-
-          if (committeePrefs.length > 0) {
-            const { error: reporterError } = await supabase
-              .from('ip_reporter_preferences')
-              .insert(committeePrefs);
-
-            if (reporterError) throw reporterError;
-          }
-        }
       }
 
       successfulOperations.push("userPrefs");
@@ -744,7 +769,6 @@ const RegistrationForm = () => {
           if (successfulOperations.includes("userPrefs")) {
             await supabase.from('user_preferences').delete().eq('user_id', user.id);
             await supabase.from('delegate_country_preferences').delete().eq('user_id', user.id);
-            await supabase.from('ip_reporter_preferences').delete().eq('user_id', user.id);
           }
 
           if (successfulOperations.includes("internalReg")) {
@@ -826,7 +850,12 @@ const RegistrationForm = () => {
                 )}
                 {currentStep === 1 && <div />}
                 <div className="flex items-center gap-2">
-                  {isLastStep && !validateSubmission() && (
+                  {(isLastStep && !validateSubmission()) && (
+                    <p className="text-red-500 text-sm">
+                      Please complete all required fields
+                    </p>
+                  )}
+                  {((!isLastStep) && (Object.keys(validateStep(currentStep)).length > 0)) && (
                     <p className="text-red-500 text-sm">
                       Please complete all required fields
                     </p>

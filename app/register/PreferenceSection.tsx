@@ -64,17 +64,11 @@ export const PreferenceSection = React.memo(({
   );
 
   useEffect(() => {
-    if (pref === 'delegate') {
+    if (pref === 'delegate' || (pref === 'IP' && role === 'reporter')) {
       const committeeValue = formData[`committee${num}`];
       setSelectedCommittee(typeof committeeValue === 'string' ? committeeValue : '');
-    } else if (pref === 'IP' && role === 'reporter') {
-      const committeeValues = [1, 2, 3].map(index => {
-        const value = formData[`committee${num}_${index}`];
-        return typeof value === 'string' ? value : '';
-      });
-      setSelectedCommittees(committeeValues);
     }
-    
+
     const countryValues = [1, 2, 3].map(index => {
       const value = formData[`country${num}_${index}`];
       return typeof value === 'string' ? value : '';
@@ -100,23 +94,13 @@ export const PreferenceSection = React.memo(({
     setIsUserAction(false);
   }, [selectedCommittee, isUserAction, handleInputChange, num]);
 
-  const handleCommitteeChange = (value: string, index?: number) => {
+  const handleCommitteeChange = (value: string) => {
     setIsUserAction(true);
     const actualValue = value === 'none' ? '' : value;
-    
-    if (pref === 'delegate') {
-      setSelectedCommittee(actualValue);
-      handleInputChange({
-        target: { name: `committee${num}`, value: actualValue }
-      } as React.ChangeEvent<HTMLInputElement>);
-    } else if (typeof index === 'number') {
-      const newSelectedCommittees = [...selectedCommittees];
-      newSelectedCommittees[index - 1] = actualValue;
-      setSelectedCommittees(newSelectedCommittees);
-      handleInputChange({
-        target: { name: `committee${num}_${index}`, value: actualValue }
-      } as React.ChangeEvent<HTMLInputElement>);
-    }
+    setSelectedCommittee(actualValue);
+    handleInputChange({
+      target: { name: `committee${num}`, value: actualValue }
+    } as React.ChangeEvent<HTMLInputElement>);
   };
 
   const validateSelection = (value: string) => {
@@ -172,34 +156,28 @@ export const PreferenceSection = React.memo(({
           </Select>
           {role === "reporter" && (
             <div className="grid grid-cols-1 gap-2 mt-3">
-              <Label className="text-sm md:text-base">Committee Preferences</Label>
-              {[1, 2, 3].map((index) => (
-                <div key={index} className="w-[300px] sm:w-[400px]">
-                  <Label className="text-sm text-gray-600">Committee {index}</Label>
-                  <Select 
-                    value={getStringValue(`committee${num}_${index}`) || "none"} 
-                    onValueChange={(value) => handleCommitteeChange(value, index)} 
-                    required
+              <Label className="text-sm md:text-base">Committee Preference</Label>
+              <div className="w-[300px] sm:w-[400px]">
+                <Select 
+                  value={getStringValue(`committee${num}`) || "none"} 
+                  onValueChange={(value) => handleCommitteeChange(value)} 
+                  required
+                >
+                  <SelectTrigger 
+                    className={`w-full mt-1 ${!validateSelection(getStringValue(`committee${num}`)) ? 'border-red-500' : ''}`}
                   >
-                    <SelectTrigger 
-                      className={`w-full mt-1 ${!validateSelection(getStringValue(`committee${num}_${index}`)) ? 'border-red-500' : ''}`}
-                    >
-                      {committees.find(c => c.id === getStringValue(`committee${num}_${index}`))?.name || "Select Committee"}
-                    </SelectTrigger>
-                    <SelectContent className="w-[300px] sm:w-[400px]">
-                      <SelectItem value="none">Select Committee</SelectItem>
-                      {committees
-                        .filter(committee => !selectedCommittees.includes(committee.id) || 
-                          getStringValue(`committee${num}_${index}`) === committee.id)
-                        .map(committee => (
-                          <SelectItem key={committee.id} value={committee.id}>
-                            {committee.name}
-                          </SelectItem>
-                        ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-              ))}
+                    {committees.find(c => c.id === getStringValue(`committee${num}`))?.name || "Select Committee"}
+                  </SelectTrigger>
+                  <SelectContent className="w-[300px] sm:w-[400px]">
+                    <SelectItem value="none">Select Committee</SelectItem>
+                    {committees.map(committee => (
+                      <SelectItem key={committee.id} value={committee.id}>
+                        {committee.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
           )}
         </div>

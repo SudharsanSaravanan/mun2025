@@ -126,7 +126,7 @@ export default function SignUpPage() {
       return;
     }
 
-    setMessage("Sign up successful! Please check your email to confirm your account.");
+    setMessage("Sign up successful! Please check your email to confirm your account. If you don't see it, be sure to check your spam or junk folder.");
     
     setFormData({
       name: "",
