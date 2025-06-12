@@ -151,11 +151,10 @@ export default function DashboardPage() {
     );
   }
   
-  return (
-    <div className="min-h-screen bg-blue-50">
+  return (    <div className="min-h-screen bg-blue-50">
       <DashboardNavbar onLogout={handleLogout} />      
-      <div className="pt-26 px-6">
-        <div className="max-w-6xl">
+      <div className="pt-20 pb-10 px-4 md:px-6">
+        <div className="max-w-6xl mx-auto">
           {user && (
             <>
               {user.is_admin ? (
