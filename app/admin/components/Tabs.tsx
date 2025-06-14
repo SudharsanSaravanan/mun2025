@@ -17,7 +17,16 @@ const Tabs: React.FC<TabsProps> = ({ activeTab, setActiveTab, unallocatedCount }
         }`}
         onClick={() => setActiveTab('Unallocated')}
       >
-        Unallocated <span className="ml-2 bg-red-500 text-white rounded-full px-2 py-1 text-xs">{unallocatedCount}</span>
+        Unallocated 
+        {unallocatedCount > 0 && (
+          <span className={`ml-2 rounded-full px-2 py-1 text-xs font-extrabold ${
+            activeTab === 'Unallocated'
+              ? 'bg-white text-blue-600'  // Active state: white bg, blue text
+              : 'bg-blue-600 text-white'   // Inactive state: blue bg, white text
+          }`}>
+            {unallocatedCount}
+          </span>
+        )}
       </button>
       <button
         className={`px-4 py-2 font-semibold rounded-t-lg ${

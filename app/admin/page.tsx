@@ -107,10 +107,10 @@ const AdminDashboard: React.FC = () => {
   const allocatedCount = delegates.filter((d) => d.allocation).length;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-140 to-blue-700 p-6">
+    <div className="min-h-screen bg-blue-200 p-6">
       <div className="max-w-7xl mx-auto">
         {/* Header Section */}
-        <header className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-4">
+        <header className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-28">
           <div className="flex items-center mb-4 sm:mb-0">
             <div className="relative">
               <img
