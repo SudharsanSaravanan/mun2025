@@ -26,7 +26,7 @@ interface UserDashboardProps {
 
 export default function UserDashboard({ user, registrationStatus }: UserDashboardProps) {
   const router = useRouter();
-  const [isAllocated, setIsAllocated] = useState(false);
+  const [isAllocated, setIsAllocated] = useState(true);
   const [allocationData, setAllocationData] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
 
