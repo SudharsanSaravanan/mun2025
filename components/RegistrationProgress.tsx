@@ -48,12 +48,12 @@ export function RegistrationProgress({ currentStep }: RegistrationProgressProps)
   }, []);
 
   return (
-    <div className="w-full mb-8 mt-14">
+    <div className="w-full mb-8 mt-4">
       <div className="relative h-24">
         {/* Progress line segments - positioned below circles */}
         <div className="absolute top-5 left-0 right-0 w-full flex justify-center z-10">
           {/* First line segment */}
-          <div className="w-1/3 flex items-center justify-center px-8">
+          <div className="w-1/3 flex items-center justify-center pl-10 pr-6 md:pl-0">
             <div 
               className={`h-2 w-full rounded-full ${
                 getStepStatus("registration") === "completed" 
@@ -64,7 +64,7 @@ export function RegistrationProgress({ currentStep }: RegistrationProgressProps)
           </div>
           
           {/* Second line segment */}
-          <div className="w-1/3 flex items-center justify-center px-8">
+          <div className="w-1/3 flex items-center justify-center pr-8 md:pr-0 pl-8">
             <div 
               className={`h-2 w-full rounded-full ${
                 getStepStatus("review") === "completed" 

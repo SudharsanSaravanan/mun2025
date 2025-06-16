@@ -60,12 +60,12 @@ export default function UserDashboard({ user, registrationStatus }: UserDashboar
   
   return (
     <div className="flex flex-col items-center justify-center w-full py-8">
-      <div className="mb-8 self-start ml-4 md:ml-8">
+      <div className="mb-8 self-start ml-2">
         <h1 className="text-3xl font-bold text-gray-900">Hi {user.name}</h1>
       </div>
-        <div className="max-w-md w-full mx-auto">{registrationStatus.isRegistered ? (
+        <div className="max-w-2xl md:max-w-xl w-full mx-auto">{registrationStatus.isRegistered ? (
           <>
-            
+
             <RegistrationProgress 
               currentStep={isAllocated ? "allocation" : "review"} 
             />
@@ -79,7 +79,6 @@ export default function UserDashboard({ user, registrationStatus }: UserDashboar
                     Your allocation is complete
                   </p>
                 </div>
-
              
                 <div className="w-full border border-blue-200 rounded-lg bg-blue-50 p-5 shadow-sm mb-4">
                   <h3 className="text-lg font-medium text-blue-800 mb-3 text-center">Your Allocation Details</h3>
@@ -144,29 +143,28 @@ export default function UserDashboard({ user, registrationStatus }: UserDashboar
               </>
             )}
           </>
-        ) : (              <>
-                <RegistrationProgress currentStep="registration" />
-                
-                <div className="flex flex-col items-center w-full text-center">
-                  <div className="mb-5 p-5 border border-blue-100 rounded-lg bg-blue-50 w-full text-sm shadow-sm">
-                    <p className="text-gray-700 mb-3 font-medium">Registration Guidelines:</p>
-                    <ul className="list-disc pl-5 text-left text-gray-600">
-                      <li className="mb-1.5">Complete all required fields</li>
-                      <li className="mb-1.5">Have your ID proof ready to upload</li>
-                      <li className="mb-1.5">Select your committee preferences wisely</li>
-                    </ul>
-                  </div>
-                  <Button 
-                    onClick={handleRegister}
-                    className="cursor-pointer bg-[#00B7FF] hover:bg-blue-600 text-white font-medium px-10 py-3 rounded-md shadow-sm transition-all hover:shadow"
-                  >
-                    Complete Registration
-                  </Button>
-                </div>
-              </>
+        ) : (              
+          <>
+            <RegistrationProgress currentStep="registration" />
             
+            <div className="flex flex-col items-center w-full text-center">
+              <div className="mb-5 p-5 border border-blue-100 rounded-lg bg-blue-50 w-full text-sm shadow-sm">
+                <p className="text-gray-700 mb-3 font-medium">Guidelines</p>
+                <ul className="list-disc pl-5 text-left text-gray-600">
+                  <li className="mb-1.5">Complete all required fields</li>
+                  <li className="mb-1.5">Have your ID proof ready to upload</li>
+                  <li className="mb-1.5">Select your committee preferences wisely</li>
+                </ul>
+              </div>
+              <Button 
+                onClick={handleRegister}
+                className="cursor-pointer bg-[#00B7FF] hover:bg-blue-600 text-white font-medium px-10 py-3 rounded-md shadow-sm transition-all hover:shadow"
+              >
+                Complete Registration
+              </Button>
+            </div>
+          </> 
         )}
-      
       </div>
     </div>
   );
