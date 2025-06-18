@@ -58,68 +58,78 @@ export default function UserDashboard({ user, registrationStatus }: UserDashboar
     router.push("/register");
   };  
   
+
+  const sharedGuidelines = (
+    <ul className="list-disc pl-5 text-left text-gray-600">
+      <li className="mb-1.5">Complete all required fields in your application</li>
+      <li className="mb-1.5">Have your ID proof ready for verification</li>
+      <li className="mb-1.5">Select your committee preferences wisely</li>
+      <li className="mb-1.5">For any queries, contact the secretariat at support@amun25.org</li>
+    </ul>
+  );
+
   return (
     <div className="flex flex-col items-center justify-center w-full py-8">
       <div className="mb-8 self-start ml-2">
         <h1 className="text-3xl font-bold text-gray-900">Hi {user.name}</h1>
       </div>
-        <div className="max-w-2xl md:max-w-xl w-full mx-auto">{registrationStatus.isRegistered ? (
+      <div className="max-w-2xl md:max-w-xl w-full mx-auto">
+        {registrationStatus.isRegistered ? (
           <>
-
             <RegistrationProgress 
               currentStep={isAllocated ? "allocation" : "review"} 
             />
-              {isAllocated ? (
+            {isAllocated ? (
               <>
-                <div className="flex items-center justify-center bg-green-50 p-4 border border-green-200 rounded-lg shadow-sm mb-4">
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 mr-2 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                  </svg>
-                  <p className="text-green-800 font-medium">
-                    Your allocation is complete
-                  </p>
-                </div>
-             
-                <div className="w-full border border-blue-200 rounded-lg bg-blue-50 p-5 shadow-sm mb-4">
-                  <h3 className="text-lg font-medium text-blue-800 mb-3 text-center">Your Allocation Details</h3>
+                                <div className="w-full border border-blue-200 rounded-lg bg-gradient-to-br from-blue-50 to-blue-100 p-6 shadow-md mb-6 relative overflow-hidden">
                   
-                  <div className="space-y-2">
-                    <div className="flex justify-between items-center p-2 bg-white rounded">
-                      <span className="font-medium text-gray-700">Category:</span>
-                      <span className="font-medium text-blue-700">{allocationData?.[0]?.category || "Not specified"}</span>
-                    </div>
-                    <div className="flex justify-between items-center p-2 bg-white rounded">
-                      <span className="font-medium text-gray-700">Committee:</span>
-                      <span className="font-medium text-blue-700">{allocationData?.[0]?.committee || "Not specified"}</span>
-                    </div>
-                    <div className="flex justify-between items-center p-2 bg-white rounded">
-                      <span className="font-medium text-gray-700">Country:</span>
-                      <span className="font-medium text-blue-700">{allocationData?.[0]?.country || "Not specified"}</span>
+                  
+                  <div className="relative z-10">
+                    <h3 className="text-xl font-bold text-blue-800 mb-5 text-center">Your Allocation Details</h3>
+                    
+                    <div className="space-y-4">
+                      <div className="flex flex-col md:flex-row md:justify-between md:items-center p-3 bg-white rounded-lg border border-blue-100 shadow-sm hover:shadow-md transition-shadow">
+                        <div className="flex items-center mb-2 md:mb-0">
+                          <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center mr-3">
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                            </svg>
+                          </div>
+                          <span className="font-semibold text-gray-700">Category:</span>
+                        </div>
+                        <span className="font-semibold text-blue-700 bg-blue-50 px-4 py-1.5 rounded-full">{allocationData?.[0]?.role || "Not specified"}</span>
+                      </div>
+                      
+                      <div className="flex flex-col md:flex-row md:justify-between md:items-center p-3 bg-white rounded-lg border border-blue-100 shadow-sm hover:shadow-md transition-shadow">
+                        <div className="flex items-center mb-2 md:mb-0">
+                          <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center mr-3">
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                            </svg>
+                          </div>
+                          <span className="font-semibold text-gray-700">Committee:</span>
+                        </div>
+                        <span className="font-semibold text-blue-700 bg-blue-50 px-4 py-1.5 rounded-full">{allocationData?.[0]?.committee_id || "Not specified"}</span>
+                      </div>
+                      
+                      <div className="flex flex-col md:flex-row md:justify-between md:items-center p-3 bg-white rounded-lg border border-blue-100 shadow-sm hover:shadow-md transition-shadow">
+                        <div className="flex items-center mb-2 md:mb-0">
+                          <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center mr-3">
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 21v-4m0 0V5a2 2 0 012-2h6.5l1 1H21l-3 6 3 6h-8.5l-1-1H5a2 2 0 00-2 2zm9-13.5V9" />
+                            </svg>
+                          </div>
+                          <span className="font-semibold text-gray-700">Country:</span>
+                        </div>
+                        <span className="font-semibold text-blue-700 bg-blue-50 px-4 py-1.5 rounded-full">{allocationData?.[0]?.country || "Not specified"}</span>
+                      </div>
                     </div>
                   </div>
-                </div>
-
-                {/* Allocation Guidelines */}
-                <div className="mt-4 p-5 border border-green-100 rounded-lg bg-green-50 w-full text-sm shadow-sm">
-                  <p className="text-gray-700 mb-3 font-medium">Delegate Guidelines:</p>
-                  <ul className="list-disc pl-5 text-left text-gray-600">
-                    <li className="mb-1.5">Research your allocated country's position thoroughly</li>
-                    <li className="mb-1.5">Prepare position papers according to committee guidelines</li>
-                    <li className="mb-1.5">Attend all scheduled committee sessions</li>
-                    <li className="mb-1.5">Remember to follow the dress code during the event</li>
-                  </ul>
                 </div>
               </>
             ) : (
               <>
-                <div className="flex items-center justify-center bg-green-50 p-4 border border-green-200 rounded-lg shadow-sm mb-4">
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 mr-2 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                  </svg>
-                  <p className="text-green-800 font-medium">
-                    Registration for AMUN 2025 Completed
-                  </p>
-                </div>
+                
                 
                 <div className="flex items-center justify-center bg-yellow-50 p-4 border border-yellow-200 rounded-lg shadow-sm mb-4">
                   <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 mr-2 text-yellow-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -129,17 +139,6 @@ export default function UserDashboard({ user, registrationStatus }: UserDashboar
                     Your application is under review. Allocation results will be announced soon.
                   </p>
                 </div>
-
-                {/* Review Guidelines */}
-                <div className="mt-4 p-5 border border-yellow-100 rounded-lg bg-yellow-50 w-full text-sm shadow-sm">
-                  <p className="text-gray-700 mb-3 font-medium">Review Process Guidelines:</p>
-                  <ul className="list-disc pl-5 text-left text-gray-600">
-                    <li className="mb-1.5">The review process typically takes 3-5 working days</li>
-                    <li className="mb-1.5">Our team evaluates committee preferences and assigns allocations</li>
-                    <li className="mb-1.5">You will receive an email notification once allocations are finalized</li>
-                    <li className="mb-1.5">For any queries regarding your application, contact the secretariat</li>
-                  </ul>
-                </div>
               </>
             )}
           </>
@@ -148,22 +147,39 @@ export default function UserDashboard({ user, registrationStatus }: UserDashboar
             <RegistrationProgress currentStep="registration" />
             
             <div className="flex flex-col items-center w-full text-center">
-              <div className="mb-5 p-5 border border-blue-100 rounded-lg bg-blue-50 w-full text-sm shadow-sm">
-                <p className="text-gray-700 mb-3 font-medium">Guidelines</p>
-                <ul className="list-disc pl-5 text-left text-gray-600">
-                  <li className="mb-1.5">Complete all required fields</li>
-                  <li className="mb-1.5">Have your ID proof ready to upload</li>
-                  <li className="mb-1.5">Select your committee preferences wisely</li>
-                </ul>
-              </div>
               <Button 
                 onClick={handleRegister}
-                className="cursor-pointer bg-[#00B7FF] hover:bg-blue-600 text-white font-medium px-10 py-3 rounded-md shadow-sm transition-all hover:shadow"
+                className="cursor-pointer bg-[#00B7FF] hover:bg-blue-600 text-white font-medium px-10 py-3 rounded-md shadow-sm transition-all hover:shadow mt-5"
               >
                 Complete Registration
               </Button>
             </div>
           </> 
+        )}
+      </div>      <div className="w-full px-4 md:px-8 lg:px-16 mt-8">
+        {registrationStatus.isRegistered ? (
+          isAllocated ? (
+            <div className="max-w-full p-6 border border-gray-200 rounded-lg bg-white text-sm shadow-sm">
+              <p className="text-gray-700 mb-3 font-medium">Delegate Guidelines:</p>
+              <ul className="list-disc pl-5 text-left text-gray-600">
+                <li className="mb-1.5">Research your allocated country's position thoroughly</li>
+                <li className="mb-1.5">Prepare position papers according to committee guidelines</li>
+                <li className="mb-1.5">Attend all scheduled committee sessions</li>
+                <li className="mb-1.5">Remember to follow the dress code during the event</li>
+                <li className="mb-1.5">Submit your position papers by the designated deadline</li>
+              </ul>
+            </div>
+          ) : (
+            <div className="max-w-full p-6 border border-gray-200 rounded-lg bg-white text-sm shadow-sm">
+              <p className="text-gray-700 mb-3 font-medium">Guidelines:</p>
+              {sharedGuidelines}
+            </div>
+          )
+        ) : (
+          <div className="max-w-full p-6 border border-gray-200 rounded-lg bg-white text-sm shadow-sm">
+            <p className="text-gray-700 mb-3 font-medium">Guidelines:</p>
+            {sharedGuidelines}
+          </div>
         )}
       </div>
     </div>

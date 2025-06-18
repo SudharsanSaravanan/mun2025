@@ -18,7 +18,6 @@ export function RegistrationProgress({ currentStep }: RegistrationProgressProps)
     return "upcoming";
   };
 
-  // Add a keyframes style for the pulse animation
   useEffect(() => {
     if (!document.getElementById("progress-pulse-keyframes")) {
       const style = document.createElement("style");
@@ -136,32 +135,26 @@ export function RegistrationProgress({ currentStep }: RegistrationProgressProps)
               Review
             </span>
           </div>
-          
-          {/* Allocation Step */}
+            {/* Allocation Step */}
           <div className="flex flex-col items-center">
             <div 
               className={`w-10 h-10 rounded-full flex items-center justify-center mb-2 ${
-                getStepStatus("allocation") === "completed"
+                getStepStatus("allocation") === "completed" || getStepStatus("allocation") === "current"
                   ? "bg-green-500 text-white" 
-                  : getStepStatus("allocation") === "current"
-                    ? "bg-yellow-50 border-3 border-yellow-400 text-yellow-600 animate-pulse-custom shadow-md" 
-                    : "bg-gray-100 text-gray-400"
+                  : "bg-gray-100 text-gray-400"
               }`}
             >
-              {getStepStatus("allocation") === "completed" ? (
+              {getStepStatus("allocation") === "completed" || getStepStatus("allocation") === "current" ? (
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                 </svg>
               ) : (
                 <span className="text-sm">3</span>
               )}
-            </div>
-            <span className={`text-xs font-medium ${
-              getStepStatus("allocation") === "completed"
+            </div>            <span className={`text-xs font-medium ${
+              getStepStatus("allocation") === "completed" || getStepStatus("allocation") === "current"
                 ? "text-green-600" 
-                : getStepStatus("allocation") === "current"
-                  ? "text-yellow-600"
-                  : "text-gray-500"
+                : "text-gray-500"
             }`}>
               Allocation
             </span>
