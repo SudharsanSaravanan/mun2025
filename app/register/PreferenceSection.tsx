@@ -158,18 +158,20 @@ export const PreferenceSection = React.memo(({
           {role === "reporter" && (
             <div className="grid grid-cols-1 gap-2 mt-3">
               <Label className="text-sm md:text-base">Committee Preference</Label>
-              <div className="w-[300px] sm:w-[400px]">
+              <div className="w-full">
                 <Select 
                   value={getStringValue(`committee${num}`) || "none"} 
                   onValueChange={(value) => handleCommitteeChange(value)} 
                   required
                 >
                   <SelectTrigger 
-                    className={`w-full mt-1 ${!validateSelection(getStringValue(`committee${num}`)) ? 'border-red-500' : ''}`}
+                    className={`w-full mt-1 flex items-center justify-between ${!validateSelection(getStringValue(`committee${num}`)) ? 'border-red-500' : ''}`}
                   >
-                    {committees.find(c => c.id === getStringValue(`committee${num}`))?.name || "Select Committee"}
+                    <span className="truncate block">
+                      {committees.find(c => c.id === getStringValue(`committee${num}`))?.name || "Select Committee"}
+                    </span>
                   </SelectTrigger>
-                  <SelectContent className="w-[300px] sm:w-[400px]">
+                  <SelectContent className="w-full">
                     <SelectItem value="none">Select Committee</SelectItem>
                     {committees.map(committee => (
                       <SelectItem key={committee.id} value={committee.id}>
@@ -187,18 +189,20 @@ export const PreferenceSection = React.memo(({
       {pref === "delegate" && (
         <div className="grid grid-cols-1 gap-3 mt-2">
           <Label className="text-sm md:text-base">Committee Preference</Label>
-          <div className="w-[300px] sm:w-[400px]">
+          <div className="w-full">
             <Select 
               value={getStringValue(`committee${num}`) || "none"} 
               onValueChange={(value) => handleCommitteeChange(value)} 
               required
             >
               <SelectTrigger 
-                className={`w-full mt-1 ${!validateSelection(getStringValue(`committee${num}`)) ? 'border-red-500' : ''}`}
+                className={`w-full mt-1 flex items-center justify-between ${!validateSelection(getStringValue(`committee${num}`)) ? 'border-red-500' : ''}`}
               >
-                {committees.find(c => c.id === getStringValue(`committee${num}`))?.name || "Select Committee"}
+                <span className="truncate block">
+                  {committees.find(c => c.id === getStringValue(`committee${num}`))?.name || "Select Committee"}
+                </span>
               </SelectTrigger>
-              <SelectContent className="w-[300px] sm:w-[400px]">
+              <SelectContent className="w-full">
                 <SelectItem value="none">Select Committee</SelectItem>
                 {committees.map(committee => (
                   <SelectItem key={committee.id} value={committee.id}>

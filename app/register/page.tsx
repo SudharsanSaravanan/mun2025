@@ -842,6 +842,19 @@ const RegistrationForm = () => {
             <Card className="p-4 md:p-6 flex-grow flex flex-col bg-white">
               {renderStepContent()}
               
+              <div className="w-full md:hidden">
+                {(isLastStep && !validateSubmission()) && (
+                  <p className="text-red-500 text-xs">
+                    Please complete all required fields
+                  </p>
+                )}
+                {((!isLastStep) && (Object.keys(validateStep(currentStep)).length > 0)) && (
+                  <p className="text-red-500 text-xs">
+                    Please complete all required fields
+                  </p>
+                )}
+              </div>
+
               <div className="flex justify-between mt-4">
                 {currentStep > 1 && (
                   <Button type="button" onClick={prevStep} variant="outline" className={currentStep === 1 ? "" : backButtonStyle}>
@@ -851,12 +864,12 @@ const RegistrationForm = () => {
                 {currentStep === 1 && <div />}
                 <div className="flex items-center gap-2">
                   {(isLastStep && !validateSubmission()) && (
-                    <p className="text-red-500 text-sm">
+                    <p className="text-red-500 text-xs md:text-sm hidden md:flex">
                       Please complete all required fields
                     </p>
                   )}
                   {((!isLastStep) && (Object.keys(validateStep(currentStep)).length > 0)) && (
-                    <p className="text-red-500 text-sm">
+                    <p className="text-red-500 text-xs md:text-sm hidden md:flex">
                       Please complete all required fields
                     </p>
                   )}
