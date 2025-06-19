@@ -190,14 +190,7 @@ export default function UserDashboard({ user, registrationStatus }: UserDashboar
           <>
             <RegistrationProgress currentStep="registration" />
             
-            <div className="flex flex-col items-center w-full text-center">
-              <Button 
-                onClick={handleRegister}
-                className="cursor-pointer bg-[#00B7FF] hover:bg-blue-600 text-white font-medium px-10 py-3 rounded-md shadow-sm transition-all hover:shadow mt-5"
-              >
-                Complete Registration
-              </Button>
-            </div>
+            
           </> 
         )}
       </div>      
@@ -221,10 +214,20 @@ export default function UserDashboard({ user, registrationStatus }: UserDashboar
             </div>
           )
         ) : (
+          <>
           <div className="max-w-full p-6 border border-gray-200 rounded-lg bg-white text-sm shadow-sm">
             <p className="text-gray-700 mb-3 font-medium">Guidelines:</p>
             {sharedGuidelines}
           </div>
+          <div className="flex flex-col items-center w-full text-center">
+              <Button 
+                onClick={handleRegister}
+                className="cursor-pointer bg-[#00B7FF] hover:bg-blue-600 text-white font-medium px-10 py-3 rounded-md shadow-sm transition-all hover:shadow mt-5"
+              >
+                Complete Registration
+              </Button>
+          </div>
+          </>
         )}
       </div>
     </div>
