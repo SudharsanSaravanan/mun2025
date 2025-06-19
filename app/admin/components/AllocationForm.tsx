@@ -53,7 +53,7 @@ const AllocationForm: React.FC<AllocationFormProps> = ({
           <p><strong>Country:</strong> {delegate.allocation?.country}</p>
           <div className="mt-2 space-x-2">
             <button
-              className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+              className="px-6 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
               onClick={() => setIsEditing(true)}
             >
               Edit
@@ -68,21 +68,27 @@ const AllocationForm: React.FC<AllocationFormProps> = ({
         </div>
       ) : (
         <>
-          <Dropdown
-            options={committees}
-            value={committee}
-            onChange={setCommittee}
-            placeholder="Select Committee"
-          />
-          <Dropdown
-            options={availableCountries.length > 0 ? availableCountries : ['All countries allocated']}
-            value={country}
-            onChange={setCountry}
-            placeholder="Select Country"
-            disabled={!committee || availableCountries.length === 0}
-          />
+          <div className="flex  gap-4 w-full pb-5">
+            <Dropdown
+              options={committees}
+              value={committee}
+              onChange={setCommittee}
+              placeholder="Select Committee"
+              className="w-full"
+            />
+            
+            <Dropdown
+              options={availableCountries.length > 0 ? availableCountries : ['All countries allocated']}
+              value={country}
+              onChange={setCountry}
+              placeholder="Select Country"
+              disabled={!committee || availableCountries.length === 0}
+              className="w-full"
+            />
+          </div>
+          
           <button
-            className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:bg-gray-400"
+            className=" px-5 py-2 bg-blue-600 text-white rounded hover:bg-blue-900 disabled:bg-gray-400"
             onClick={isAllocated ? handleEdit : handleAllocate}
             disabled={!committee || !country}
           >

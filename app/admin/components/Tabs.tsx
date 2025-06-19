@@ -12,7 +12,7 @@ const Tabs: React.FC<TabsProps> = ({ activeTab, setActiveTab, unallocatedCount }
       <button
         className={`px-4 py-2 font-semibold rounded-t-lg ${
           activeTab === 'Unallocated'
-            ? 'bg-blue-600 text-white'
+            ? 'bg-blue-900 text-white'
             : 'bg-gray-200 text-blue-900'
         }`}
         onClick={() => setActiveTab('Unallocated')}
@@ -22,7 +22,7 @@ const Tabs: React.FC<TabsProps> = ({ activeTab, setActiveTab, unallocatedCount }
           <span className={`ml-2 rounded-full px-2 py-1 text-xs font-extrabold ${
             activeTab === 'Unallocated'
               ? 'bg-white text-blue-600'  // Active state: white bg, blue text
-              : 'bg-blue-600 text-white'   // Inactive state: blue bg, white text
+              : 'bg-blue-900 text-white'   // Inactive state: blue bg, white text
           }`}>
             {unallocatedCount}
           </span>
@@ -31,7 +31,7 @@ const Tabs: React.FC<TabsProps> = ({ activeTab, setActiveTab, unallocatedCount }
       <button
         className={`px-4 py-2 font-semibold rounded-t-lg ${
           activeTab === 'Allocated'
-            ? 'bg-blue-600 text-white'
+            ? 'bg-blue-900 text-white'
             : 'bg-gray-200 text-blue-900'
         }`}
         onClick={() => setActiveTab('Allocated')}
