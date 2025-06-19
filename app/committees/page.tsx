@@ -25,7 +25,7 @@ const committees: Committee[] = [
     id: 1,
     name: "International Press Coprs",
     description: "International press corps, constituting both reporters and photojournalists, covers committee proceedings, conducts interviews, writes articles, and captures MUN moments creatively.",
-    logo: "/committees/IPC.png",
+    logo: "/images/IPC_logo.png",
     members: [
       { name: "Chairperson", image: "/images/watermelon_head.jpg" },
       { name: "Vice Chair", image: "/images/watermelon_head.jpg" },
@@ -36,7 +36,7 @@ const committees: Committee[] = [
     id: 2,
     name: "Constituent Assembly",
     description: "Constituent assembly is a historical Indian setup discussing the formation of the Indian constitution. Debates are based on national policy, rights, and governance.",
-    logo: "/committees/CA.png",
+    logo: "/images/CA_logo.png",
     members: [
       { name: "Chairperson", image: "/images/watermelon_head.jpg" },
       { name: "Vice Chair", image: "/images/watermelon_head.jpg" },
@@ -47,7 +47,7 @@ const committees: Committee[] = [
     id: 3,
     name: "United Nations Human Rights Council",
     description: "United Nations Human Rights Council deals with global human rights issues, violations, and promotes fundamental freedom across countries.",
-    logo: "/committees/UNHRC.png",
+    logo: "/images/UNHRC_logo.png",
     members: [
       { name: "Speaker", image: "/images/watermelon_head.jpg" },
       { name: "Deputy Speaker", image: "/images/watermelon_head.jpg" },
@@ -58,7 +58,7 @@ const committees: Committee[] = [
     id: 4,
     name: "Economic And Social Council",
     description: "Economic and Social Council focuses on global economic development, sustainability, and social issues like education, health, and inequality.",
-    logo: "/committees/UNSC.png",
+    logo: "/images/UNSC_logo.png",
     members: [
       { name: "Director-General", image: "/images/watermelon_head.jpg" },
       { name: "Assistant Director", image: "/images/watermelon_head.jpg" },
@@ -69,7 +69,7 @@ const committees: Committee[] = [
     id: 5,
     name: "United Nations Security Council",
     description: "United Nations Security Council handles international peace and security. It discusses conflicts, sanctions, peacekeeping missions, and crisis situations.",
-    logo: "/committees/UNSC.png",
+    logo: "/images/UNSC_logo.png",
     members: [
       { name: "Executive Director", image: "/images/watermelon_head.jpg" },
       { name: "Deputy Director", image: "/images/watermelon_head.jpg" },
@@ -135,12 +135,12 @@ export default function CommitteePage() {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div className="flex flex-wrap justify-center gap-4 sm:gap-8">
             {committees.map((committee) => (
               <Tilt key={committee.id} options={defaultTiltOptions}>
                 <div
-                  className="bg-white rounded-xl shadow-md overflow-hidden cursor-pointer h-full transition-shadow duration-300 hover:shadow-lg border border-sky-100 flex flex-col"
-                  onClick={() => openModal(committee)}
+                  className="bg-white rounded-xl shadow-md overflow-hidden cursor-pointer h-full transition-shadow duration-300 hover:shadow-lg border border-sky-100 flex flex-col w-full max-w-[170px] sm:max-w-sm min-w-[160px] sm:min-w-[280px] flex-shrink-0"
+                  //onClick={() => openModal(committee)}
                 >
                   <div className="relative aspect-[4/3] w-full">
                     <Image
@@ -158,9 +158,9 @@ export default function CommitteePage() {
                   </div>
 
                   {/* Fixed card content section - consistent height and no mt-auto */}
-                  <div className="p-6 flex-grow bg-white border-t border-sky-100 flex flex-col">
-                    <h2 className="text-xl font-semibold text-gray-800 mb-3">{committee.name}</h2>
-                    <p className="text-gray-600 text-sm line-clamp-3">{committee.description}</p>
+                  <div className="p-4 sm:p-6 flex-grow bg-white border-t border-sky-100 flex flex-col">
+                    <h2 className="text-lg sm:text-xl font-semibold text-gray-800 mb-2 sm:mb-3">{committee.name}</h2>
+                    <p className="text-gray-600 text-xs sm:text-sm line-clamp-3">{committee.description}</p>
                   </div>
                 </div>
               </Tilt>
