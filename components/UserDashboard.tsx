@@ -118,39 +118,57 @@ export default function UserDashboard({ user, registrationStatus }: UserDashboar
                         </span>
                       </div>
                       
-                      <div className="flex flex-col md:flex-row md:justify-between md:items-center p-3 bg-white rounded-lg border border-blue-100 shadow-sm hover:shadow-md transition-shadow">
-                        <div className="flex items-center mb-2 md:mb-0">
-                          <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center mr-3">
-                            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-                            </svg>
+                      {allocationData?.[0]?.role === 'IP' ? (
+                        <div className="flex flex-col md:flex-row md:justify-between md:items-center p-3 bg-white rounded-lg border border-blue-100 shadow-sm hover:shadow-md transition-shadow">
+                          <div className="flex items-center mb-2 md:mb-0">
+                            <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center mr-3">
+                              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                              </svg>
+                            </div>
+                            <span className="font-semibold text-gray-700">Role:</span>
                           </div>
-                          <span className="font-semibold text-gray-700">Committee:</span>
-                        </div>
-                        <span className="font-semibold text-blue-700 bg-blue-50 px-4 py-1.5 rounded-full">
-                          {allocationData && fetchedCommittees.length > 0 
-                            ? (fetchedCommittees.find(c => c.id === allocationData?.[0]?.committee_id)?.name || "Not specified")
-                            : "Not specified"
-                          }
+                          <span className="font-semibold text-blue-700 bg-blue-50 px-4 py-1.5 rounded-full">
+                            {allocationData?.[0]?.ip_subrole || "Not specified"}
                           </span>
-                      </div>
-                      
-                      <div className="flex flex-col md:flex-row md:justify-between md:items-center p-3 bg-white rounded-lg border border-blue-100 shadow-sm hover:shadow-md transition-shadow">
-                        <div className="flex items-center mb-2 md:mb-0">
-                          <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center mr-3">
-                            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 21v-4m0 0V5a2 2 0 012-2h6.5l1 1H21l-3 6 3 6h-8.5l-1-1H5a2 2 0 00-2 2zm9-13.5V9" />
-                            </svg>
-                          </div>
-                          <span className="font-semibold text-gray-700">Country:</span>
                         </div>
-                        <span className="font-semibold text-blue-700 bg-blue-50 px-4 py-1.5 rounded-full">
-                          {allocationData && fetchedCountries.length > 0
-                            ? (fetchedCountries.find(c => c.id === allocationData?.[0]?.country_id)?.name || "Not specified")
-                            : "Not specified"
-                          }
-                        </span>
-                      </div>
+                      ) : (
+                        <>
+                          <div className="flex flex-col md:flex-row md:justify-between md:items-center p-3 bg-white rounded-lg border border-blue-100 shadow-sm hover:shadow-md transition-shadow">
+                            <div className="flex items-center mb-2 md:mb-0">
+                              <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center mr-3">
+                                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                                </svg>
+                              </div>
+                              <span className="font-semibold text-gray-700">Committee:</span>
+                            </div>
+                            <span className="font-semibold text-blue-700 bg-blue-50 px-4 py-1.5 rounded-full">
+                              {allocationData && fetchedCommittees.length > 0 
+                                ? (fetchedCommittees.find(c => c.id === allocationData?.[0]?.committee_id)?.name || "Not specified")
+                                : "Not specified"
+                              }
+                            </span>
+                          </div>
+                          
+                          <div className="flex flex-col md:flex-row md:justify-between md:items-center p-3 bg-white rounded-lg border border-blue-100 shadow-sm hover:shadow-md transition-shadow">
+                            <div className="flex items-center mb-2 md:mb-0">
+                              <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center mr-3">
+                                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 21v-4m0 0V5a2 2 0 012-2h6.5l1 1H21l-3 6 3 6h-8.5l-1-1H5a2 2 0 00-2 2zm9-13.5V9" />
+                                </svg>
+                              </div>
+                              <span className="font-semibold text-gray-700">Country:</span>
+                            </div>
+                            <span className="font-semibold text-blue-700 bg-blue-50 px-4 py-1.5 rounded-full">
+                              {allocationData && fetchedCountries.length > 0
+                                ? (fetchedCountries.find(c => c.id === allocationData?.[0]?.country_id)?.name || "Not specified")
+                                : "Not specified"
+                              }
+                            </span>
+                          </div>
+                        </>
+                      )}
                     </div>
                   </div>
                 </div>
