@@ -29,6 +29,8 @@ export default function UserDashboard({ user, registrationStatus }: UserDashboar
   const [isAllocated, setIsAllocated] = useState(false);
   const [allocationData, setAllocationData] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [fetchedCommittees, setCommittees] = useState<any[]>([]);
+  const [fetchedCountries, setCountries] = useState<any[]>([]);
 
   useEffect(() => {
     const fetchAllocation = async () => {
@@ -54,6 +56,20 @@ export default function UserDashboard({ user, registrationStatus }: UserDashboar
     fetchAllocation();
   }, [user])
  
+  useEffect(() => {
+    const fetchCommitteeCountryData = async () => {
+      try {
+        const { data: committeesData } = await supabase.from('committees').select('*');
+        const { data: countriesData } = await supabase.from('countries').select('*');
+        setCommittees(committeesData || []);
+        setCountries(countriesData || []);
+      } catch (error) {
+        console.error('Error fetching committee & country data:', error);
+      }
+    };
+    fetchCommitteeCountryData();
+  }, []);
+
   const handleRegister = () => {
     router.push("/register");
   };  
@@ -76,17 +92,13 @@ export default function UserDashboard({ user, registrationStatus }: UserDashboar
       <div className="max-w-2xl md:max-w-xl w-full mx-auto">
         {registrationStatus.isRegistered ? (
           <>
-            <RegistrationProgress 
-              currentStep={isAllocated ? "allocation" : "review"} 
-            />
+            <RegistrationProgress currentStep={isAllocated ? "allocation" : "review"} />
             {isAllocated ? (
               <>
-                                <div className="w-full border border-blue-200 rounded-lg bg-gradient-to-br from-blue-50 to-blue-100 p-6 shadow-md mb-6 relative overflow-hidden">
-                  
-                  
+                <div className="w-full border border-blue-200 rounded-lg bg-gradient-to-br from-blue-50 to-blue-100 p-6 shadow-md mb-6 relative overflow-hidden">
                   <div className="relative z-10">
                     <h3 className="text-xl font-bold text-blue-800 mb-5 text-center">Your Allocation Details</h3>
-                    
+                  
                     <div className="space-y-4">
                       <div className="flex flex-col md:flex-row md:justify-between md:items-center p-3 bg-white rounded-lg border border-blue-100 shadow-sm hover:shadow-md transition-shadow">
                         <div className="flex items-center mb-2 md:mb-0">
@@ -97,7 +109,13 @@ export default function UserDashboard({ user, registrationStatus }: UserDashboar
                           </div>
                           <span className="font-semibold text-gray-700">Category:</span>
                         </div>
-                        <span className="font-semibold text-blue-700 bg-blue-50 px-4 py-1.5 rounded-full">{allocationData?.[0]?.role || "Not specified"}</span>
+                        <span className="font-semibold text-blue-700 bg-blue-50 px-4 py-1.5 rounded-full">
+                          {allocationData?.[0]?.role === 'delegate'
+                            ? 'Delegate'
+                            : allocationData?.[0]?.role === 'IP'
+                              ? 'International Press'
+                              : allocationData?.[0]?.role || 'Not specified'}
+                        </span>
                       </div>
                       
                       <div className="flex flex-col md:flex-row md:justify-between md:items-center p-3 bg-white rounded-lg border border-blue-100 shadow-sm hover:shadow-md transition-shadow">
@@ -109,7 +127,12 @@ export default function UserDashboard({ user, registrationStatus }: UserDashboar
                           </div>
                           <span className="font-semibold text-gray-700">Committee:</span>
                         </div>
-                        <span className="font-semibold text-blue-700 bg-blue-50 px-4 py-1.5 rounded-full">{allocationData?.[0]?.committee_id || "Not specified"}</span>
+                        <span className="font-semibold text-blue-700 bg-blue-50 px-4 py-1.5 rounded-full">
+                          {allocationData && fetchedCommittees.length > 0 
+                            ? (fetchedCommittees.find(c => c.id === allocationData?.[0]?.committee_id)?.name || "Not specified")
+                            : "Not specified"
+                          }
+                          </span>
                       </div>
                       
                       <div className="flex flex-col md:flex-row md:justify-between md:items-center p-3 bg-white rounded-lg border border-blue-100 shadow-sm hover:shadow-md transition-shadow">
@@ -121,7 +144,12 @@ export default function UserDashboard({ user, registrationStatus }: UserDashboar
                           </div>
                           <span className="font-semibold text-gray-700">Country:</span>
                         </div>
-                        <span className="font-semibold text-blue-700 bg-blue-50 px-4 py-1.5 rounded-full">{allocationData?.[0]?.country || "Not specified"}</span>
+                        <span className="font-semibold text-blue-700 bg-blue-50 px-4 py-1.5 rounded-full">
+                          {allocationData && fetchedCountries.length > 0
+                            ? (fetchedCountries.find(c => c.id === allocationData?.[0]?.country_id)?.name || "Not specified")
+                            : "Not specified"
+                          }
+                        </span>
                       </div>
                     </div>
                   </div>
@@ -129,8 +157,6 @@ export default function UserDashboard({ user, registrationStatus }: UserDashboar
               </>
             ) : (
               <>
-                
-                
                 <div className="flex items-center justify-center bg-yellow-50 p-4 border border-yellow-200 rounded-lg shadow-sm mb-4">
                   <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 mr-2 text-yellow-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
@@ -156,7 +182,8 @@ export default function UserDashboard({ user, registrationStatus }: UserDashboar
             </div>
           </> 
         )}
-      </div>      <div className="w-full px-4 md:px-8 lg:px-16 mt-8">
+      </div>      
+      <div className="w-full px-4 md:px-8 lg:px-16 mt-8">
         {registrationStatus.isRegistered ? (
           isAllocated ? (
             <div className="max-w-full p-6 border border-gray-200 rounded-lg bg-white text-sm shadow-sm">

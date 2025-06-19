@@ -47,7 +47,7 @@ export function RegistrationProgress({ currentStep }: RegistrationProgressProps)
   }, []);
 
   return (
-    <div className="w-full mb-8 mt-4">
+    <div className="w-full mb-4">
       <div className="relative h-24">
         {/* Progress line segments - positioned below circles */}
         <div className="absolute top-5 left-0 right-0 w-full flex justify-center z-10">
