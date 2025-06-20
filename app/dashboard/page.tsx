@@ -158,7 +158,7 @@ export default function DashboardPage() {
           {user && (
             <>
               {user.is_admin ? (
-                <AdminDashboard user={user} />           
+                <AdminDashboard />           
               ) : (
                 <UserDashboard 
                   user={user} 

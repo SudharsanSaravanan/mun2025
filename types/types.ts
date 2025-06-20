@@ -1,39 +1,57 @@
 export type Role = 'Reporter' | 'Photojournalist';
 export type DelegateType = 'Delegate' | 'IP';
 
-export interface Preference {
-  type: DelegateType;
-  role?: Role;
-  committee?: string;
-  countries?: string[];
-}
-
-export interface Delegate {
-  id: number;
+export type Committee = {
+  id: string;
   name: string;
-  email: string;
-  phone: string;
-  institution: string;
-  internal: boolean;
-  rollNumber?: string; // For internal
-  address?: string; // For external
-  pinCode?: string; // For external
-  accommodationNeeded?: boolean; // For external
-  isHeadDelegation?: boolean; // For external
-  delegationName?: string; // For external
-  uploads: {
-    paymentProof: string;
-    collegeId?: string; // For internal
-    aadharId?: string; // For external
-    delegateExperience?: string;
-    delegationSheet?: string; // For external group delegation
+};
+
+export type Country = {
+  id: string;
+  name: string;
+  committee_id: string;
+};
+
+export type User = {
+  user_id: string;
+  type: 'Internal' | 'External';
+  users: {
+    id: string;
+    name: string;
+    email: string;
   };
+};
+
+export type Allocation = {
+  user_id: string;
+  role: 'delegate' | 'IP';
+  ip_subrole?: string | null;
+  committee_id?: string | null;
+  country_id?: string | null;
+};
+
+export type Preference = {
+  preference_order: number;
+  role: 'delegate' | 'IP';
+  ip_subrole?: string | null;
+  committee_id?: string | null;
+  committees?: {
+    name: string;
+  };
+  delegate_country_preferences?: {
+    country_order: number;
+    country_id: string;
+    countries: {
+      name: string;
+    };
+  }[];
+};
+
+export type UserWithData = User & {
   preferences: Preference[];
   allocation: Allocation | null;
-}
+};
 
-export interface Allocation {
-  committee: string;
-  country: string;
-  role?: Role; // For IP allocations
-}
+export type RegistrationSource =
+  | { table: 'internal_registrations'; type: 'Internal' }
+  | { table: 'external_registrations'; type: 'External' };
