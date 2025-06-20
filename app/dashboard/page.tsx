@@ -5,8 +5,8 @@ import { supabase } from "@/lib/supabase";
 import { useEffect, useState } from "react";
 import { DashboardNavbar } from "@/components/DashboardNavbar";
 import { Loader2 } from "lucide-react";
-import UserDashboard from "@/components/UserDashboard";
-import AdminDashboard from "@/components/AdminDashboard";
+import UserDashboard from "@/app/dashboard/UserDashboard";
+import AdminDashboard from "@/app/dashboard/AdminDashboard";
 
 interface UserData {
   id: string;

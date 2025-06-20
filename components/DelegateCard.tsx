@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import AllocationForm from './AllocationForm';
 import FileDownloadButtons from './FileDownloadButtons';
-import { Delegate, Allocation } from '.././types';
+import { Delegate, Allocation } from '../types/types';
 
 interface DelegateCardProps {
   delegate: Delegate;

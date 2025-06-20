@@ -1,10 +1,24 @@
 'use client';
 
 import React, { useState } from 'react';
-import Tabs from './components/Tabs';
-import FilterBar from './components/FilterBar';
-import DelegateCard from './components/DelegateCard';
-import { Delegate, Allocation } from './types';
+import Tabs from '../../components/Tabs';
+import FilterBar from '../../components/FilterBar';
+import DelegateCard from '../../components/DelegateCard';
+import { Delegate, Allocation } from '../../types/types';
+
+interface UserData {
+  id: string;
+  name: string;
+  phone_number: string;
+  email: string;
+  is_internal: boolean;
+  is_admin: boolean;
+  created_at: string;
+}
+
+interface AdminDashboardProps {
+  user: UserData;
+}
 
 const dummyData: Delegate[] = [
   {
@@ -70,7 +84,7 @@ const countriesByCommittee: { [key: string]: string[] } = {
   WHO: ["Canada", "Australia", "South Africa", "UK"],
 };
 
-const AdminDashboard: React.FC = () => {
+export default function AdminDashboard({ user }: AdminDashboardProps) {
   const [delegates, setDelegates] = useState<Delegate[]>(dummyData);
   const [activeTab, setActiveTab] = useState<'Unallocated' | 'Allocated'>('Unallocated');
   const [filter, setFilter] = useState<'All' | 'Internal' | 'External'>('All');
@@ -123,29 +137,29 @@ const AdminDashboard: React.FC = () => {
   return (
     <div className="min-h-screen bg-white p-6 font-[Roboto] text-black">
      
-        {/* Header Section */}
- <header className="w-full border-b border-gray-300 pb-5">
-    <div className="max-w-7xl mx-auto">
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between">
-        <div className="flex items-center mb-4 sm:mb-0">
-          <div className="relative">
-            <img
-              src="/images/AMUN25_Logo.png"
-              alt="Admin Profile"
-              className="w-14 h-14 rounded-full mr-4 border-4 border-white shadow-md"
-            />
-            <span className="absolute bottom-0 right-4 w-4 h-4 bg-green-500 rounded-full border-2 border-white"></span>
+      <header className="w-full border-b border-gray-300 pb-5">
+          <div className="max-w-7xl mx-auto">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between">
+              <div className="flex items-center mb-4 sm:mb-0">
+                <div className="relative">
+                  <img
+                    src="/images/AMUN25_Logo.png"
+                    alt="Admin Profile"
+                    className="w-14 h-14 rounded-full mr-4 border-4 border-white shadow-md"
+                  />
+                  <span className="absolute bottom-0 right-4 w-4 h-4 bg-green-500 rounded-full border-2 border-white"></span>
+                </div>
+                <div>
+                  <h1 className="text-3xl font-bold">Admin Dashboard</h1>
+                  <p className="text-xl font-bold">Welcome back</p>
+                </div>
+              </div>
+            </div>
           </div>
-          <div>
-            <h1 className="text-3xl font-bold">Admin Dashboard</h1>
-            <p className="text-xl font-bold">Welcome back</p>
-          </div>
-        </div>
-      </div>
-    </div>
-  </header>
-         <div className="max-w-7xl mx-auto pt-13">
-        {/* Stats Cards */}
+        </header>
+
+        <div className="max-w-7xl mx-auto pt-13">
+
         <div className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4 mb-6">
           <div className="bg-white p-4 rounded-xl shadow-sm border border-gray-200 flex-1">
             <p className="text-sm font-bold">Total Delegates</p>
@@ -163,7 +177,6 @@ const AdminDashboard: React.FC = () => {
 
         {/* Main Content */}
         <div className="bg-white rounded-2xl shadow-lg overflow-hidden">
-          {/* Control Bar */}
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center p-6 border-b border-gray-200">
             <Tabs
               activeTab={activeTab}
@@ -208,5 +221,3 @@ const AdminDashboard: React.FC = () => {
     </div>
   );
 };
-
-export default AdminDashboard;
