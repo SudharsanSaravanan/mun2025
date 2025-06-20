@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import Dropdown from './Dropdown';
-import { Delegate, Allocation } from '.././types';
+import { Delegate, Allocation } from '../types/types';
 
 interface AllocationFormProps {
   delegate: Delegate;
