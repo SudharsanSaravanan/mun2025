@@ -82,7 +82,6 @@ export default function UserDashboard({ user, registrationStatus }: UserDashboar
     router.push("/register");
   };  
   
-
   const sharedGuidelines = (
     <ul className="list-disc pl-5 text-left text-gray-600">
       <li className="mb-1.5">Complete all required fields in your application</li>
