@@ -6,6 +6,7 @@ interface DropdownProps {
   onChange: (value: string) => void;
   placeholder?: string;
   disabled?: boolean;
+  className?: string; //className to props
 }
 
 const Dropdown: React.FC<DropdownProps> = ({
@@ -14,10 +15,11 @@ const Dropdown: React.FC<DropdownProps> = ({
   onChange,
   placeholder = 'Select an option',
   disabled = false,
+  className = '', // className with default value
 }) => {
   return (
     <select
-      className="px-4 py-2 border border-blue-300 rounded bg-white text-blue-900 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-200"
+      className={`px-4 py-2 border border-blue-300 rounded bg-white text-blue-900 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-200 ${className}`}
       value={value}
       onChange={(e) => onChange(e.target.value)}
       disabled={disabled}
