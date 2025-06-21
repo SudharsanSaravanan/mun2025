@@ -170,6 +170,57 @@ export default function AdminDashboard() {
     return { success: true };
   }
 
+  async function updateAllocation({
+    user_id,
+    role,
+    committee_id,
+    country_id,
+    ip_subrole
+  }: Allocation): Promise<{ success: boolean; error?: string }> {
+    const updateData =
+      role === 'delegate'
+        ? {
+            role: 'delegate',
+            committee_id: committee_id!,
+            country_id: country_id!,
+            ip_subrole: null
+          }
+        : {
+            role: 'IP',
+            ip_subrole: ip_subrole!,
+            committee_id: null,
+            country_id: null
+          };
+
+    const { error } = await supabase
+      .from('allocations')
+      .update(updateData)
+      .eq('user_id', user_id);
+
+    if (error) {
+      console.error("Allocation update failed:", error.message);
+      return { success: false, error: error.message };
+    }
+
+    await fetchData();
+    return { success: true };
+  }
+
+  async function deleteAllocation(user_id: string): Promise<{ success: boolean; error?: string }> {
+    const { error } = await supabase
+      .from('allocations')
+      .delete()
+      .eq('user_id', user_id);
+
+    if (error) {
+      console.error("Allocation deletion failed:", error.message);
+      return { success: false, error: error.message };
+    }
+
+    await fetchData();
+    return { success: true };
+  }
+
   // const handleAllocate = (delegateId: number, allocation: Allocation) => {
   //   setDelegates((prev) =>
   //     prev.map((delegate) =>
