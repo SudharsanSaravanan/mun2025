@@ -140,7 +140,7 @@ export default function CommitteePage() {
               <Tilt key={committee.id} options={defaultTiltOptions}>
                 <div
                   className="bg-white rounded-xl shadow-md overflow-hidden cursor-pointer h-full transition-shadow duration-300 hover:shadow-lg border border-sky-100 flex flex-col w-full max-w-[170px] sm:max-w-sm min-w-[160px] sm:min-w-[280px] flex-shrink-0"
-                  //onClick={() => openModal(committee)}
+                  onClick={() => openModal(committee)}
                 >
                   <div className="relative aspect-[4/3] w-full">
                     <Image
