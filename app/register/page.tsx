@@ -21,13 +21,18 @@ const UNIVERSITIES = [
   "Amrita Vishwa Vidyapeetham, Chennai",
   "Amrita Vishwa Vidyapeetham, Amritapuri",
   "Amrita Vishwa Vidyapeetham, Bengaluru",
-  "Vellore Institute of Technology (VIT)",
+  "Amrita Vishwa Vidyapeetham, Amaravati",
+  "Amrita Vishwa Vidyapeetham, Faridabad",
+  "Amrita Vishwa Vidyapeetham, Mysuru",
+  "Amrita Vishwa Vidyapeetham, Kochi",
+  "Amrita Vishwa Vidyapeetham, Nagercoil",
+  "Vellore Institute of Technology, Vellore (VIT)",
   "Vellore Institute of Technology, Chennai (VIT-C)",
   "PSG College of Technology",
   "SSN College of Engineering",
-  "Shiv Nadar University (SNU)",
-  "Kumaraguru College of Technology (KCT)",
-  "SRM Institute of Science and Technology",
+  "Shiv Nadar University, Chennai (SNUC)",
+  "Kumaraguru Institutions",
+  "SRM Institute of Science and Technology, Chennai",
 ];
 
 const RegistrationForm = () => {
@@ -583,10 +588,10 @@ const RegistrationForm = () => {
           <div className="flex-grow space-y-4 md:space-y-6 py-2">
             <div className="space-y-2">
               {isInternal && (
-                <p className="mb-4">Please make the payment of <strong>₹1500/-</strong> for internal delegates at "PayU Link"</p>
+                <p className="mb-4">Please make the payment of <strong>₹1770/-</strong> for internal delegates at <a href="https://www.google.com"  className="text-blue-500">PayU Link</a></p>
               )}
               {!isInternal && (
-                <p className="mb-4">Please make the payment of <strong>₹1800/-</strong> for external delegates at "PayU Link"</p>
+                <p className="mb-4">Please make the payment of <strong>₹2242/-</strong> for external delegates at <a href="https://www.google.com" className="text-blue-500">PayU Link</a></p>
               )}
               <Label className="text-sm md:text-base">Payment ID</Label>
               <Input
