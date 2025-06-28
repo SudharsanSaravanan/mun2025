@@ -26,13 +26,13 @@ const UNIVERSITIES = [
   "Amrita Vishwa Vidyapeetham, Mysuru",
   "Amrita Vishwa Vidyapeetham, Kochi",
   "Amrita Vishwa Vidyapeetham, Nagercoil",
-  "Vellore Institute of Technology (VIT)",
+  "Vellore Institute of Technology, Vellore (VIT)",
   "Vellore Institute of Technology, Chennai (VIT-C)",
   "PSG College of Technology",
   "SSN College of Engineering",
-  "Shiv Nadar University (SNU)",
-  "Kumaraguru College of Technology (KCT)",
-  "SRM Institute of Science and Technology",
+  "Shiv Nadar University, Chennai (SNUC)",
+  "Kumaraguru Institutions",
+  "SRM Institute of Science and Technology, Chennai",
 ];
 
 const RegistrationForm = () => {
