@@ -588,10 +588,10 @@ const RegistrationForm = () => {
           <div className="flex-grow space-y-4 md:space-y-6 py-2">
             <div className="space-y-2">
               {isInternal && (
-                <p className="mb-4">Please make the payment of <strong>₹1500/-</strong> for internal delegates at "PayU Link"</p>
+                <p className="mb-4">Please make the payment of <strong>₹1770/-</strong> for internal delegates at <a href="https://www.google.com"  className="text-blue-500">PayU Link</a></p>
               )}
               {!isInternal && (
-                <p className="mb-4">Please make the payment of <strong>₹1800/-</strong> for external delegates at "PayU Link"</p>
+                <p className="mb-4">Please make the payment of <strong>₹2242/-</strong> for external delegates at <a href="https://www.google.com" className="text-blue-500">PayU Link</a></p>
               )}
               <Label className="text-sm md:text-base">Payment ID</Label>
               <Input
