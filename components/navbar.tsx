@@ -12,6 +12,8 @@ const links = [
   { href: "/committees", label: "Committees" },
   { href: "/team", label: "Secretariat" },
   { href: "/contact", label: "Contact" },
+  
+  
 ];
 
 export function Navbar() {

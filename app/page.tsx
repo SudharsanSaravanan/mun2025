@@ -3,6 +3,8 @@
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image"
+import { Button } from "@/components/ui/button"
+import { ArrowRight,Users, Award,Mic2Icon } from "lucide-react"
 import Link from "next/link";
 import { Navbar } from "@/components/navbar";
 
@@ -231,7 +233,7 @@ export default function Home() {
           </div>
         </section>
 
-        <section className="py-24 px-25 bg-white">
+        {/* <section className="py-24 px-25 bg-white">
           <div className="container max-w-7xl px-4">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -259,10 +261,44 @@ export default function Home() {
               </p>
               <p className="text-lg font-extrabold text-gray-600 max-w-4xl mx-auto">
                 The world is waiting. Let&apos;s build it together—one step at a time.
-              </p>
+              </p>q
             </motion.div>
           </div>
-        </section>
+        </section> */}
+        <section className="py-24 bg-white px-4">
+  <div className="container max-w-7xl mx-auto">
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.6 }}
+      viewport={{ once: true }}
+      className="space-y-12"
+    >
+      <h2 className="text-3xl md:text-4xl font-bold text-center text-gray-900">
+        A Look Back at Amrita-MUN&apos;24
+      </h2>
+      <p className="text-lg text-gray-600 max-w-4xl mx-auto text-center">
+        Amrita-MUN&apos;24 brought together bright minds from across the globe, where delegates immersed themselves in
+        thought-provoking debates and collaborative diplomacy. The conference highlighted the power of dialogue in
+        addressing complex global issues, fostering a space where innovation and leadership thrived. Through intense
+        deliberations and strategic resolutions, AMUN&apos;24 not only celebrated the spirit of international cooperation
+        but also set the stage for an even more engaging and impactful Amrita-MUN&apos;25.
+      </p>
+      <div className="flex flex-col sm:flex-row gap-4 justify-center">
+        <Button
+          asChild
+          className="group h-12 px-8 bg-[#00B7FF] hover:bg-[#009EDB] transition-colors text-white"
+        >
+          <Link href="/gallery">
+            Relive the Moments of Amrita-MUN&apos;24
+            <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
+          </Link>
+        </Button>
+      </div>
+    </motion.div>
+  </div>
+</section>
+
       </div>
     </>
   );
