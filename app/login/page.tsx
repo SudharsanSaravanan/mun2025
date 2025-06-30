@@ -45,7 +45,7 @@ export default function LoginPage() {
   return (
     <>
       <Navbar />
-      <div className="min-h-screen py-20 md:py-24 flex items-center justify-center bg-gradient-to-br from-sky-100 to-sky-200 p-4">
+      <div className="min-h-screen py-2 md:py-4 mt-6 flex items-center justify-center bg-gradient-to-br from-sky-100 to-sky-200 p-4">
         <motion.div
           className="bg-white/90 backdrop-blur-2xl rounded-xl shadow-[0_8px_32px_rgb(0,0,0,0.15)] border border-sky-200 p-6 sm:p-8 w-full max-w-md"
           initial={{ opacity: 0, y: 40 }}

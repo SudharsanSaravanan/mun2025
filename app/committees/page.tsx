@@ -6,6 +6,8 @@ import Link from "next/link";
 import { Tilt } from "react-tilt";
 import { Navbar } from "@/components/navbar";
 import { motion, AnimatePresence } from "framer-motion";
+import { supabase } from "@/lib/supabase";
+import { Loader2 } from "lucide-react";
 
 interface CommitteeMember {
   name: string;
@@ -93,6 +95,7 @@ const defaultTiltOptions = {
 export default function CommitteePage() {
   const [selectedCommittee, setSelectedCommittee] = useState<Committee | null>(null);
   const [showScrollButton, setShowScrollButton] = useState(true);
+  const [isDownloadingBgGuide, setIsDownloadingBgGuide] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
 
   // Check if the screen is mobile size on component mount and window resize
@@ -121,6 +124,35 @@ export default function CommitteePage() {
       top: document.documentElement.scrollHeight,
       behavior: 'smooth'
     });
+  };
+
+  const downloadBgGuide = async (committeeName: string): Promise<void> => {
+    setIsDownloadingBgGuide(true);
+
+    try {
+      const fileName = `${committeeName.toLowerCase().replace(/\s+/g, "-")}.pdf`;
+  
+      const { data, error } = await supabase.storage
+        .from("background-guides")
+        .download(fileName);
+  
+      if (error || !data) {
+        throw error;
+      }
+  
+      const url = URL.createObjectURL(data);
+      const anchor = document.createElement("a");
+      anchor.href = url;
+      anchor.download = fileName;
+      document.body.appendChild(anchor);
+      anchor.click();
+      anchor.remove();
+      URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setIsDownloadingBgGuide(false);
+    }
   };
 
   return (
@@ -221,6 +253,17 @@ export default function CommitteePage() {
                         className="bg-white cursor-pointer hover:bg-gray-100 text-sky-700 border border-sky-300 font-medium py-2 px-6 rounded-lg w-full sm:w-auto"
                       >
                         View Country Matrix
+                      </button>
+                      <button
+                        onClick={() => downloadBgGuide(selectedCommittee.name)}
+                        disabled={isDownloadingBgGuide}
+                        className="bg-white cursor-pointer hover:bg-gray-100 text-sky-700 border border-sky-300 font-medium py-2 px-6 rounded-lg w-full sm:w-auto disabled:opacity-50"
+                      >
+                        {isDownloadingBgGuide ? (
+                          <Loader2 className="animate-spin w-5 h-5 text-sky-700" />
+                        ) : (
+                          "Download Background Guide"
+                        )}
                       </button>
                     </div>
                   </div>
