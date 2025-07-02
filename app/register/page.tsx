@@ -64,7 +64,7 @@ const RegistrationForm = () => {
     delegationName: "", paymentId: "", termsAccepted: false,
     collegeIdFile: null as File | null, delegateExperienceFile: null as File | null,
     idProofFile: null as File | null, delegationSheetFile: null as File | null,
-    paymentProofFile: null as File | null
+    paymentProofFile: null as File | null, bankBranch: "", bankName: "", paymentDate: ""
   });
 
   const [committees, setCommittees] = useState<Committee[]>([]);
@@ -600,6 +600,30 @@ const RegistrationForm = () => {
                 onChange={handleInputChange}
                 placeholder="Enter payment reference ID"
                 className={formErrors.paymentId ? "border-red-500" : ""}
+              />
+              <Label className="text-sm md:text-base">Bank Name</Label>
+              <Input
+                name="bankName"
+                value={formData.bankName}
+                onChange={handleInputChange}
+                placeholder="Enter your bank name"
+                className={formErrors.bankName ? "border-red-500" : ""}
+              />
+              <Label className="text-sm md:text-base">Bank Branch</Label>
+              <Input
+                name="bankBranch"
+                value={formData.bankBranch}
+                onChange={handleInputChange}
+                placeholder="Enter your bank branch"
+                className={formErrors.bankBranch ? "border-red-500" : ""}
+              />
+              <Label className="text-sm md:text-base">Payment Date</Label>
+              <Input
+                name="paymentDate"
+                type="date"
+                value={formData.paymentDate}
+                onChange={handleInputChange}
+                className={formErrors.paymentDate ? "border-red-500" : ""}
               />
               {formErrors.paymentId && <p className="text-red-500 text-xs mt-1">{formErrors.paymentId}</p>}
             </div>
