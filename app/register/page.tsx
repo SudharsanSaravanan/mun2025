@@ -64,7 +64,7 @@ const RegistrationForm = () => {
     delegationName: "", paymentId: "", termsAccepted: false,
     collegeIdFile: null as File | null, delegateExperienceFile: null as File | null,
     idProofFile: null as File | null, delegationSheetFile: null as File | null,
-    paymentProofFile: null as File | null
+    paymentProofFile: null as File | null, bankBranch: "", bankName: "", paymentDate: ""
   });
 
   const [committees, setCommittees] = useState<Committee[]>([]);
@@ -199,6 +199,9 @@ const RegistrationForm = () => {
       } else if (step === 7) {
         const paymentFields = [
           ["paymentId", "Payment ID"],
+          ["bankName", "Bank name"],
+          ["bankBranch", "Bank branch"],
+          ["paymentDate", "Payment date"],
           ["paymentProofFile", "Payment proof"],
           ["termsAccepted", "Terms acceptance"]
         ];
@@ -261,6 +264,9 @@ const RegistrationForm = () => {
       } else if (step === 8) {
         const paymentFields = [
           ["paymentId", "Payment ID"],
+          ["bankName", "Bank name"],
+          ["bankBranch", "Bank branch"],
+          ["paymentDate", "Payment date"],
           ["paymentProofFile", "Payment proof"],
           ["termsAccepted", "Terms acceptance"]
         ];
@@ -601,7 +607,35 @@ const RegistrationForm = () => {
                 placeholder="Enter payment reference ID"
                 className={formErrors.paymentId ? "border-red-500" : ""}
               />
-              {formErrors.paymentId && <p className="text-red-500 text-xs mt-1">{formErrors.paymentId}</p>}
+               {formErrors.paymentId && <p className="text-red-500 text-xs mt-1">{formErrors.paymentId}</p>}
+              <Label className="text-sm md:text-base">Bank Name</Label>
+              <Input
+                name="bankName"
+                value={formData.bankName}
+                onChange={handleInputChange}
+                placeholder="Enter your bank name"
+                className={formErrors.bankName ? "border-red-500" : ""}
+              />
+              {formErrors.bankName && <p className="text-red-500 text-xs mt-1">{formErrors.bankName}</p>}
+              <Label className="text-sm md:text-base">Bank Branch</Label>
+              <Input
+                name="bankBranch"
+                value={formData.bankBranch}
+                onChange={handleInputChange}
+                placeholder="Enter your bank branch"
+                className={formErrors.bankBranch ? "border-red-500" : ""}
+              />
+              {formErrors.bankBranch && <p className="text-red-500 text-xs mt-1">{formErrors.bankBranch}</p>}
+              <Label className="text-sm md:text-base">Payment Date</Label>
+              <Input
+                name="paymentDate"
+                type="date"
+                value={formData.paymentDate}
+                onChange={handleInputChange}
+                max={new Date().toISOString().split('T')[0]} // Disable future dates
+                className={formErrors.paymentDate ? "border-red-500" : ""}
+              />
+               {formErrors.paymentDate && <p className="text-red-500 text-xs mt-1">{formErrors.paymentDate}</p>}
             </div>
             {renderFileField("paymentProofFile", "Payment Proof")}
             <div className="flex items-center space-x-2 mt-4">
@@ -693,6 +727,9 @@ const RegistrationForm = () => {
             college_id_photo_url: fileUploads.collegeIdUrl,
             delegate_experience_doc_url: fileUploads.experienceUrl,
             payment_id: formData.paymentId,
+            bank_name: formData.bankName,
+            bank_branch: formData.bankBranch,
+            payment_date: formData.paymentDate,
             payment_proof_url: fileUploads.paymentProofUrl,
           });
 
@@ -716,6 +753,9 @@ const RegistrationForm = () => {
             delegation_sheet_url: fileUploads.delegationSheetUrl || null,
             delegate_experience_doc_url: fileUploads.experienceUrl,
             payment_id: formData.paymentId,
+            bank_name: formData.bankName,
+            bank_branch: formData.bankBranch,
+            payment_date: formData.paymentDate,
             payment_proof_url: fileUploads.paymentProofUrl,
           });
           
