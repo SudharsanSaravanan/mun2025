@@ -199,6 +199,9 @@ const RegistrationForm = () => {
       } else if (step === 7) {
         const paymentFields = [
           ["paymentId", "Payment ID"],
+          ["bankName", "Bank name"],
+          ["bankBranch", "Bank branch"],
+          ["paymentDate", "Payment date"],
           ["paymentProofFile", "Payment proof"],
           ["termsAccepted", "Terms acceptance"]
         ];
@@ -261,6 +264,9 @@ const RegistrationForm = () => {
       } else if (step === 8) {
         const paymentFields = [
           ["paymentId", "Payment ID"],
+          ["bankName", "Bank name"],
+          ["bankBranch", "Bank branch"],
+          ["paymentDate", "Payment date"],
           ["paymentProofFile", "Payment proof"],
           ["termsAccepted", "Terms acceptance"]
         ];
@@ -601,6 +607,7 @@ const RegistrationForm = () => {
                 placeholder="Enter payment reference ID"
                 className={formErrors.paymentId ? "border-red-500" : ""}
               />
+               {formErrors.paymentId && <p className="text-red-500 text-xs mt-1">{formErrors.paymentId}</p>}
               <Label className="text-sm md:text-base">Bank Name</Label>
               <Input
                 name="bankName"
@@ -609,6 +616,7 @@ const RegistrationForm = () => {
                 placeholder="Enter your bank name"
                 className={formErrors.bankName ? "border-red-500" : ""}
               />
+              {formErrors.bankName && <p className="text-red-500 text-xs mt-1">{formErrors.bankName}</p>}
               <Label className="text-sm md:text-base">Bank Branch</Label>
               <Input
                 name="bankBranch"
@@ -617,15 +625,17 @@ const RegistrationForm = () => {
                 placeholder="Enter your bank branch"
                 className={formErrors.bankBranch ? "border-red-500" : ""}
               />
+              {formErrors.bankBranch && <p className="text-red-500 text-xs mt-1">{formErrors.bankBranch}</p>}
               <Label className="text-sm md:text-base">Payment Date</Label>
               <Input
                 name="paymentDate"
                 type="date"
                 value={formData.paymentDate}
                 onChange={handleInputChange}
+                max={new Date().toISOString().split('T')[0]} // Disable future dates
                 className={formErrors.paymentDate ? "border-red-500" : ""}
               />
-              {formErrors.paymentId && <p className="text-red-500 text-xs mt-1">{formErrors.paymentId}</p>}
+               {formErrors.paymentDate && <p className="text-red-500 text-xs mt-1">{formErrors.paymentDate}</p>}
             </div>
             {renderFileField("paymentProofFile", "Payment Proof")}
             <div className="flex items-center space-x-2 mt-4">
@@ -676,7 +686,7 @@ const RegistrationForm = () => {
 
     const successfulOperations: string[] = [];
     const uploadedFilePaths: string[] = [];
-     
+
     try {
       setIsSubmitting(true);
       
