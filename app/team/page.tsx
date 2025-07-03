@@ -1,13 +1,7 @@
 "use client"
 
 import { motion } from "framer-motion"
-import { Card, CardContent } from "@/components/ui/card"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Navbar } from "@/components/navbar"
-
-
-
-
 
 // Define a type for a Team Member
 interface TeamMember {
@@ -22,7 +16,6 @@ interface Section {
   members: TeamMember[];
 }
 
-// ⬇️ Team Dat
 const sections: Section[] = [
   {
     title: "Convenors",
@@ -289,7 +282,7 @@ function TeamSection({ title, members }: TeamSectionProps) {
 // Main Page Component
 export default function Team() {
   return (
-    <div className="min-h-screen pt-32 pb-16 bg-gradient-to-b from-white to-blue-50 flex flex-col items-center">
+    <div className="min-h-screen pt-14 pb-16 bg-gradient-to-b from-white to-blue-50 flex flex-col items-center">
       <Navbar /> {/* ✅ Navigation stays at top */}
       
       <div className="container px-4 flex flex-col items-center text-center">

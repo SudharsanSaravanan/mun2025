@@ -72,7 +72,7 @@ export default function Home() {
   return (
     <>
       <Navbar />
-      <div className="pt-16">
+      <div>
         <section className="relative min-h-[95vh] flex items-center justify-center overflow-hidden">
           <div className="absolute top-0 left-0 w-full h-full z-0">
             <div className="absolute top-0 left-0 w-full h-full bg-[#202020]">
