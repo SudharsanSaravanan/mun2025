@@ -676,7 +676,7 @@ const RegistrationForm = () => {
 
     const successfulOperations: string[] = [];
     const uploadedFilePaths: string[] = [];
-
+     
     try {
       setIsSubmitting(true);
       
@@ -717,6 +717,9 @@ const RegistrationForm = () => {
             college_id_photo_url: fileUploads.collegeIdUrl,
             delegate_experience_doc_url: fileUploads.experienceUrl,
             payment_id: formData.paymentId,
+            bank_name: formData.bankName,
+            bank_branch: formData.bankBranch,
+            payment_date: formData.paymentDate,
             payment_proof_url: fileUploads.paymentProofUrl,
           });
 
@@ -740,6 +743,9 @@ const RegistrationForm = () => {
             delegation_sheet_url: fileUploads.delegationSheetUrl || null,
             delegate_experience_doc_url: fileUploads.experienceUrl,
             payment_id: formData.paymentId,
+            bank_name: formData.bankName,
+            bank_branch: formData.bankBranch,
+            payment_date: formData.paymentDate,
             payment_proof_url: fileUploads.paymentProofUrl,
           });
           
