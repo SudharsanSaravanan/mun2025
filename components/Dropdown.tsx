@@ -1,12 +1,17 @@
 import React from 'react';
 
+interface DropdownOption {
+  id: string;
+  name: string;
+}
+
 interface DropdownProps {
-  options: string[];
+  options: DropdownOption[];
   value: string;
   onChange: (value: string) => void;
   placeholder?: string;
   disabled?: boolean;
-  className?: string; //className to props
+  className?: string;
 }
 
 const Dropdown: React.FC<DropdownProps> = ({
@@ -15,7 +20,7 @@ const Dropdown: React.FC<DropdownProps> = ({
   onChange,
   placeholder = 'Select an option',
   disabled = false,
-  className = '', // className with default value
+  className = '',
 }) => {
   return (
     <select
@@ -28,8 +33,8 @@ const Dropdown: React.FC<DropdownProps> = ({
         {placeholder}
       </option>
       {options.map((option) => (
-        <option key={option} value={option}>
-          {option}
+        <option key={option.id} value={option.id}>
+          {option.name}
         </option>
       ))}
     </select>
