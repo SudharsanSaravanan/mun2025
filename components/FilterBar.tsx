@@ -7,7 +7,11 @@ interface FilterBarProps {
 }
 
 const FilterBar: React.FC<FilterBarProps> = ({ filter, setFilter }) => {
-  const options = ['All', 'Internal', 'External'];
+  const options = [
+    { id: 'All', name: 'All' },
+    { id: 'Internal', name: 'Internal' },
+    { id: 'External', name: 'External' },
+  ];
 
   return (
     <div className="flex items-center">
