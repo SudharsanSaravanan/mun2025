@@ -151,9 +151,10 @@ export default function DashboardPage() {
     );
   }
   
-  return (    <div className="min-h-screen bg-blue-50">
+  return (    
+    <div className="min-h-screen bg-blue-50">
       <DashboardNavbar onLogout={handleLogout} />      
-      <div className="pt-20 pb-10 px-4 md:px-6">
+      <div className="pt-6 pb-10 px-4 md:px-6">
         <div className=" mx-auto">
           {user && (
             <>

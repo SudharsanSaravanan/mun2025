@@ -94,91 +94,91 @@ const AllocationForm: React.FC<AllocationFormProps> = ({
   };
 
   return (
+  <>
+    <div className="flex flex-col gap-4 w-full pb-5 text-sm">
+      <div className="flex gap-2">
+        <button
+          className={`px-4 py-2 rounded text-sm ${role === 'delegate' ? 'bg-gray-700 text-white' : 'bg-gray-200'}`}
+          onClick={() => setRole('delegate')}
+        >
+          Delegate
+        </button>
+        <button
+          className={`px-4 py-2 rounded text-sm ${role === 'IP' ? 'bg-gray-700 text-white' : 'bg-gray-200'}`}
+          onClick={() => setRole('IP')}
+        >
+          IP
+        </button>
+      </div>
+
+      {role === 'delegate' ? (
         <>
-          <div className="flex flex-col gap-4 w-full pb-5 text-sm">
-            <div className="flex gap-2">
-              <button
-                className={`px-4 py-2 rounded text-sm ${role === 'delegate' ? 'bg-gray-700 text-white' : 'bg-gray-200'}`}
-                onClick={() => setRole('delegate')}
-              >
-                Delegate
-              </button>
-              <button
-                className={`px-4 py-2 rounded text-sm ${role === 'IP' ? 'bg-gray-700 text-white' : 'bg-gray-200'}`}
-                onClick={() => setRole('IP')}
-              >
-                IP
-              </button>
-            </div>
-
-            {role === 'delegate' ? (
-              <>
-                <Dropdown
-                  options={committees.map((c) => ({ id: c.id, name: c.name }))}
-                  value={committee}
-                  onChange={setCommittee}
-                  placeholder="Select Committee"
-                  className="w-full text-sm"
-                />
-                <Dropdown
-                  options={availableCountries.length > 0
-                    ? availableCountries.map(c => ({ id: c.id, name: c.name }))
-                    : [{ id: '', name: 'All countries allocated' }]
-                  }
-                  value={country}
-                  onChange={setCountry}
-                  placeholder="Select Country"
-                  disabled={!committee || availableCountries.length === 0}
-                  className="w-full text-sm"
-                />
-              </>
-            ) : (
-              <Dropdown
-                options={[
-                  { id: 'reporter', name: 'Reporter' },
-                  { id: 'photojournalist', name: 'Photojournalist' },
-                ]}
-                value={ipSubrole}
-                onChange={(value) => setIpSubrole(value as any)}
-                placeholder="Select IP Role"
-                className="w-full text-sm"
-              />
-            )}
-          </div>
-
-         <button
-            className="px-3 py-2 bg-[#1c398e] text-white rounded hover:bg-[#1c398e] hover:cursor-pointer disabled:bg-gray-400 text-sm"
-            onClick={() => setConfirmType(isAllocated ? 'edit' : 'allocate')}
-            disabled={role === 'delegate' ? (!committee || !country) : false}
-          >
-            {isAllocated ? 'Update Allocation' : 'Allocate'}
-          </button>
-         {isAllocated && (
-            <button
-              className="ml-4 px-6 py-2 bg-gray-200 text-black rounded hover:bg-gray-300 hover:cursor-pointer text-sm"
-              onClick={() => setIsEditing(false)}
-            >
-              Cancel
-            </button>
-          )}
-
-        <ConfirmationModal
-          isOpen={confirmType !== null}
-          message={
-            confirmType === 'allocate'
-              ? `Are you sure you want to allocate this user?`
-              : confirmType === 'edit'
-              ? `Are you sure you want to update this user's allocation?`
-              : `Are you sure you want to delete this user's allocation?`
-          }
-          onClose={() => setConfirmType(null)}
-          onConfirm={() => {
-            if (confirmType === 'allocate') handleAllocate();
-            else if (confirmType === 'edit') handleEdit();
-            else if (confirmType === 'delete') onDeleteAllocation();
-          }}
-        />
+          <Dropdown
+            options={committees.map((c) => ({ id: c.id, name: c.name }))}
+            value={committee}
+            onChange={setCommittee}
+            placeholder="Select Committee"
+            className="w-full text-sm"
+          />
+          <Dropdown
+            options={availableCountries.length > 0
+              ? [{ id: '', name: 'Select Country' }, ...availableCountries.map(c => ({ id: c.id, name: c.name }))]
+              : [{ id: '', name: 'All countries allocated' }]
+            }
+            value={country}
+            onChange={setCountry}
+            placeholder="Select Country"
+            disabled={!committee || availableCountries.length === 0}
+            className="w-full text-sm"
+          />
         </>
+      ) : (
+        <Dropdown
+          options={[
+            { id: 'reporter', name: 'Reporter' },
+            { id: 'photojournalist', name: 'Photojournalist' },
+          ]}
+          value={ipSubrole}
+          onChange={(value) => setIpSubrole(value as any)}
+          placeholder="Select IP Role"
+          className="w-full text-sm"
+        />
       )}
+    </div>
+
+    <button
+      className="px-3 py-2 bg-[#1c398e] text-white rounded hover:bg-[#1c398e] hover:cursor-pointer disabled:bg-gray-400 text-sm"
+      onClick={() => setConfirmType(isAllocated ? 'edit' : 'allocate')}
+      disabled={role === 'delegate' ? (!committee || !country || country === '') : false}
+    >
+      {isAllocated ? 'Update Allocation' : 'Allocate'}
+    </button>
+    {isAllocated && (
+      <button
+        className="ml-4 px-6 py-2 bg-gray-200 text-black rounded hover:bg-gray-300 hover:cursor-pointer text-sm"
+        onClick={() => setIsEditing(false)}
+      >
+        Cancel
+      </button>
+    )}
+
+  <ConfirmationModal
+    isOpen={confirmType !== null}
+    message={
+      confirmType === 'allocate'
+        ? `Are you sure you want to allocate this user?`
+        : confirmType === 'edit'
+        ? `Are you sure you want to update this user's allocation?`
+        : `Are you sure you want to delete this user's allocation?`
+    }
+    onClose={() => setConfirmType(null)}
+    onConfirm={() => {
+      if (confirmType === 'allocate') handleAllocate();
+      else if (confirmType === 'edit') handleEdit();
+      else if (confirmType === 'delete') onDeleteAllocation();
+    }}
+  />
+  </>
+)}
 
 export default AllocationForm;
