@@ -18,18 +18,18 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
   if (!isOpen) return null;
 
   return (
-    <div className="absolute top-0 left-0 w-full h-full flex items-center justify-center z-50">
-      <div className="bg-white text-blue-800  text-lg rounded-xl shadow-2xl p-6 w-[25rem] border border-blue-800">
+    <div className="fixed inset-0 flex items-center justify-center z-50 bg-white">
+      <div className="bg-white text-gray-800 text-lg rounded-xl shadow-2xl p-6 w-[25rem] border">
         <p className="mb-5 text-base font-bold">{message}</p>
         <div className="flex justify-end gap-3">
           <button
-            className="px-4 py-2 bg-white text-blue-700 font-semibold rounded hover:bg-gray-300"
+            className="px-4 py-2 bg-white text-gray-700 font-semibold rounded hover:bg-gray-300"
             onClick={onClose}
           >
             Cancel
           </button>
           <button
-            className="px-4 py-2 bg-blue-600 text-white font-semibold rounded hover:bg-blue-900"
+            className="px-4 py-2 bg-blue-900 text-white font-semibold rounded hover:cursor-pointer"
             onClick={() => {
               onConfirm();
               onClose();

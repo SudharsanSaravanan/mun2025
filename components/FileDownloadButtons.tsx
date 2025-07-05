@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+import { supabase } from '@/lib/supabase';
 
 interface FileDownloadButtonsProps {
   uploads: {
@@ -11,20 +12,55 @@ interface FileDownloadButtonsProps {
 }
 
 const FileDownloadButtons: React.FC<FileDownloadButtonsProps> = ({ uploads }) => {
+  const [fileLinks, setFileLinks] = useState<Record<string, string>>({});
+
+  useEffect(() => {
+    const fetchLinks = async () => {
+      const getSignedUrl = async (path: string | undefined) => {
+        if (!path) return '';
+        const { data, error } = await supabase
+          .storage
+          .from("registration-files")
+          .createSignedUrl(path, 3600);
+        return data?.signedUrl || '';
+      };
+
+      const [paymentProof, collegeId, aadharId, delegateExperience, delegationSheet] = await Promise.all([
+        getSignedUrl(uploads.paymentProof),
+        getSignedUrl(uploads.collegeId),
+        getSignedUrl(uploads.aadharId),
+        getSignedUrl(uploads.delegateExperience),
+        getSignedUrl(uploads.delegationSheet),
+      ]);
+
+      setFileLinks({
+        paymentProof,
+        collegeId,
+        aadharId,
+        delegateExperience,
+        delegationSheet,
+      });
+    };
+
+    fetchLinks();
+  }, [uploads]);
+
   return (
     <div className="mt-2 space-y-2">
       <div className="flex flex-wrap gap-2">
         <a
-          href={uploads.paymentProof}
-          download
+          href={fileLinks.paymentProof}
+          target="_blank"
+          rel="noopener noreferrer"
           className="px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-900 text-sm"
         >
           Payment Proof
         </a>
         {uploads.collegeId && (
           <a
-            href={uploads.collegeId}
-            download
+            href={fileLinks.collegeId}
+            target="_blank"
+            rel="noopener noreferrer"
             className="px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-900 text-sm"
           >
             College ID
@@ -32,8 +68,9 @@ const FileDownloadButtons: React.FC<FileDownloadButtonsProps> = ({ uploads }) =>
         )}
         {uploads.aadharId && (
           <a
-            href={uploads.aadharId}
-            download
+            href={fileLinks.aadharId}
+            target="_blank"
+            rel="noopener noreferrer"
             className="px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-900 text-sm"
           >
             ID Proof
@@ -41,17 +78,19 @@ const FileDownloadButtons: React.FC<FileDownloadButtonsProps> = ({ uploads }) =>
         )}
         {uploads.delegateExperience && (
           <a
-            href={uploads.delegateExperience}
-            download
+            href={fileLinks.delegateExperience}
+            target="_blank"
+            rel="noopener noreferrer"
             className="px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-900 text-sm"
           >
-            Experience Doc
+            Delegate Experience
           </a>
         )}
         {uploads.delegationSheet && (
           <a
-            href={uploads.delegationSheet}
-            download
+            href={fileLinks.delegationSheet}
+            target="_blank"
+            rel="noopener noreferrer"
             className="px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-900 text-sm"
           >
             Delegation Sheet

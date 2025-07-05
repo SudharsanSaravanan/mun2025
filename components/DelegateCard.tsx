@@ -6,6 +6,7 @@ import FileDownloadButtons from './FileDownloadButtons';
 import { UserWithData, Allocation } from '../types/types';
 import { Committee, Country } from '../types/types';
 import ConfirmationModal from './ConfirmationBox';
+import { FaChevronUp, FaChevronDown } from 'react-icons/fa';
 
 interface DelegateCardProps {
   delegate: UserWithData;
@@ -118,7 +119,9 @@ const DelegateCard: React.FC<DelegateCardProps> = ({
             </span>
           )}
         </div>
-        <span className="text-blue-600 text-sm font-medium">{isExpanded ? 'Close' : 'View'}</span>
+        <span className="text-blue-600 text-sm font-medium">
+          {isExpanded ? <FaChevronUp /> : <FaChevronDown />}
+        </span>
       </div>
 
       {isExpanded && (
@@ -132,7 +135,6 @@ const DelegateCard: React.FC<DelegateCardProps> = ({
               {delegate.is_internal ? (
                 <>
                   <p><span className="font-semibold">Roll Number:</span> {delegate.roll_number}</p>
-                  <p><span className="font-semibold">Payment ID:</span> {delegate.payment_id}</p>
                 </>
               ) : (
                 <>
@@ -142,7 +144,17 @@ const DelegateCard: React.FC<DelegateCardProps> = ({
                   <p><span className="font-semibold">University Address:</span> {delegate.university_address}</p>
                   <p><span className="font-semibold">University Pin Code:</span> {delegate.university_pincode}</p>
                   <p><span className="font-semibold">Accommodation Needed:</span> {delegate.accomodation_required ? 'Yes' : 'No'}</p>
-
+                </>
+              )}
+              
+              <br />
+              <p><span className="font-semibold">Payment ID:</span> {delegate.payment_id}</p>
+              <p><span className="font-semibold">Payment Date:</span> {delegate.payment_date}</p>
+              <p><span className="font-semibold">Bank Name:</span> {delegate.bank_name}</p>
+              <p><span className="font-semibold">Bank Branch:</span> {delegate.bank_branch}</p>
+              
+              {!delegate.is_internal && (
+                <>
                   <h4 className="text-md font-bold text-blue-800 mt-4 mb-2">Delegation Details</h4>
                   {delegate.delegation_name ? (
                     <>
@@ -175,77 +187,77 @@ const DelegateCard: React.FC<DelegateCardProps> = ({
           </div>
 
           <div>
-             <h4 className="text-md font-bold text-blue-800 mb-2">Allocation</h4>
+            <h4 className="text-md font-bold text-blue-800 mb-2">Allocation</h4>
+            {!delegate.allocation || isEditing ? (
+              <AllocationForm
+                delegate={{
+                  id: delegate.user_id,
+                  name: delegate.name,
+                  allocation: delegate.allocation
+                    ? {
+                        committee: delegate.allocation.committee_id || '',
+                        country: delegate.allocation.country_id || ''
+                      }
+                    : null,
+                  is_internal: delegate.is_internal
+                }}
+                committees={committees.map(c => ({ id: c.id, name: c.name }))}
+                getAvailableCountries={getAvailableCountries}
+                onAllocate={async (allocation) => {
+                  await handleAllocate(allocation);
+                  setIsEditing(false);
+                }}
+                onEditAllocation={async (allocation) => {
+                  await handleEditAllocation(allocation);
+                  setIsEditing(false);
+                }}
+                onDeleteAllocation={handleDeleteAllocation}
+                isAllocated={isAllocated}
+                setIsEditing={setIsEditing}
+              />
+            ) : (
+            <div className="space-y-2 text-sm mb-4">
+              <p>
+                <span className="font-semibold">Role:</span> {delegate.allocation.role === 'IP' ? 'IP' : 'Delegate'}
+              </p>
 
-{!delegate.allocation || isEditing ? (
-  <AllocationForm
-    delegate={{
-      id: delegate.user_id,
-      name: delegate.name,
-      allocation: delegate.allocation
-        ? {
-            committee: delegate.allocation.committee_id || '',
-            country: delegate.allocation.country_id || ''
-          }
-        : null,
-      is_internal: delegate.is_internal
-    }}
-    committees={committees.map(c => ({ id: c.id, name: c.name }))}
-    getAvailableCountries={getAvailableCountries}
-    onAllocate={async (allocation) => {
-      await handleAllocate(allocation);
-      setIsEditing(false);
-    }}
-    onEditAllocation={async (allocation) => {
-      await handleEditAllocation(allocation);
-      setIsEditing(false);
-    }}
-    onDeleteAllocation={handleDeleteAllocation}
-    isAllocated={isAllocated}
-  />
-) : (
-<div className="space-y-2 text-sm mb-4">
-  <p>
-    <span className="font-semibold">Role:</span> {delegate.allocation.role === 'IP' ? 'IP' : 'Delegate'}
-  </p>
+              {delegate.allocation.role === 'delegate' && (
+                <>
+                  <p><span className="font-semibold">Committee:</span> {delegate.allocation.committee_id ? getCommitteeName(delegate.allocation.committee_id) : 'N/A'}</p>
+                  <p><span className="font-semibold">Country:</span> {delegate.allocation.country_id ? getCountryName(delegate.allocation.country_id) : 'N/A'}</p>
+                </>
+              )}
 
-  {delegate.allocation.role === 'delegate' && (
-    <>
-      <p><span className="font-semibold">Committee:</span> {delegate.allocation.committee_id ? getCommitteeName(delegate.allocation.committee_id) : 'N/A'}</p>
-      <p><span className="font-semibold">Country:</span> {delegate.allocation.country_id ? getCountryName(delegate.allocation.country_id) : 'N/A'}</p>
-    </>
-  )}
+              {delegate.allocation.role === 'IP' && (
+                <p><span className="font-semibold">IP Role:</span> {delegate.allocation.ip_subrole || 'N/A'}</p>
+              )}
 
-  {delegate.allocation.role === 'IP' && (
-    <p><span className="font-semibold">IP Role:</span> {delegate.allocation.ip_subrole || 'N/A'}</p>
-  )}
+              <div className="flex gap-2 mt-2">
+                <button
+                  className="bg-[#1c398e] text-white px-4 py-2 rounded hover:cursor-pointer"
+                  onClick={() => setIsEditing(true)}
+                >
+                  Edit
+                </button>
+                <button
+                  className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 hover:cursor-pointer"
+                  onClick={() => setShowDeleteConfirm(true)}
+                >
+                  Delete
+                </button>
+              </div>
+            </div>
+            )}
 
-  <div className="flex gap-2 mt-2">
-    <button
-      className="bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700"
-      onClick={() => setIsEditing(true)}
-    >
-      Edit
-    </button>
-    <button
-      className="bg-red-600 text-white px-3 py-1 rounded hover:bg-red-700"
-      onClick={() => setShowDeleteConfirm(true)}
-    >
-      Delete
-    </button>
-  </div>
-</div>
-
-)}
-  <ConfirmationModal
-    isOpen={showDeleteConfirm}
-    onClose={() => setShowDeleteConfirm(false)}
-    onConfirm={() => {
-      onDeleteAllocation(delegate.user_id);
-      setShowDeleteConfirm(false);
-    }}
-    message="Are you sure you want to delete this user's allocation?"
-  />
+            <ConfirmationModal
+              isOpen={showDeleteConfirm}
+              onClose={() => setShowDeleteConfirm(false)}
+              onConfirm={() => {
+                onDeleteAllocation(delegate.user_id);
+                setShowDeleteConfirm(false);
+              }}
+              message="Are you sure you want to delete this user's allocation?"
+            />
           </div>
         </div>
       )}

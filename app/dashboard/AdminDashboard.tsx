@@ -182,68 +182,65 @@ export default function AdminDashboard() {
   const allocatedCount = users.filter(u => u.allocation).length;
 
   return (
-    <div className="min-h-screen bg-white p-6 font-[Roboto] text-black">
-      <div className="max-w-7xl mx-auto pt-13">
-        <div className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4 mb-6">
-          <div className="bg-white p-4 rounded-xl shadow-sm border border-gray-200 flex-1">
-            <p className="text-sm font-bold">Total Delegates</p>
-            <p className="text-2xl font-bold">{users.length}</p>
-          </div>
-          <div className="bg-white p-4 rounded-xl shadow-sm border border-gray-200 flex-1">
-            <p className="text-sm font-bold">Unallocated</p>
-            <p className="text-2xl font-bold">{unallocatedCount}</p>
-          </div>
-          <div className="bg-white p-4 rounded-xl shadow-sm border border-gray-200 flex-1">
-            <p className="text-sm font-bold">Allocated</p>
-            <p className="text-2xl font-bold">{allocatedCount}</p>
+    <div className="max-w-7xl mx-auto pt-6">
+      <div className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4 mb-6">
+        <div className="bg-white p-4 rounded-xl shadow-sm border border-gray-200 flex-1">
+          <p className="text-sm font-bold">Total Delegates</p>
+          <p className="text-2xl font-bold">{users.length}</p>
+        </div>
+        <div className="bg-white p-4 rounded-xl shadow-sm border border-gray-200 flex-1">
+          <p className="text-sm font-bold">Unallocated</p>
+          <p className="text-2xl font-bold">{unallocatedCount}</p>
+        </div>
+        <div className="bg-white p-4 rounded-xl shadow-sm border border-gray-200 flex-1">
+          <p className="text-sm font-bold">Allocated</p>
+          <p className="text-2xl font-bold">{allocatedCount}</p>
+        </div>
+      </div>
+
+      <div className="bg-white rounded-2xl shadow-lg overflow-hidden">
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center p-6 border-b border-gray-200">
+          <Tabs
+            activeTab={activeTab}
+            setActiveTab={setActiveTab}
+            unallocatedCount={unallocatedCount}
+          />
+          <div className="mt-4 md:mt-0 w-full md:w-auto">
+            <FilterBar filter={filter} setFilter={setFilter} />
           </div>
         </div>
 
-        <div className="bg-white rounded-2xl shadow-lg overflow-hidden">
-          <div className="flex flex-col md:flex-row justify-between items-start md:items-center p-6 border-b border-gray-200">
-            <Tabs
-              activeTab={activeTab}
-              setActiveTab={setActiveTab}
-              unallocatedCount={unallocatedCount}
-            />
-            <div className="mt-4 md:mt-0 w-full md:w-auto">
-              <FilterBar filter={filter} setFilter={setFilter} />
+        <div className="p-6">
+          {loading ? (
+            <div className="flex justify-center items-center py-12">
+              <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
             </div>
-          </div>
-
-          <div className="p-6">
-            {loading ? (
-              <div className="flex justify-center items-center py-12">
-                <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
-              </div>
-            ) : filteredUsers.length === 0 ? (
-              <div className="flex flex-col items-center justify-center py-12">
-                <svg className="w-16 h-16 text-gray-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path>
-                </svg>
-                <h3 className="text-lg font-medium mb-1">No delegates found</h3>
-                <p className="text-sm text-gray-500">Try adjusting your filters or check back later</p>
-              </div>
-            ) : (
-              <div className="grid gap-6">
-                {filteredUsers.map((user) => (
-                  <DelegateCard
-                    key={user.user_id}
-                    delegate={user}
-                    committees={committees}
-                    committeeMap={committeeMap}
-                    countryMap={countryMap}
-                    getAvailableCountries={getAvailableCountries}
-                    onAllocate={handleAllocate}
-                    onEditAllocation={handleUpdateAllocation}
-                    onDeleteAllocation={handleDeleteAllocation}
-                    isAllocated={activeTab === 'Allocated'}
-                    filter={filter}
-                  />
-                ))}
-              </div>
-            )}
-          </div>
+          ) : filteredUsers.length === 0 ? (
+            <div className="flex flex-col items-center justify-center py-12">
+              <svg className="w-16 h-16 text-gray-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path>
+              </svg>
+              <h3 className="text-lg font-medium mb-1">No delegates found</h3>
+            </div>
+          ) : (
+            <div className="grid gap-3">
+              {filteredUsers.map((user) => (
+                <DelegateCard
+                  key={user.user_id}
+                  delegate={user}
+                  committees={committees}
+                  committeeMap={committeeMap}
+                  countryMap={countryMap}
+                  getAvailableCountries={getAvailableCountries}
+                  onAllocate={handleAllocate}
+                  onEditAllocation={handleUpdateAllocation}
+                  onDeleteAllocation={handleDeleteAllocation}
+                  isAllocated={activeTab === 'Allocated'}
+                  filter={filter}
+                />
+              ))}
+            </div>
+          )}
         </div>
       </div>
     </div>

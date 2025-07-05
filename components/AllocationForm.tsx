@@ -31,6 +31,7 @@ interface AllocationFormProps {
   onEditAllocation: (allocation: Omit<Allocation, 'allocated_at'>) => void;
   onDeleteAllocation: () => void;
   isAllocated: boolean;
+  setIsEditing: (isEditing: boolean) => void;
 }
 
 const AllocationForm: React.FC<AllocationFormProps> = ({
@@ -41,12 +42,12 @@ const AllocationForm: React.FC<AllocationFormProps> = ({
   onEditAllocation,
   onDeleteAllocation,
   isAllocated,
+  setIsEditing,
 }) => {
   const [role, setRole] = useState<'delegate' | 'IP'>(delegate.allocation?.committee ? 'delegate' : 'IP');
   const [committee, setCommittee] = useState(delegate.allocation?.committee || '');
   const [country, setCountry] = useState(delegate.allocation?.country || '');
   const [ipSubrole, setIpSubrole] = useState<'reporter' | 'photojournalist' | 'editor'>('reporter');
-  const [isEditing, setIsEditing] = useState(false);
   const [confirmType, setConfirmType] = useState<'allocate' | 'edit' | 'delete' | null>(null);
 
   const availableCountries: Country[] = committee ? getAvailableCountries(committee) : [];
@@ -94,16 +95,16 @@ const AllocationForm: React.FC<AllocationFormProps> = ({
 
   return (
         <>
-          <div className="flex flex-col gap-4 w-full pb-5">
+          <div className="flex flex-col gap-4 w-full pb-5 text-sm">
             <div className="flex gap-2">
               <button
-                className={`px-4 py-2 rounded ${role === 'delegate' ? 'bg-blue-600 text-white' : 'bg-gray-200'}`}
+                className={`px-4 py-2 rounded text-sm ${role === 'delegate' ? 'bg-gray-700 text-white' : 'bg-gray-200'}`}
                 onClick={() => setRole('delegate')}
               >
                 Delegate
               </button>
               <button
-                className={`px-4 py-2 rounded ${role === 'IP' ? 'bg-blue-600 text-white' : 'bg-gray-200'}`}
+                className={`px-4 py-2 rounded text-sm ${role === 'IP' ? 'bg-gray-700 text-white' : 'bg-gray-200'}`}
                 onClick={() => setRole('IP')}
               >
                 IP
@@ -117,7 +118,7 @@ const AllocationForm: React.FC<AllocationFormProps> = ({
                   value={committee}
                   onChange={setCommittee}
                   placeholder="Select Committee"
-                  className="w-full"
+                  className="w-full text-sm"
                 />
                 <Dropdown
                   options={availableCountries.length > 0
@@ -128,7 +129,7 @@ const AllocationForm: React.FC<AllocationFormProps> = ({
                   onChange={setCountry}
                   placeholder="Select Country"
                   disabled={!committee || availableCountries.length === 0}
-                  className="w-full"
+                  className="w-full text-sm"
                 />
               </>
             ) : (
@@ -136,29 +137,28 @@ const AllocationForm: React.FC<AllocationFormProps> = ({
                 options={[
                   { id: 'reporter', name: 'Reporter' },
                   { id: 'photojournalist', name: 'Photojournalist' },
-                  { id: 'editor', name: 'Editor' },
                 ]}
                 value={ipSubrole}
                 onChange={(value) => setIpSubrole(value as any)}
                 placeholder="Select IP Role"
-                className="w-full"
+                className="w-full text-sm"
               />
             )}
           </div>
 
          <button
-              className="px-3 py-2 bg-blue-600 text-white rounded hover:bg-blue-900 disabled:bg-gray-400"
-              onClick={() => setConfirmType(isAllocated ? 'edit' : 'allocate')}
-              disabled={role === 'delegate' ? (!committee || !country) : false}
-            >
-              {isAllocated ? 'Update Allocation' : 'Allocate'}
-            </button>
+            className="px-3 py-2 bg-[#1c398e] text-white rounded hover:bg-[#1c398e] hover:cursor-pointer disabled:bg-gray-400 text-sm"
+            onClick={() => setConfirmType(isAllocated ? 'edit' : 'allocate')}
+            disabled={role === 'delegate' ? (!committee || !country) : false}
+          >
+            {isAllocated ? 'Update Allocation' : 'Allocate'}
+          </button>
          {isAllocated && (
             <button
-              className="ml-7 px-9 py-2 bg-red-600 text-white rounded hover:bg-red-700"
-              onClick={() => setConfirmType('delete')}
+              className="ml-4 px-6 py-2 bg-gray-200 text-black rounded hover:bg-gray-300 hover:cursor-pointer text-sm"
+              onClick={() => setIsEditing(false)}
             >
-              Delete
+              Cancel
             </button>
           )}
 
@@ -180,7 +180,5 @@ const AllocationForm: React.FC<AllocationFormProps> = ({
         />
         </>
       )}
-   
-
 
 export default AllocationForm;
