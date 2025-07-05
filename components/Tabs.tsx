@@ -10,7 +10,7 @@ const Tabs: React.FC<TabsProps> = ({ activeTab, setActiveTab, unallocatedCount }
   return (
     <div className="flex space-x-4">
       <button
-        className={`px-4 py-2 font-semibold rounded-t-lg ${
+        className={`px-4 py-2 font-semibold rounded-lg cursor-pointer ${
           activeTab === 'Unallocated'
             ? 'bg-blue-900 text-white'
             : 'bg-gray-200 text-blue-900'
@@ -29,7 +29,7 @@ const Tabs: React.FC<TabsProps> = ({ activeTab, setActiveTab, unallocatedCount }
         )}
       </button>
       <button
-        className={`px-4 py-2 font-semibold rounded-t-lg ${
+        className={`px-4 py-2 font-semibold rounded-lg cursor-pointer ${
           activeTab === 'Allocated'
             ? 'bg-blue-900 text-white'
             : 'bg-gray-200 text-blue-900'

@@ -5,8 +5,8 @@ import { supabase } from "@/lib/supabase";
 import { useEffect, useState } from "react";
 import { DashboardNavbar } from "@/components/DashboardNavbar";
 import { Loader2 } from "lucide-react";
-import UserDashboard from "@/components/UserDashboard";
-import AdminDashboard from "@/components/AdminDashboard";
+import UserDashboard from "@/app/dashboard/UserDashboard";
+import AdminDashboard from "@/app/dashboard/AdminDashboard";
 
 interface UserData {
   id: string;
@@ -151,14 +151,15 @@ export default function DashboardPage() {
     );
   }
   
-  return (    <div className="min-h-screen bg-blue-50">
+  return (    
+    <div className="min-h-screen bg-blue-50">
       <DashboardNavbar onLogout={handleLogout} />      
-      <div className="pt-20 pb-10 px-4 md:px-6">
+      <div className="pt-6 pb-10 px-4 md:px-6">
         <div className=" mx-auto">
           {user && (
             <>
               {user.is_admin ? (
-                <AdminDashboard user={user} />           
+                <AdminDashboard />           
               ) : (
                 <UserDashboard 
                   user={user} 

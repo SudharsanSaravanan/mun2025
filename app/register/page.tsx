@@ -861,7 +861,7 @@ const RegistrationForm = () => {
     <div className="min-h-screen bg-blue-50 overflow-y-auto">
       <DashboardNavbar onLogout={handleLogout} />
       
-      <div className="flex flex-col px-2 md:px-4 pt-22 md:pt-18 pb-6 max-w-5xl mx-auto relative">
+      <div className="flex flex-col px-2 md:px-4 pt-22 md:pt-10 pb-6 max-w-5xl mx-auto relative">
         {/* Progress bar and step indicators */}
         <div className="fixed top-20 left-0 right-0 z-40 bg-blue/60 backdrop-blur-md">
           <div className="max-w-5xl mx-auto py-3 px-4">
