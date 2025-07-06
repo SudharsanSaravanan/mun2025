@@ -373,15 +373,15 @@ const RegistrationForm = () => {
                 <ul className="text-gray-700 text-left space-y-3">
                   <li className="flex items-start">
                     <span className="text-[#00B7FF] mr-2">•</span>
-                    Guideline 1
+                    Make sure you regsiter under the correct category (internal / external)
                   </li>
                   <li className="flex items-start">
                     <span className="text-[#00B7FF] mr-2">•</span>
-                    Guideline 2
+                    Ensure all details submitted are correct and complete
                   </li>
                   <li className="flex items-start">
                     <span className="text-[#00B7FF] mr-2">•</span>
-                    Guideline 3
+                    Choose your committee preferences wisely
                   </li>
                 </ul>
               </div>

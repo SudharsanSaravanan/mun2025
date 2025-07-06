@@ -84,10 +84,10 @@ export default function UserDashboard({ user, registrationStatus }: UserDashboar
   
   const sharedGuidelines = (
     <ul className="list-disc pl-5 text-left text-gray-600">
-      <li className="mb-1.5">Complete all required fields in your application</li>
-      <li className="mb-1.5">Have your ID proof ready for verification</li>
+      <li className="mb-1.5"><strong>Register under the correct category</strong> - Amrita CBE students must use their <strong>@cb.students.amrita.edu</strong> email id to register as an internal delegate.</li>
+      <li className="mb-1.5"><strong>Ensure all details entered are accurate and complete</strong> - Incorrect or incomplete entries may lead to rejection or delayed processing.</li>
       <li className="mb-1.5">Select your committee preferences wisely</li>
-      <li className="mb-1.5">For any queries, contact the secretariat at support@amun25.org</li>
+      <li className="mb-1.5">For any queries, contact us at amunso@cb.amrita.edu</li>
     </ul>
   );
 
@@ -220,7 +220,7 @@ export default function UserDashboard({ user, registrationStatus }: UserDashboar
         {registrationStatus.isRegistered ? (
           isAllocated ? (
             <div className="max-w-full p-6 border border-gray-200 rounded-lg bg-white text-sm shadow-sm">
-              <p className="text-gray-700 mb-3 font-medium">Delegate Guidelines:</p>
+              <p className="text-gray-700 mb-3 font-bold text-lg">GUIDELINES:</p>
               <ul className="list-disc pl-5 text-left text-gray-600">
                 <li className="mb-1.5">Research your allocated country's position thoroughly</li>
                 <li className="mb-1.5">Prepare position papers according to committee guidelines</li>
@@ -231,14 +231,14 @@ export default function UserDashboard({ user, registrationStatus }: UserDashboar
             </div>
           ) : (
             <div className="max-w-full p-6 border border-gray-200 rounded-lg bg-white text-sm shadow-sm">
-              <p className="text-gray-700 mb-3 font-medium">Guidelines:</p>
+              <h3 className="text-gray-700 mb-3 font-bold text-lg">GUIDELINES:</h3>
               {sharedGuidelines}
             </div>
           )
         ) : (
           <>
           <div className="max-w-full p-6 border border-gray-200 rounded-lg bg-white text-sm shadow-sm">
-            <p className="text-gray-700 mb-3 font-medium">Guidelines:</p>
+            <p className="text-gray-700 mb-3 font-bold text-lg">GUIDELINES:</p>
             {sharedGuidelines}
           </div>
           <div className="flex flex-col items-center w-full text-center">
