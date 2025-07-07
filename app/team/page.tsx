@@ -3,14 +3,12 @@
 import { motion } from "framer-motion"
 import { Navbar } from "@/components/navbar"
 
-// Define a type for a Team Member
 interface TeamMember {
   name: string;
   role: string;
   image: string;
 }
 
-// Define the type for sections
 interface Section {
   title: string;
   members: TeamMember[];
@@ -174,7 +172,6 @@ const sections: Section[] = [
   },
 ];
 
-// Define the TeamSection props type
 interface TeamSectionProps {
   title: string;
   members: TeamMember[];
@@ -184,47 +181,45 @@ function TeamSection({ title, members }: TeamSectionProps) {
   const isConvenors = title === "Convenors";
 
   return (
-    <div className="mb-28">
-      <h2 className="text-2xl font-bold text-center text-gray-700 mb-8 lowercase first-letter:uppercase">
+    <div className="mb-28 w-full max-w-6xl px-4 mx-auto">
+      <h2 className="text-2xl sm:text-3xl font-bold text-center text-gray-700 mb-4 lowercase first-letter:uppercase">
         {title}
       </h2>
 
       {isConvenors ? (
-        // Convenors Section
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, ease: "easeInOut" }}
           className="flex flex-col items-center relative group"
         >
-          <div className="relative w-[76rem] max-w-full h-auto shadow-none group">
+          <div className="relative w-full max-w-6xl h-auto shadow-none group -mt-4">
             <img
-              src="Secretriat/mun convenors.png"
+              src="Secretriat/Untitled design.png"
               alt="Convenors"
               className="w-full h-auto object-contain"
             />
             <div className="absolute inset-0 bg-[url('/pattern.png')] bg-cover bg-center opacity-0 group-hover:opacity-40 transition-opacity duration-700 mix-blend-overlay pointer-events-none" />
           </div>
 
-          <div className="flex flex-col sm:flex-row justify-center gap-16 mt-8 text-center">
+          <div className="flex flex-col sm:flex-row justify-center gap-12 sm:gap-32 lg:gap-60 mt-10 text-center">
+            <div className="max-w-xs">
+              <h3 className="text-lg font-semibold text-gray-600">Dr. Ritwik M.</h3>
+              <p className="text-sm text-gray-600 mt-4">
+                Assistant Professor, Dept. of Computer Science and Engineering
+              </p>
+            </div>
             <div className="max-w-xs">
               <h3 className="text-lg font-semibold text-gray-600">
                 Dr. Ramaguru Radhakrishnan
               </h3>
-              <p className="text-sm text-gray-600">
+              <p className="text-sm text-gray-600 mt-4">
                 Assistant Professor (Senior Grade), TIFAC-CORE in Cyber Security
-              </p>
-            </div>
-            <div className="max-w-xs">
-              <h3 className="text-lg font-semibold text-gray-600">Dr. Ritwik M.</h3>
-              <p className="text-sm text-gray-600">
-                Assistant Professor, Dept. of Computer Science and Engineering
               </p>
             </div>
           </div>
         </motion.div>
       ) : (
-        // Non-Convenors Section
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -232,8 +227,8 @@ function TeamSection({ title, members }: TeamSectionProps) {
           viewport={{ once: true }}
           className="w-full flex justify-center"
         >
-          <div className="w-[76rem] bg-gray-100/40 backdrop-blur-sm border border-gray-300 shadow-md p-8 hover:shadow-lg transition-shadow duration-300">
-            <div className="flex flex-wrap justify-center gap-10">
+          <div className="w-full max-w-6xl bg-gray-100/40 backdrop-blur-sm border border-gray-300 shadow-md p-4 sm:p-8 hover:shadow-lg transition-shadow duration-300 rounded-xl">
+            <div className="flex flex-wrap justify-center gap-6 sm:gap-10">
               {members.map((member, index) => (
                 <motion.div
                   key={index}
@@ -247,15 +242,12 @@ function TeamSection({ title, members }: TeamSectionProps) {
                   viewport={{ once: true }}
                   className="flex flex-col items-center group"
                 >
-                  {/* Circular image */}
-                  <div className="relative w-52 h-52 rounded-full border-[2px] border-sky-400 shadow-md overflow-hidden group">
+                  <div className="relative w-44 h-44 sm:w-52 sm:h-52 rounded-full border-[2px] border-sky-400 shadow-md overflow-hidden group">
                     <img
                       src={member.image}
                       alt={member.name}
                       className="w-full h-full object-cover"
                     />
-
-                    {/* Hover Overlay */}
                     <div className="absolute inset-0 bg-sky-500/60 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center text-white text-center px-2">
                       <div>
                         <h3 className="text-sm font-semibold">{member.name}</h3>
@@ -264,7 +256,6 @@ function TeamSection({ title, members }: TeamSectionProps) {
                     </div>
                   </div>
 
-                  {/* Name & role (initial state) */}
                   <div className="mt-3 text-center transition-opacity duration-300 group-hover:opacity-0">
                     <h3 className="text-sm font-semibold text-gray-800">{member.name}</h3>
                     <p className="text-xs text-gray-600">{member.role}</p>
@@ -279,27 +270,24 @@ function TeamSection({ title, members }: TeamSectionProps) {
   );
 }
 
-// Main Page Component
 export default function Team() {
   return (
     <div className="min-h-screen pt-14 pb-16 bg-gradient-to-b from-white to-blue-50 flex flex-col items-center">
-      <Navbar /> {/* ✅ Navigation stays at top */}
-      
-      <div className="container px-4 flex flex-col items-center text-center">
-        {/* Heading */}
+      <Navbar />
+
+      <div className="w-full max-w-7xl px-4 flex flex-col items-center text-center">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
           className="mb-6"
         >
-          <h1 className="text-5xl font-bold text-gray-900 mb-4">Our Team</h1>
-          <p className="text-xl text-gray-600">
+          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-gray-900 mb-4">Our Team</h1>
+          <p className="text-base sm:text-lg lg:text-xl text-gray-600">
             Meet the passionate individuals behind our MUN club
           </p>
         </motion.div>
 
-        {/* All sections centered */}
         <div className="w-full flex flex-col items-center">
           {sections.map((section, idx) => (
             <TeamSection key={idx} title={section.title} members={section.members} />
