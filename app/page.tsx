@@ -9,9 +9,11 @@ import Link from "next/link";
 import { Navbar } from "@/components/navbar";
 
 const images = [
-  "/images/temp-image-1.JPG",
-  "/images/temp-image-2.JPG",
-  "/images/temp-image-3.JPG"
+  "/gallery/IMG_1518.JPG",
+  "/gallery/IMG_1288.JPG",
+  "/gallery/IMG-20240722-WA0302.jpg",
+  "/gallery/DSC02617.jpg",
+  "/gallery/19.JPG"
 ];
 
 export default function Home() {
@@ -33,7 +35,7 @@ export default function Home() {
 
   useEffect(() => {
     const getTimeRemaining = () => {
-      const targetDate = new Date("2025-08-01T09:00:00");
+      const targetDate = new Date("2025-08-29T09:00:00");
       const now = new Date();
       const total = Math.max(targetDate.getTime() - now.getTime(), 0);
 
@@ -120,7 +122,7 @@ export default function Home() {
 
                 <div className="space-y-3">
                   <h2 className="text-lg md:text-xl font-semibold tracking-wider text-white/90">
-                    AUGUST 1-3, 2025
+                    AUGUST 29-31, 2025
                   </h2>
 
                   <p className="text-base md:text-md font-medium text-[#00B7FF] max-w-2xl mx-auto tracking-wider">
