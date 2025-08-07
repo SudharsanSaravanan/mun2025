@@ -51,6 +51,18 @@ CREATE POLICY "Admins can view all Delegate Country preferences"
 ON delegate_country_preferences FOR SELECT TO authenticated
 USING (get_current_user_is_admin());
 
+-- IP Committee Preferences RLS Policies
+ALTER TABLE ip_committee_preferences ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Authenticated users can manage their own IP Committee preferences"
+ON ip_committee_preferences FOR ALL TO authenticated
+USING (user_id = auth.uid())
+WITH CHECK (user_id = auth.uid());
+
+CREATE POLICY "Admins can view all IP Committee preferences"
+ON ip_committee_preferences FOR SELECT TO authenticated
+USING (get_current_user_is_admin());
+
 -- Internal Registrations RLS Policies
 ALTER TABLE internal_registrations ENABLE ROW LEVEL SECURITY;
 
