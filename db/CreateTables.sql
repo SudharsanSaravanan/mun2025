@@ -118,3 +118,7 @@ CREATE TABLE allocations (
     (role = 'IP' AND committee_id IS NULL AND country_id IS NULL)
   )
 );
+
+CREATE UNIQUE INDEX unique_allocations_non_double
+ON allocations(committee_id, country_id)
+WHERE is_double_delegation = FALSE;
