@@ -95,7 +95,7 @@ const defaultTiltOptions = {
 export default function CommitteePage() {
   const [selectedCommittee, setSelectedCommittee] = useState<Committee | null>(null);
   const [showScrollButton, setShowScrollButton] = useState(true);
-  const [isDownloadingBgGuide, setIsDownloadingBgGuide] = useState(false);
+  const [isGeneratingBgGuideLink, setIsGeneratingBgGuideLink] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
 
   // Check if the screen is mobile size on component mount and window resize
@@ -126,32 +126,34 @@ export default function CommitteePage() {
     });
   };
 
-  const downloadBgGuide = async (committeeName: string): Promise<void> => {
-    setIsDownloadingBgGuide(true);
+  const getBgGuideLink = async (committeeName: string): Promise<string | void> => {
+    setIsGeneratingBgGuideLink(true);
 
     try {
       const fileName = `${committeeName.toLowerCase().replace(/\s+/g, "-")}.pdf`;
-  
+
       const { data, error } = await supabase.storage
         .from("background-guides")
-        .download(fileName);
-  
+        .createSignedUrl(fileName, 300);
+
       if (error || !data) {
         throw error;
       }
-  
-      const url = URL.createObjectURL(data);
-      const anchor = document.createElement("a");
-      anchor.href = url;
-      anchor.download = fileName;
-      document.body.appendChild(anchor);
-      anchor.click();
-      anchor.remove();
-      URL.revokeObjectURL(url);
+
+      if (data?.signedUrl) {
+        return data.signedUrl;
+      }
     } catch (error) {
       console.error(error);
     } finally {
-      setIsDownloadingBgGuide(false);
+      setIsGeneratingBgGuideLink(false);
+    }
+  };
+
+  const handleOpenBgGuide = async (committeeName: string) => {
+    const link = await getBgGuideLink(committeeName);
+    if (link) {
+      window.open(link, '_blank');
     }
   };
 
@@ -255,14 +257,14 @@ export default function CommitteePage() {
                         View Country Matrix
                       </button>
                       <button
-                        onClick={() => downloadBgGuide(selectedCommittee.name)}
-                        disabled={isDownloadingBgGuide}
+                        onClick={() => handleOpenBgGuide(selectedCommittee.name)}
+                        disabled={isGeneratingBgGuideLink}
                         className="bg-white cursor-pointer hover:bg-gray-100 text-sky-700 border border-sky-300 font-medium py-2 px-6 rounded-lg w-full sm:w-auto disabled:opacity-50"
                       >
-                        {isDownloadingBgGuide ? (
+                        {isGeneratingBgGuideLink ? (
                           <Loader2 className="animate-spin w-5 h-5 text-sky-700" />
                         ) : (
-                          "Download Background Guide"
+                          "View Background Guide"
                         )}
                       </button>
                     </div>
