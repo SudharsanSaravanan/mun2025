@@ -16,6 +16,7 @@ export default function AdminDashboard() {
   const [activeTab, setActiveTab] = useState<'Unallocated' | 'Allocated'>('Unallocated');
   const [filter, setFilter] = useState<'All' | 'Internal' | 'External'>('All');
   const [loading, setLoading] = useState<boolean>(false);
+  const [searchQuery, setSearchQuery] = useState<string>('');
 
   const fetchData = useCallback(async () => {
     setLoading(true);
@@ -26,7 +27,10 @@ export default function AdminDashboard() {
         .from('committees')
         .select('*')
         .order('name');
+      
       if (committeesError) throw committeesError;
+      if (!committeesData) throw new Error('No committees data returned');
+      
       setCommittees(committeesData);
 
       const newCommitteeMap = committeesData.reduce((acc, c) => {
@@ -40,7 +44,10 @@ export default function AdminDashboard() {
         .from('countries')
         .select('*')
         .order('name');
+      
       if (countriesError) throw countriesError;
+      if (!countriesData) throw new Error('No countries data returned');
+      
       setCountries(countriesData);
 
       const newCountryMap = countriesData.reduce((acc, c) => {
@@ -49,67 +56,129 @@ export default function AdminDashboard() {
       }, {} as Record<string, Country>);
       setCountryMap(newCountryMap);
 
-      // Fetch registrations
-      const { data: internalRegistrations, error: internalError } = await supabase
-        .from('internal_registrations')
-        .select('*, users!inner(*)');
-      if (internalError) throw internalError;
+      // Fetch users with their registration data and allocations
+      const { data: usersData, error: usersError } = await supabase
+        .from('users')
+        .select(`
+          *,
+          internal_registrations(*),
+          external_registrations(*),
+          allocations(*)
+        `)
+        .eq('is_admin', false);
 
-      const { data: externalRegistrations, error: externalError } = await supabase
-        .from('external_registrations')
-        .select('*, users!inner(*)');
-      if (externalError) throw externalError;
-
-      // Combine registrations
-      const allUsers = [
-        ...internalRegistrations.map(reg => ({ ...reg, type: 'Internal' })),
-        ...externalRegistrations.map(reg => ({ ...reg, type: 'External' }))
-      ];
-
-      // Fetch allocations
-      const { data: allocations, error: allocationError } = await supabase
-        .from('allocations')
-        .select('*');
-      if (allocationError) throw allocationError;
-
-      const allocationsMap = allocations.reduce((acc, alloc) => {
-        acc[alloc.user_id] = alloc;
-        return acc;
-      }, {} as Record<string, Allocation>);
+      if (usersError) throw usersError;
+      if (!usersData) throw new Error('No users data returned');
 
       // Fetch preferences for each user
       const usersWithData = await Promise.all(
-        allUsers.map(async (user) => {
-          const { data: preferences, error: prefsError } = await supabase
-            .from('user_preferences')
-            .select(`
-              preference_order,
-              role,
-              ip_subrole,
-              committee_id,
-              delegate_country_preferences (
-                country_order,
-                country_id
-              )
-            `)
-            .eq('user_id', user.user_id)
-            .order('preference_order', { ascending: true });
+        usersData.map(async (user) => {
+          try {
+            // Fetch preferences
+            const { data: preferences, error: prefsError } = await supabase
+              .from('user_preferences')
+              .select(`
+                preference_order,
+                role,
+                ip_subrole,
+                co_delegate_name,
+                co_delegate_email,
+                delegate_country_preferences(country_order, country_id),
+                ip_committee_preferences(committee_order, committee_id)
+              `)
+              .eq('user_id', user.id)
+              .order('preference_order', { ascending: true });
 
-          if (prefsError) throw prefsError;
+            if (prefsError) throw prefsError;
 
-          return {
-            ...user.users,
-            ...user,
-            is_internal: user.type === 'Internal',
-            preferences: preferences || [],
-            allocation: allocationsMap[user.user_id] || null
-          };
+            // Format preferences with countries and committees
+            const formattedPreferences = await Promise.all(
+              (preferences || []).map(async (pref) => {
+                if (pref.role === 'delegate') {
+                  // For delegate preferences, get country preferences
+                  const countryPrefs = pref.delegate_country_preferences || [];
+                  const countries = await Promise.all(
+                    countryPrefs.map(async (cp: any) => {
+                      const { data: country } = await supabase
+                        .from('countries')
+                        .select('*')
+                        .eq('id', cp.country_id)
+                        .single();
+                      return {
+                        ...cp,
+                        country
+                      };
+                    })
+                  );
+                  return {
+                    ...pref,
+                    countries: countries.sort((a, b) => a.country_order - b.country_order)
+                  };
+                } else {
+                  // For IP preferences, get committee preferences
+                  const committeePrefs = pref.ip_committee_preferences || [];
+                  const committees = await Promise.all(
+                    committeePrefs.map(async (ip: any) => {
+                      const { data: committee } = await supabase
+                        .from('committees')
+                        .select('*')
+                        .eq('id', ip.committee_id)
+                        .single();
+                      return {
+                        ...ip,
+                        committee
+                      };
+                    })
+                  );
+                  return {
+                    ...pref,
+                    committees: committees.sort((a, b) => a.committee_order - b.committee_order)
+                  };
+                }
+              })
+            );
+
+            // Get the correct registration data
+            const registration = user.is_internal 
+              ? user.internal_registrations 
+              : user.external_registrations;
+
+            // Ensure we have the right registration data
+            if (!user.is_internal && !user.external_registrations) {
+              console.warn(`External user ${user.id} missing external_registrations`);
+            }
+
+            return {
+              ...user,
+              is_internal: user.is_internal,
+              preferences: formattedPreferences,
+              allocation: user.allocations?.[0] || null,
+              registration: registration?.[0] || null // Changed to get the first element of the array
+            };
+          } catch (error) {
+            console.error(`Error processing user ${user.id}:`, error);
+            return {
+              ...user,
+              is_internal: user.is_internal,
+              preferences: [],
+              allocation: user.allocations?.[0] || null,
+              registration: user.is_internal 
+                ? user.internal_registrations?.[0] 
+                : user.external_registrations?.[0]
+            };
+          }
         })
       );
 
       setUsers(usersWithData);
     } catch (error) {
       console.error('Error fetching data:', error);
+      if (error instanceof Error) {
+        console.error('Error details:', {
+          message: error.message,
+          stack: error.stack
+        });
+      }
     } finally {
       setLoading(false);
     }
@@ -121,7 +190,10 @@ export default function AdminDashboard() {
 
   const handleAllocate = async (allocation: Omit<Allocation, 'allocated_at'>) => {
     try {
-      const { error } = await supabase.from('allocations').insert(allocation);
+      const { error } = await supabase.from('allocations').insert({
+        ...allocation,
+        allocated_at: new Date().toISOString()
+      });
       if (error) throw error;
       await fetchData();
     } catch (error) {
@@ -129,18 +201,18 @@ export default function AdminDashboard() {
     }
   };
 
-    const handleUpdateAllocation = async (allocation: Omit<Allocation, 'allocated_at'>) => {
-      try {
-        const { error } = await supabase
-          .from('allocations')
-          .update(allocation)
-          .eq('user_id', allocation.user_id);
-        if (error) throw error;
-        await fetchData();
-      } catch (error) {
-        console.error('Error updating allocation:', error);
-      }
-    };
+  const handleUpdateAllocation = async (allocation: Omit<Allocation, 'allocated_at'>) => {
+    try {
+      const { error } = await supabase
+        .from('allocations')
+        .update(allocation)
+        .eq('user_id', allocation.user_id);
+      if (error) throw error;
+      await fetchData();
+    } catch (error) {
+      console.error('Error updating allocation:', error);
+    }
+  };
 
   const handleDeleteAllocation = async (userId: string) => {
     try {
@@ -156,6 +228,8 @@ export default function AdminDashboard() {
   };
 
   const getAvailableCountries = (committeeId: string): Country[] => {
+    if (!committeeId) return [];
+    
     const allocatedCountryIds = users
       .filter(u => u.allocation?.committee_id === committeeId)
       .map(u => u.allocation?.country_id)
@@ -167,14 +241,13 @@ export default function AdminDashboard() {
   };
 
   const filteredUsers = users.filter(user => {
-    // Filter by allocation status
     if (activeTab === 'Unallocated' && user.allocation) return false;
     if (activeTab === 'Allocated' && !user.allocation) return false;
-    
-    // Filter by user type
     if (filter === 'Internal' && !user.is_internal) return false;
     if (filter === 'External' && user.is_internal) return false;
-    
+    if (searchQuery && !user.name.toLowerCase().includes(searchQuery.toLowerCase())) {
+      return false;
+    }
     return true;
   });
 
@@ -200,13 +273,24 @@ export default function AdminDashboard() {
 
       <div className="bg-white rounded-2xl shadow-lg overflow-hidden">
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center p-6 border-b border-gray-200">
-          <Tabs
-            activeTab={activeTab}
-            setActiveTab={setActiveTab}
-            unallocatedCount={unallocatedCount}
-          />
-          <div className="mt-4 md:mt-0 w-full md:w-auto">
-            <FilterBar filter={filter} setFilter={setFilter} />
+          <div className="w-full md:w-auto mb-4 md:mb-0">
+            <input
+              type="text"
+              placeholder="Search delegates by name..."
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+          </div>
+          <div className="flex flex-col md:flex-row items-start md:items-center space-y-4 md:space-y-0 md:space-x-4 w-full md:w-auto">
+            <Tabs
+              activeTab={activeTab}
+              setActiveTab={setActiveTab}
+              unallocatedCount={unallocatedCount}
+            />
+            <div className="w-full md:w-auto">
+              <FilterBar filter={filter} setFilter={setFilter} />
+            </div>
           </div>
         </div>
 
@@ -221,12 +305,13 @@ export default function AdminDashboard() {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path>
               </svg>
               <h3 className="text-lg font-medium mb-1">No delegates found</h3>
+              <p className="text-gray-500">Try adjusting your search or filters</p>
             </div>
           ) : (
             <div className="grid gap-3">
               {filteredUsers.map((user) => (
                 <DelegateCard
-                  key={user.user_id}
+                  key={user.id}
                   delegate={user}
                   committees={committees}
                   committeeMap={committeeMap}
@@ -245,4 +330,4 @@ export default function AdminDashboard() {
       </div>
     </div>
   );
-};
+}

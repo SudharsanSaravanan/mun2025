@@ -1,3 +1,4 @@
+
 'use client';
 
 import React, { useState } from 'react';
@@ -52,8 +53,17 @@ const DelegateCard: React.FC<DelegateCardProps> = ({
         {pref.role === 'IP' ? (
           <div className="ml-4 space-y-1">
             <p><span className="font-semibold">Role:</span> {pref.ip_subrole || 'IP Member'}</p>
-            {pref.committee_id && (
-              <p><span className="font-semibold">Committee Preference:</span> {getCommitteeName(pref.committee_id)}</p>
+            {pref.ip_committee_preferences?.length > 0 && (
+              <div>
+                <p className="font-semibold mb-1">Committee Preferences:</p>
+                <div className="ml-4 space-y-1">
+                  {pref.ip_committee_preferences.map((committeePref: any, committeeIndex: number) => (
+                    <p key={committeeIndex}>
+                      {committeePref.committee_order}. {getCommitteeName(committeePref.committee_id)}
+                    </p>
+                  ))}
+                </div>
+              </div>
             )}
           </div>
         ) : (
@@ -73,22 +83,29 @@ const DelegateCard: React.FC<DelegateCardProps> = ({
                 </div>
               </div>
             )}
+            {pref.co_delegate_name && (
+              <div className="mt-2 pt-2 border-t border-gray-200">
+                <p className="font-semibold">Co-Delegate Details:</p>
+                <p><span className="font-semibold">Name:</span> {pref.co_delegate_name}</p>
+                <p><span className="font-semibold">Email:</span> {pref.co_delegate_email}</p>
+              </div>
+            )}
           </div>
         )}
       </div>
     );
   };
 
-  const handleAllocate = (allocation: Omit<Allocation, 'allocated_at'>) => {
-    onAllocate(allocation);
+  const handleAllocate = async (allocation: Omit<Allocation, 'allocated_at'>) => {
+    await onAllocate(allocation);
   };
 
-  const handleEditAllocation = (allocation: Omit<Allocation, 'allocated_at'>) => {
-    onEditAllocation(allocation);
+  const handleEditAllocation = async (allocation: Omit<Allocation, 'allocated_at'>) => {
+    await onEditAllocation(allocation);
   };
 
-  const handleDeleteAllocation = () => {
-    onDeleteAllocation(delegate.user_id);
+  const handleDeleteAllocation = async () => {
+    await onDeleteAllocation(delegate.id);
   };
 
   return (
@@ -108,12 +125,12 @@ const DelegateCard: React.FC<DelegateCardProps> = ({
               {delegate.is_internal ? 'Internal' : 'External'}
             </span>
           )}
-          {!delegate.is_internal && delegate.university_name && (
+          {!delegate.is_internal && delegate.external_registrations?.university_name && (
             <span className="px-2 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-800">
-              {delegate.university_name}
+              {delegate.external_registrations.university_name}
             </span>
           )}
-          {delegate.is_head_of_delegation && !delegate.is_internal && (
+          {delegate.external_registrations?.is_head_of_delegation && !delegate.is_internal && (
             <span className="px-2 py-1 text-xs font-semibold rounded-full bg-yellow-100 text-yellow-800">
               Head of Delegation
             </span>
@@ -134,33 +151,33 @@ const DelegateCard: React.FC<DelegateCardProps> = ({
               <p><span className="font-semibold">Email ID:</span> {delegate.email}</p>
               {delegate.is_internal ? (
                 <>
-                  <p><span className="font-semibold">Roll Number:</span> {delegate.roll_number}</p>
+                  <p><span className="font-semibold">Roll Number:</span> {delegate.internal_registrations?.roll_number}</p>
                 </>
               ) : (
                 <>
-                  <p><span className="font-semibold">Residential Address:</span> {delegate.residential_address}</p>
-                  <p><span className="font-semibold">Residential Pin Code:</span> {delegate.residential_pincode}</p>
-                  <p><span className="font-semibold">University/Institution Name:</span> {delegate.university_name}</p>
-                  <p><span className="font-semibold">University Address:</span> {delegate.university_address}</p>
-                  <p><span className="font-semibold">University Pin Code:</span> {delegate.university_pincode}</p>
-                  <p><span className="font-semibold">Accommodation Needed:</span> {delegate.accomodation_required ? 'Yes' : 'No'}</p>
+                  <p><span className="font-semibold">Residential Address:</span> {delegate.external_registrations?.residential_address}</p>
+                  <p><span className="font-semibold">Residential Pin Code:</span> {delegate.external_registrations?.residential_pincode}</p>
+                  <p><span className="font-semibold">University/Institution Name:</span> {delegate.external_registrations?.university_name}</p>
+                  <p><span className="font-semibold">University Address:</span> {delegate.external_registrations?.university_address}</p>
+                  <p><span className="font-semibold">University Pin Code:</span> {delegate.external_registrations?.university_pincode}</p>
+                  <p><span className="font-semibold">Accommodation Needed:</span> {delegate.external_registrations?.accomodation_required ? 'Yes' : 'No'}</p>
                 </>
               )}
               
               <br />
-              <p><span className="font-semibold">Payment ID:</span> {delegate.payment_id}</p>
-              <p><span className="font-semibold">Payment Date:</span> {delegate.payment_date}</p>
-              <p><span className="font-semibold">Bank Name:</span> {delegate.bank_name}</p>
-              <p><span className="font-semibold">Bank Branch:</span> {delegate.bank_branch}</p>
+              <p><span className="font-semibold">Payment ID:</span> {delegate.internal_registrations?.payment_id || delegate.external_registrations?.payment_id}</p>
+              <p><span className="font-semibold">Payment Date:</span> {delegate.internal_registrations?.payment_date || delegate.external_registrations?.payment_date}</p>
+              <p><span className="font-semibold">Bank Name:</span> {delegate.internal_registrations?.bank_name || delegate.external_registrations?.bank_name}</p>
+              <p><span className="font-semibold">Bank Branch:</span> {delegate.internal_registrations?.bank_branch || delegate.external_registrations?.bank_branch}</p>
               
               {!delegate.is_internal && (
                 <>
                   <h4 className="text-md font-bold text-blue-800 mt-4 mb-2">Delegation Details</h4>
-                  {delegate.delegation_name ? (
+                  {delegate.external_registrations?.delegation_name ? (
                     <>
-                      <p><span className="font-semibold">Type:</span> {delegate.delegation_type}</p>
-                      <p><span className="font-semibold">Delegation Name:</span> {delegate.delegation_name}</p>
-                      <p><span className="font-semibold">Head of Delegation:</span> {delegate.is_head_of_delegation ? 'Yes' : 'No'}</p>
+                      <p><span className="font-semibold">Type:</span> {delegate.external_registrations.delegation_type}</p>
+                      <p><span className="font-semibold">Delegation Name:</span> {delegate.external_registrations.delegation_name}</p>
+                      <p><span className="font-semibold">Head of Delegation:</span> {delegate.external_registrations.is_head_of_delegation ? 'Yes' : 'No'}</p>
                     </>
                   ) : (
                     <p><span className="font-semibold">Type:</span> Individual Delegate</p>
@@ -177,11 +194,11 @@ const DelegateCard: React.FC<DelegateCardProps> = ({
             <h4 className="text-md font-bold text-blue-800 mt-6 mb-2">Documents</h4>
             <FileDownloadButtons
               uploads={{
-                paymentProof: delegate.payment_proof_url || '',
-                collegeId: delegate.college_id_photo_url,
-                aadharId: delegate.id_proof_url,
-                delegateExperience: delegate.delegate_experience_doc_url,
-                delegationSheet: delegate.delegation_sheet_url || undefined
+                paymentProof: delegate.internal_registrations?.payment_proof_url || delegate.external_registrations?.payment_proof_url || '',
+                collegeId: delegate.internal_registrations?.college_id_photo_url,
+                aadharId: delegate.external_registrations?.id_proof_url,
+                delegateExperience: delegate.internal_registrations?.delegate_experience_doc_url || delegate.external_registrations?.delegate_experience_doc_url,
+                delegationSheet: delegate.external_registrations?.delegation_sheet_url || undefined
               }}
             />
           </div>
@@ -191,17 +208,23 @@ const DelegateCard: React.FC<DelegateCardProps> = ({
             {!delegate.allocation || isEditing ? (
               <AllocationForm
                 delegate={{
-                  id: delegate.user_id,
+                  id: delegate.id,
                   name: delegate.name,
-                  allocation: delegate.allocation
-                    ? {
-                        committee: delegate.allocation.committee_id || '',
-                        country: delegate.allocation.country_id || ''
-                      }
-                    : null,
-                  is_internal: delegate.is_internal
+                  allocation: delegate.allocation ? {
+                    role: delegate.allocation.role,
+                    ip_subrole: delegate.allocation.ip_subrole || undefined,
+                    committee: delegate.allocation.committee_id || '',
+                    country: delegate.allocation.country_id || '',
+                    is_double_delegation: delegate.allocation.is_double_delegation || false
+                  } : null,
+                  is_internal: delegate.is_internal,
+                  preferences: delegate.preferences
                 }}
-                committees={committees.map(c => ({ id: c.id, name: c.name }))}
+                committees={committees.map(c => ({ 
+                  id: c.id, 
+                  name: c.name,
+                  is_double_delegation: c.is_double_delegation 
+                }))}
                 getAvailableCountries={getAvailableCountries}
                 onAllocate={async (allocation) => {
                   await handleAllocate(allocation);
@@ -225,6 +248,9 @@ const DelegateCard: React.FC<DelegateCardProps> = ({
                 <>
                   <p><span className="font-semibold">Committee:</span> {delegate.allocation.committee_id ? getCommitteeName(delegate.allocation.committee_id) : 'N/A'}</p>
                   <p><span className="font-semibold">Country:</span> {delegate.allocation.country_id ? getCountryName(delegate.allocation.country_id) : 'N/A'}</p>
+                  {delegate.allocation.is_double_delegation && (
+                    <p><span className="font-semibold">Double Delegation:</span> Yes</p>
+                  )}
                 </>
               )}
 
@@ -252,8 +278,8 @@ const DelegateCard: React.FC<DelegateCardProps> = ({
             <ConfirmationModal
               isOpen={showDeleteConfirm}
               onClose={() => setShowDeleteConfirm(false)}
-              onConfirm={() => {
-                onDeleteAllocation(delegate.user_id);
+              onConfirm={async () => {
+                await handleDeleteAllocation();
                 setShowDeleteConfirm(false);
               }}
               message="Are you sure you want to delete this user's allocation?"

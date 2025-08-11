@@ -142,14 +142,17 @@ export default function SignUpPage() {
       <Navbar />
       <div className="min-h-screen py-2 md:py-4 flex items-center justify-center bg-gradient-to-br from-sky-100 to-sky-200 p-4">
         <motion.div
-          className="bg-white/90 backdrop-blur-2xl rounded-xl shadow-[0_8px_32px_rgb(0,0,0,0.15)] border border-sky-200 p-6 sm:p-8 w-full max-w-2xl"
+          className="bg-white/90 backdrop-blur-2xl rounded-xl shadow-[0_8px_32px_rgb(0,0,0,0.15)] border border-sky-200 p-6 sm:p-8 w-full max-w-[786px]"
           initial={{ opacity: 0, y: 40 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, ease: "easeOut" }}
         >
-          <h2 className="text-2xl sm:text-3xl font-bold text-center text-gray-800 mb-6">
+          <h2 className="text-2xl sm:text-3xl font-bold text-center text-gray-800 mb-3">
             Create your Account
           </h2>
+          <p className="text-center text-sm text-gray-600 mb-8  ">
+            Create an account to register for Amrita MUN, participate in events, and stay updated with all the conference details.
+          </p>
           {error && (
             <div className="mb-4 p-3 rounded bg-red-50 border border-red-200">
               <p className="text-red-600 text-sm">{error}</p>
