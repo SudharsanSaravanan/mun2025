@@ -63,6 +63,13 @@ export interface DelegateCountryPreference {
   country_id: string;
 }
 
+export interface IPCommitteePreferences {
+  user_id: string;
+  preference_order: number;
+  committee_order: number;
+  committee_id: string;
+}
+
 export interface UserPreference {
   user_id: string;
   preference_order: number;
@@ -70,6 +77,7 @@ export interface UserPreference {
   ip_subrole: string | null;
   committee_id: string | null;
   delegate_country_preferences: DelegateCountryPreference[];
+  ip_committee_preferences: IPCommitteePreferences[];
 }
 
 export interface Allocation {
