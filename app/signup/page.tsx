@@ -150,6 +150,9 @@ export default function SignUpPage() {
           <h2 className="text-2xl sm:text-3xl font-bold text-center text-gray-800 mb-6">
             Create your Account
           </h2>
+          <p className="text-center text-sm text-gray-600 mb-4">
+            Create an account to register for Amrita MUN, participate in events, and stay updated with all the conference details
+          </p>
           {error && (
             <div className="mb-4 p-3 rounded bg-red-50 border border-red-200">
               <p className="text-red-600 text-sm">{error}</p>
@@ -161,7 +164,8 @@ export default function SignUpPage() {
             </div>
           )}
           <form className="space-y-4" onSubmit={handleSubmit}>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">            <div className="md:col-span-2">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">            
+              <div className="md:col-span-2">
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Full Name
                 </label>
@@ -227,7 +231,8 @@ export default function SignUpPage() {
                     onClick={() => setShowPassword(prev => !prev)}
                     className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-500 hover:text-gray-700 cursor-pointer"
                     tabIndex={-1}
-                  >                  {showPassword ? (
+                  >                  
+                    {showPassword ? (
                       <EyeOff className="h-5 w-5" />
                     ) : (
                       <Eye className="h-5 w-5" />
@@ -257,7 +262,8 @@ export default function SignUpPage() {
                     onClick={() => setShowConfirmPassword(prev => !prev)}
                     className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-500 hover:text-gray-700 cursor-pointer"
                     tabIndex={-1}
-                  >                  {showConfirmPassword ? (
+                  >                  
+                    {showConfirmPassword ? (
                       <EyeOff className="h-5 w-5" />
                     ) : (
                       <Eye className="h-5 w-5" />
