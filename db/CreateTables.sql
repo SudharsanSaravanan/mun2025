@@ -30,6 +30,7 @@ CREATE TABLE user_preferences (
   preference_order SMALLINT NOT NULL CHECK (preference_order BETWEEN 1 AND 3),
   role user_role_type NOT NULL,
   ip_subrole ip_role_type,
+  committee_id UUID REFERENCES committees(id),
   co_delegate_name TEXT,
   co_delegate_email TEXT,
   PRIMARY KEY (user_id, preference_order),
@@ -37,6 +38,11 @@ CREATE TABLE user_preferences (
     (role = 'IP' AND ip_subrole IS NOT NULL)
     OR
     (role = 'delegate' AND ip_subrole IS NULL)
+  ),
+  CONSTRAINT check_delegate_committee CHECK (
+    (role = 'delegate' AND committee_id IS NOT NULL)
+    OR
+    (role <> 'delegate' AND committee_id IS NULL)
   ),
 );
 
@@ -61,7 +67,6 @@ CREATE TABLE ip_committee_preferences (
     REFERENCES user_preferences(user_id, preference_order)
     ON DELETE CASCADE
 );
-
 
 CREATE TABLE internal_registrations (
     user_id UUID PRIMARY KEY REFERENCES users(id) ON DELETE CASCADE,
