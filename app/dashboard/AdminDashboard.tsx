@@ -90,6 +90,10 @@ export default function AdminDashboard() {
               delegate_country_preferences (
                 country_order,
                 country_id
+              ),
+              ip_committee_preferences (
+                committee_order,
+                committee_id
               )
             `)
             .eq('user_id', user.user_id)

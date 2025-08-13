@@ -52,8 +52,17 @@ const DelegateCard: React.FC<DelegateCardProps> = ({
         {pref.role === 'IP' ? (
           <div className="ml-4 space-y-1">
             <p><span className="font-semibold">Role:</span> {pref.ip_subrole || 'IP Member'}</p>
-            {pref.committee_id && (
-              <p><span className="font-semibold">Committee Preference:</span> {getCommitteeName(pref.committee_id)}</p>
+            {pref.ip_committee_preferences?.length > 0 && (
+              <div>
+                <p className="font-semibold mb-1">Committee Preferences:</p>
+                <div className="ml-4 space-y-1">
+                  {pref.ip_committee_preferences.map((committeePref: any, committeeIndex: number) => (
+                    <p key={committeeIndex}>
+                      {committeePref.committee_order}. {getCommitteeName(committeePref.committee_id)}
+                    </p>
+                  ))}
+                </div>
+              </div>
             )}
           </div>
         ) : (
