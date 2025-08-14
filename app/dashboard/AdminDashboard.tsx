@@ -16,6 +16,7 @@ export default function AdminDashboard() {
   const [activeTab, setActiveTab] = useState<'Unallocated' | 'Allocated'>('Unallocated');
   const [filter, setFilter] = useState<'All' | 'Internal' | 'External'>('All');
   const [loading, setLoading] = useState<boolean>(false);
+  const [searchQuery, setSearchQuery] = useState<string>('');
 
   const fetchData = useCallback(async () => {
     setLoading(true);
@@ -133,18 +134,18 @@ export default function AdminDashboard() {
     }
   };
 
-    const handleUpdateAllocation = async (allocation: Omit<Allocation, 'allocated_at'>) => {
-      try {
-        const { error } = await supabase
-          .from('allocations')
-          .update(allocation)
-          .eq('user_id', allocation.user_id);
-        if (error) throw error;
-        await fetchData();
-      } catch (error) {
-        console.error('Error updating allocation:', error);
-      }
-    };
+  const handleUpdateAllocation = async (allocation: Omit<Allocation, 'allocated_at'>) => {
+    try {
+      const { error } = await supabase
+        .from('allocations')
+        .update(allocation)
+        .eq('user_id', allocation.user_id);
+      if (error) throw error;
+      await fetchData();
+    } catch (error) {
+      console.error('Error updating allocation:', error);
+    }
+  };
 
   const handleDeleteAllocation = async (userId: string) => {
     try {
@@ -179,6 +180,9 @@ export default function AdminDashboard() {
     if (filter === 'Internal' && !user.is_internal) return false;
     if (filter === 'External' && user.is_internal) return false;
     
+    // Filter by name search
+    if (searchQuery && !user.name.toLowerCase().includes(searchQuery.toLowerCase())) return false;
+    
     return true;
   });
 
@@ -204,6 +208,15 @@ export default function AdminDashboard() {
 
       <div className="bg-white rounded-2xl shadow-lg overflow-hidden">
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center p-6 border-b border-gray-200">
+          <div className="w-full md:w-auto mb-4 md:mb-0">
+            <input
+              type="text"
+              placeholder="Search by name..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full md:w-64 px-4 py-2 border text-gray-800 border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-200 bg-gray-50/50"
+            />
+          </div>
           <Tabs
             activeTab={activeTab}
             setActiveTab={setActiveTab}
