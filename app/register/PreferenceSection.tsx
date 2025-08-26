@@ -3,10 +3,12 @@
 import React, { useEffect, useState } from "react";
 import { Label } from "@/components/ui/label";
 import { Select, SelectTrigger, SelectContent, SelectItem } from "@/components/ui/select";
+import { Input } from "@/components/ui/input";
 
 interface Committee {
   id: string;
   name: string;
+  is_double_delegation: boolean; // Add this field
 }
 
 interface Country {
@@ -17,6 +19,7 @@ interface Country {
 
 interface PreferenceSectionProps {
   num: number;
+  isRequired: boolean;
   pref: string;
   setPref: (value: string) => void;
   role: string;
@@ -31,6 +34,7 @@ interface PreferenceSectionProps {
 
 export const PreferenceSection = React.memo(({ 
   num, 
+  isRequired,
   pref, 
   setPref, 
   role, 
@@ -55,6 +59,13 @@ export const PreferenceSection = React.memo(({
       });
     }
   );
+  
+  const [selectedIpCommittees, setSelectedIpCommittees] = useState<string[]>(
+    () => [1, 2, 3].map(index => {
+      const value = formData[`ip_committee${num}_${index}`];
+      return typeof value === 'string' ? value : '';
+    })
+  );
 
   useEffect(() => {
     if (pref === 'delegate' || (pref === 'IP' && role === 'reporter')) {
@@ -67,6 +78,13 @@ export const PreferenceSection = React.memo(({
       return typeof value === 'string' ? value : '';
     });
     setSelectedCountries(countryValues);
+    
+    const ipCommitteeValues = [1, 2, 3].map(index => {
+        const value = formData[`ip_committee${num}_${index}`];
+        return typeof value === 'string' ? value : '';
+    });
+    setSelectedIpCommittees(ipCommitteeValues);
+
   }, [formData, num, pref, role]);
 
   const [isUserAction, setIsUserAction] = useState(false);
@@ -117,12 +135,28 @@ export const PreferenceSection = React.memo(({
       .filter(country => !selectedCountries.includes(country.id) || 
         selectedCountries[index - 1] === country.id);
   };
+  
+  const handleIpCommitteeChange = (value: string, index: number) => {
+    const actualValue = value === "none" ? "" : value;
+    const newSelectedCommittees = [...selectedIpCommittees];
+    newSelectedCommittees[index - 1] = actualValue;
+    setSelectedIpCommittees(newSelectedCommittees);
+    handleInputChange({
+      target: { name: `ip_committee${num}_${index}`, value: actualValue }
+    } as React.ChangeEvent<HTMLInputElement>);
+  };
+
+  const getAvailableIpCommittees = (index: number) => {
+    return committees
+      .filter(committee => !selectedIpCommittees.includes(committee.id) || 
+        selectedIpCommittees[index - 1] === committee.id);
+  };
 
   const getStringValue = (key: string) => {
     const value = formData[key];
     return typeof value === "string" ? value : "";
   };
-
+  
   const parties = [
     { name: "BJP", flagPath: "/parties/bjp.png", members: ["narendra modi", "amit shah"] },
     { name: "Congress", flagPath: "/parties/congress.svg", members: ["rahul gandhi", "sashi tharoor"] },
@@ -157,30 +191,30 @@ export const PreferenceSection = React.memo(({
           </Select>
           {role === "reporter" && (
             <div className="grid grid-cols-1 gap-2 mt-3">
-              <Label className="text-sm md:text-base">Committee Preference</Label>
-              <div className="w-full">
-                <Select 
-                  value={getStringValue(`committee${num}`) || "none"} 
-                  onValueChange={(value) => handleCommitteeChange(value)} 
-                  required
-                >
-                  <SelectTrigger 
-                    className={`w-full mt-1 flex items-center justify-between ${!validateSelection(getStringValue(`committee${num}`)) ? 'border-red-500' : ''}`}
+              <Label className="text-sm md:text-base">Committee Preferences</Label>
+              {[1, 2, 3].map(index => (
+                <div key={index} className="w-full">
+                  <Select
+                    value={getStringValue(`ip_committee${num}_${index}`) || "none"}
+                    onValueChange={(value) => handleIpCommitteeChange(value, index)}
+                    required={isRequired}
                   >
-                    <span className="truncate block">
-                      {committees.find(c => c.id === getStringValue(`committee${num}`))?.name || "Select Committee"}
-                    </span>
-                  </SelectTrigger>
-                  <SelectContent className="w-full">
-                    <SelectItem value="none">Select Committee</SelectItem>
-                    {committees.map(committee => (
-                      <SelectItem key={committee.id} value={committee.id}>
-                        {committee.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
+                    <SelectTrigger 
+                      className={`w-full mt-1 ${isRequired && !validateSelection(getStringValue(`ip_committee${num}_${index}`)) ? 'border-red-500' : ''}`}
+                    >
+                      {committees.find(c => c.id === getStringValue(`ip_committee${num}_${index}`))?.name || `Select Committee ${index}`}
+                    </SelectTrigger>
+                    <SelectContent className="w-full">
+                      <SelectItem value="none">{`Select Committee ${index}`}</SelectItem>
+                      {getAvailableIpCommittees(index).map(committee => (
+                        <SelectItem key={committee.id} value={committee.id}>
+                          {committee.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              ))}
             </div>
           )}
         </div>
@@ -193,10 +227,10 @@ export const PreferenceSection = React.memo(({
             <Select 
               value={getStringValue(`committee${num}`) || "none"} 
               onValueChange={(value) => handleCommitteeChange(value)} 
-              required
+              required={isRequired}
             >
               <SelectTrigger 
-                className={`w-full mt-1 flex items-center justify-between ${!validateSelection(getStringValue(`committee${num}`)) ? 'border-red-500' : ''}`}
+                className={`w-full mt-1 flex items-center justify-between ${isRequired && !validateSelection(getStringValue(`committee${num}`)) ? 'border-red-500' : ''}`}
               >
                 <span className="truncate block">
                   {committees.find(c => c.id === getStringValue(`committee${num}`))?.name || "Select Committee"}
@@ -213,44 +247,48 @@ export const PreferenceSection = React.memo(({
             </Select>
           </div>
           
-          <Label className="text-sm md:text-base mt-1">Country/Member Preferences</Label>
-          {[1, 2, 3].map((index) => (
-            <div key={index} className="w-[300px] sm:w-[400px]">
-              <Select
-                value={getStringValue(`country${num}_${index}`) || "none"}
-                onValueChange={(value) => handleCountryChange(value, index)}
-                required
-              >
-                <SelectTrigger 
-                  className={`w-full mt-1 ${!validateSelection(getStringValue(`country${num}_${index}`)) ? 'border-red-500' : ''}`}
-                >
-                  {countries.find(c => c.id === getStringValue(`country${num}_${index}`))?.name || `Select Country/Member ${index}`}
-                </SelectTrigger>
-                <SelectContent className="w-[300px] sm:w-[400px]">
-                  <SelectItem value="none">{`Select Country/Member ${index}`}</SelectItem>
-                  {getAvailableCountries(index).map(country => {
-                    const isConstituentAssembly = committees.find(c => c.id === selectedCommittee)?.name === "Constituent Assembly";
-                    const defaultFlag = `/flags/${country.name.toLowerCase()}.svg`;
-                    const party = parties.find(p => p.members.includes(country.name.toLowerCase()));
-                    const flagPath = isConstituentAssembly ? (party?.flagPath ?? defaultFlag) : defaultFlag;
-                    
-                    return (
-                      <SelectItem key={country.id} value={country.id}>
-                        <div className="flex items-center">
-                          <img 
-                            src={flagPath} 
-                            alt="flag" 
-                            className="w-6 mr-2" 
-                          />
-                          {country.name}
-                        </div>
-                      </SelectItem>
-                    );
-                  })}
-                </SelectContent>
-              </Select>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-3 mt-1">
+            <div className="space-y-2">
+              <Label className="text-sm md:text-base">Country/Member Preferences</Label>
+              {[1, 2, 3].map((index) => (
+                <div key={index} className="w-full">
+                  <Select
+                    value={getStringValue(`country${num}_${index}`) || "none"}
+                    onValueChange={(value) => handleCountryChange(value, index)}
+                    required={isRequired}
+                  >
+                    <SelectTrigger 
+                      className={`w-full mt-1 ${isRequired && !validateSelection(getStringValue(`country${num}_${index}`)) ? 'border-red-500' : ''}`}
+                    >
+                      {countries.find(c => c.id === getStringValue(`country${num}_${index}`))?.name || `Select Country/Member ${index}`}
+                    </SelectTrigger>
+                    <SelectContent className="w-[300px] sm:w-[400px]">
+                      <SelectItem value="none">{`Select Country/Member ${index}`}</SelectItem>
+                      {getAvailableCountries(index).map(country => {
+                        const isConstituentAssembly = committees.find(c => c.id === selectedCommittee)?.name === "Constituent Assembly";
+                        const defaultFlag = `/flags/${country.name.toLowerCase()}.svg`;
+                        const party = parties.find(p => p.members.includes(country.name.toLowerCase()));
+                        const flagPath = isConstituentAssembly ? (party?.flagPath ?? defaultFlag) : defaultFlag;
+                        
+                        return (
+                          <SelectItem key={country.id} value={country.id}>
+                            <div className="flex items-center">
+                              <img 
+                                src={flagPath} 
+                                alt="flag" 
+                                className="w-6 mr-2" 
+                              />
+                              {country.name}
+                            </div>
+                          </SelectItem>
+                        );
+                      })}
+                    </SelectContent>
+                  </Select>
+                </div>
+              ))}
             </div>
-          ))}
+          </div>
         </div>
       )}
     </div>

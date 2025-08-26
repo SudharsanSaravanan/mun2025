@@ -47,7 +47,6 @@ const RegistrationForm = () => {
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
   const [showCollegeDropdown, setShowCollegeDropdown] = useState(false);
   
-  // Preferences state
   const [prefs, setPrefs] = useState({
     pref1: "delegate", pref2: "delegate", pref3: "delegate",
     role1: "reporter", role2: "reporter", role3: "reporter"
@@ -61,6 +60,10 @@ const RegistrationForm = () => {
     country1_1: "", country1_2: "", country1_3: "",
     country2_1: "", country2_2: "", country2_3: "",
     country3_1: "", country3_2: "", country3_3: "",
+    coDelegateName: "", coDelegateEmail: "",
+    ip_committee1_1: "", ip_committee1_2: "", ip_committee1_3: "",
+    ip_committee2_1: "", ip_committee2_2: "", ip_committee2_3: "",
+    ip_committee3_1: "", ip_committee3_2: "", ip_committee3_3: "",
     delegationName: "", paymentId: "", termsAccepted: false,
     collegeIdFile: null as File | null, delegateExperienceFile: null as File | null,
     idProofFile: null as File | null, delegationSheetFile: null as File | null,
@@ -163,39 +166,61 @@ const RegistrationForm = () => {
 
   const validateStep = (step: number): Record<string, string> => {
     const errors: Record<string, string> = {};
+    
+    const checkPreference = (prefNum: number) => {
+        const prefKey = `pref${prefNum}` as keyof typeof prefs;
+        const roleKey = `role${prefNum}` as keyof typeof prefs;
+
+        if (!prefs[prefKey]) errors[prefKey] = `Preference ${prefNum} is required`;
+        
+        if (prefs[prefKey] === "delegate") {
+            const committeeKey = `committee${prefNum}` as keyof typeof formData;
+            if (!formData[committeeKey]) errors[committeeKey] = `Committee for Preference ${prefNum} is required`;
+
+            for (let i = 1; i <= 3; i++) {
+                const countryKey = `country${prefNum}_${i}` as keyof typeof formData;
+                if (!formData[countryKey]) errors[countryKey] = `Country ${i} for Preference ${prefNum} is required`;
+            }
+        } else if (prefs[prefKey] === "IP") {
+            if (!prefs[roleKey]) errors[roleKey] = `Role for Preference ${prefNum} is required`;
+            if (prefs[roleKey] === "reporter") {
+                for (let i = 1; i <= 3; i++) {
+                    const ipCommitteeKey = `ip_committee${prefNum}_${i}` as keyof typeof formData;
+                    if (!formData[ipCommitteeKey]) errors[ipCommitteeKey] = `Committee ${i} for Preference ${prefNum} is required`;
+                }
+            }
+        }
+    };
+    
+    const requiresCoDelegate = [1, 2, 3].some(num => {
+      const prefKey = `pref${num}` as keyof typeof prefs;
+      const committeeKey = `committee${num}` as keyof typeof formData;
+      if (prefs[prefKey] === 'delegate') {
+        const committeeId = formData[committeeKey];
+        if (committeeId) {
+            const selectedCommittee = committees.find(c => c.id === committeeId);
+            return selectedCommittee?.is_double_delegation === true;
+        }
+      }
+      return false;
+    });
 
     if (isInternal) {
       if (step === 2) {
         if (!formData.rollNumber) errors.rollNumber = "Roll number is required";
-      } else if (step == 3 || step == 4 || step == 5) {
-        const prefNum = step - 2;
-        const prefKey = `pref${prefNum}` as keyof typeof prefs;
-        const roleKey = `role${prefNum}` as keyof typeof prefs;
-
-        if (!prefs[prefKey]) {
-          errors[prefKey] = `Preference ${prefNum} is required`;
-        }
-
-        if (prefs[prefKey] === "IP" && !prefs[roleKey]) {
-          errors[roleKey] = `Role for Preference ${prefNum} is required`;
-        }
-
-        const committeeKey = `committee${prefNum}` as keyof typeof formData;
-        if (((prefs[prefKey] === "delegate") || (prefs[prefKey] === "IP" && prefs[roleKey] === "reporter")) && !formData[committeeKey]) {
-          errors[committeeKey] = `Committee for Preference ${prefNum} is required`;
-        }
-
-        if (prefs[prefKey] === "delegate") {
-          for (let i = 1; i <= 3; i++) {
-            const countryKey = `country${prefNum}_${i}` as keyof typeof formData;
-            if (!formData[countryKey]) {
-              errors[countryKey] = `Country ${i} for Preference ${prefNum} is required`;
-            }
-          }
-        }
+      } else if (step === 3) {
+        checkPreference(1);
       } else if (step === 6) {
         if (!formData.collegeIdFile) errors.collegeIdFile = "College ID is required";
         if (!formData.delegateExperienceFile) errors.delegateExperienceFile = "Delegate experience is required";
+        if (requiresCoDelegate) {
+            if (!formData.coDelegateName) errors.coDelegateName = "Co-delegate name is required for double delegation committees";
+            if (!formData.coDelegateEmail) {
+                errors.coDelegateEmail = "Co-delegate email is required for double delegation committees";
+            } else if (!/\S+@\S+\.\S+/.test(formData.coDelegateEmail as string)) {
+                errors.coDelegateEmail = "Invalid co-delegate email format";
+            }
+        }
       } else if (step === 7) {
         const paymentFields = [
           ["paymentId", "Payment ID"],
@@ -231,36 +256,20 @@ const RegistrationForm = () => {
         });
       } else if (step === 3 && groupDelegation) {
         if (!formData.delegationName) errors.delegationName = "Delegation name is required";
-      } else if (step === 4 || step === 5 || step === 6) {
-        const prefNum = step - 3;
-        const prefKey = `pref${prefNum}` as keyof typeof prefs;
-        const roleKey = `role${prefNum}` as keyof typeof prefs;
-
-        if (!prefs[prefKey]) {
-          errors[prefKey] = `Preference ${prefNum} is required`;
-        }
-
-        if (prefs[prefKey] === "IP" && !prefs[roleKey]) {
-          errors[roleKey] = `Role for Preference ${prefNum} is required`;
-        }
-
-        const committeeKey = `committee${prefNum}` as keyof typeof formData;
-         if (((prefs[prefKey] === "delegate") || (prefs[prefKey] === "IP" && prefs[roleKey] === "reporter")) && !formData[committeeKey]) {
-          errors[committeeKey] = `Committee for Preference ${prefNum} is required`;
-        }
-
-        if (prefs[prefKey] === "delegate") {
-          for (let i = 1; i <= 3; i++) {
-            const countryKey = `country${prefNum}_${i}` as keyof typeof formData;
-            if (!formData[countryKey]) {
-              errors[countryKey] = `Country ${i} for Preference ${prefNum} is required`;
-            }
-          }
-        }
+      } else if (step === 4) {
+        checkPreference(1);
       } else if (step === 7) {
         if (!formData.idProofFile) errors.idProofFile = "ID proof is required";
         if (!formData.delegateExperienceFile) errors.delegateExperienceFile = "Delegate experience is required";
         if (isHeadOfDelegation && !formData.delegationSheetFile) errors.delegationSheetFile = "Delegation sheet is required";
+        if (requiresCoDelegate) {
+            if (!formData.coDelegateName) errors.coDelegateName = "Co-delegate name is required for double delegation committees";
+            if (!formData.coDelegateEmail) {
+                errors.coDelegateEmail = "Co-delegate email is required for double delegation committees";
+            } else if (!/\S+@\S+\.\S+/.test(formData.coDelegateEmail as string)) {
+                errors.coDelegateEmail = "Invalid co-delegate email format";
+            }
+        }
       } else if (step === 8) {
         const paymentFields = [
           ["paymentId", "Payment ID"],
@@ -543,6 +552,7 @@ const RegistrationForm = () => {
           <div className="flex-grow space-y-3 md:space-y-4 py-2">
             <PreferenceSection 
               num={prefNum} 
+              isRequired={prefNum === 1}
               pref={prefs[prefKey]} 
               setPref={(val) => setPrefs(prev => ({...prev, [prefKey]: val}))} 
               role={prefs[roleKey]} 
@@ -560,9 +570,22 @@ const RegistrationForm = () => {
     // Documents Step
     const isDocumentsStep = (currentStep === 6 && isInternal) || (currentStep === 7 && !isInternal);
     if (isDocumentsStep) {
+      const requiresCoDelegate = [1, 2, 3].some(num => {
+        const prefKey = `pref${num}` as keyof typeof prefs;
+        const committeeKey = `committee${num}` as keyof typeof formData;
+        if (prefs[prefKey] === 'delegate') {
+          const committeeId = formData[committeeKey];
+          if (committeeId) {
+            const selectedCommittee = committees.find(c => c.id === committeeId);
+            return selectedCommittee?.is_double_delegation === true;
+          }
+        }
+        return false;
+      });
+
       return (
         <>
-          <h2 className="text-2xl md:text-3xl font-bold mb-4 text-[#00B7FF]">Required Documents</h2>
+          <h2 className="text-2xl md:text-3xl font-bold mb-4 text-[#00B7FF]">Additional Details</h2>
           <div className="flex-grow space-y-4 md:space-y-6 py-2">
             {isInternal ? (
               <>
@@ -578,6 +601,38 @@ const RegistrationForm = () => {
                   <p className="text-sm text-gray-700 mt-4">Heads of a Delegation must submit the <strong>Delegation Sheet</strong> with details of the delegation. Reference: Google Sheets Link</p>
                 )}
               </>
+            )}
+
+            {requiresCoDelegate && (
+              <div className="space-y-4 border-t pt-4 mt-4">
+                <div className="space-y-1">
+                  <Label htmlFor="coDelegateName" className="text-sm font-medium text-gray-700">Co-Delegate Name</Label>
+                  <Input
+                    id="coDelegateName"
+                    name="coDelegateName"
+                    value={formData.coDelegateName}
+                    onChange={handleInputChange}
+                    placeholder="Full Name"
+                    required
+                    className={formErrors.coDelegateName ? "border-red-500" : ""}
+                  />
+                  {formErrors.coDelegateName && <p className="text-red-500 text-xs mt-1">{formErrors.coDelegateName}</p>}
+                </div>
+                <div className="space-y-1">
+                  <Label htmlFor="coDelegateEmail" className="text-sm font-medium text-gray-700">Co-Delegate Email</Label>
+                  <Input
+                    id="coDelegateEmail"
+                    name="coDelegateEmail"
+                    type="email"
+                    value={formData.coDelegateEmail}
+                    onChange={handleInputChange}
+                    placeholder="Email Address"
+                    required
+                    className={formErrors.coDelegateEmail ? "border-red-500" : ""}
+                  />
+                  {formErrors.coDelegateEmail && <p className="text-red-500 text-xs mt-1">{formErrors.coDelegateEmail}</p>}
+                </div>
+              </div>
             )}
           </div>
         </>
@@ -767,6 +822,15 @@ const RegistrationForm = () => {
         const prefKey = `pref${i}` as keyof typeof prefs;
         const roleKey = `role${i}` as keyof typeof prefs;
 
+        const isDelegate = prefs[prefKey] === 'delegate';
+        const committeeId = isDelegate ? formData[`committee${i}` as keyof typeof formData] as string : null;
+        
+        let isDoubleDelegation = false;
+        if (isDelegate && committeeId) {
+            const selectedCommittee = committees.find(c => c.id === committeeId);
+            isDoubleDelegation = selectedCommittee?.is_double_delegation === true;
+        }
+
         const { data: prefData, error: prefError } = await supabase
           .from('user_preferences')
           .insert({
@@ -774,10 +838,10 @@ const RegistrationForm = () => {
             preference_order: i,
             role: prefs[prefKey],
             ip_subrole: prefs[prefKey] === 'IP' ? prefs[roleKey] : null,
-            committee_id: (prefs[prefKey] === 'delegate' || (prefs[prefKey] === 'IP' && prefs[roleKey] === 'reporter')) ? formData[`committee${i}` as keyof typeof formData] as string : null
-          })
-          .select()
-          .single();
+            committee_id: committeeId,
+            co_delegate_name: isDelegate && isDoubleDelegation ? formData.coDelegateName : null,
+            co_delegate_email: isDelegate && isDoubleDelegation ? formData.coDelegateEmail : null,
+          });
     
         if (prefError) throw prefError;
         
@@ -803,17 +867,46 @@ const RegistrationForm = () => {
             if (countryError) throw countryError;
           }
         }
+
+        if (prefs[prefKey] === 'IP' && prefs[roleKey] === 'reporter') {
+            const ipCommitteePrefs = [];
+            const isUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+
+            for (let j = 1; j <= 3; j++) {
+                const ipCommitteeId = formData[`ip_committee${i}_${j}` as keyof typeof formData] as string;
+                
+                if (ipCommitteeId && isUUID.test(ipCommitteeId)) {
+                    ipCommitteePrefs.push({
+                        user_id: user.id,
+                        preference_order: i,
+                        committee_order: j,
+                        committee_id: ipCommitteeId,
+                    });
+                }
+            }
+
+            if (ipCommitteePrefs.length > 0) {
+                const { error: ipCommitteeError } = await supabase
+                    .from('ip_committee_preferences')
+                    .insert(ipCommitteePrefs);
+                if (ipCommitteeError) throw ipCommitteeError;
+            }
+        }
       }
 
       successfulOperations.push("userPrefs");
       router.push('/dashboard');
     } catch (error) {
         console.error('Error submitting form:', error);
+        if (error && typeof error === 'object') {
+            console.error('Error details:', JSON.stringify(error, null, 2));
+        }
 
         try {
           if (successfulOperations.includes("userPrefs")) {
             await supabase.from('user_preferences').delete().eq('user_id', user.id);
             await supabase.from('delegate_country_preferences').delete().eq('user_id', user.id);
+            await supabase.from('ip_committee_preferences').delete().eq('user_id', user.id);
           }
 
           if (successfulOperations.includes("internalReg")) {
@@ -862,7 +955,6 @@ const RegistrationForm = () => {
       <DashboardNavbar onLogout={handleLogout} />
       
       <div className="flex flex-col px-2 md:px-4 pt-22 md:pt-10 pb-6 max-w-5xl mx-auto relative">
-        {/* Progress bar and step indicators */}
         <div className="fixed top-20 left-0 right-0 z-40 bg-blue/60 backdrop-blur-md">
           <div className="max-w-5xl mx-auto py-3 px-4">
             <div className="flex items-center gap-3">
