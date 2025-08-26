@@ -35,7 +35,7 @@ export default function Home() {
 
   useEffect(() => {
     const getTimeRemaining = () => {
-      const targetDate = new Date("2025-08-29T09:00:00");
+      const targetDate = new Date("2025-09-19T09:00:00");
       const now = new Date();
       const total = Math.max(targetDate.getTime() - now.getTime(), 0);
 
@@ -122,7 +122,7 @@ export default function Home() {
 
                 <div className="space-y-3">
                   <h2 className="text-lg md:text-xl font-semibold tracking-wider text-white/90">
-                    AUGUST 29-31, 2025
+                    SEPTEMBER 19-21, 2025
                   </h2>
 
                   <p className="text-base md:text-md font-medium text-[#00B7FF] max-w-2xl mx-auto tracking-wider">
