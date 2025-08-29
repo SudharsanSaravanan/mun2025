@@ -406,7 +406,7 @@ const RegistrationForm = () => {
         step: 2,
         title: "Personal Details",
         content: isInternal ? (
-          <div className="flex-grow grid grid-cols-1 gap-3 py-2">
+          <div className="flex-grow flex flex-col space-y-2 py-2">
             {renderField("fullName", "Full Name", { placeholder: "Enter your full name", required: true })}
             {renderField("phoneNumber", "Phone Number", { placeholder: "Enter your phone number", required: true })}
             {renderField("email", "Email ID", { placeholder: "Enter your email address", required: true, type: "email" })}
@@ -823,28 +823,33 @@ const RegistrationForm = () => {
         const roleKey = `role${i}` as keyof typeof prefs;
 
         const isDelegate = prefs[prefKey] === 'delegate';
-        const committeeId = isDelegate ? formData[`committee${i}` as keyof typeof formData] as string : null;
-        
+        const committeeId = isDelegate ? formData[`committee${i}` as keyof typeof formData] : null;
+
+        if (isDelegate && !committeeId) continue;
+        if (prefs[prefKey] === "IP" && !prefs[roleKey]) continue;
+
         let isDoubleDelegation = false;
         if (isDelegate && committeeId) {
-            const selectedCommittee = committees.find(c => c.id === committeeId);
+            const selectedCommittee = committees.find((c) => c.id === committeeId);
             isDoubleDelegation = selectedCommittee?.is_double_delegation === true;
         }
 
+        const userPrefSubmission = {
+          user_id: user.id,
+          preference_order: i,
+          role: prefs[prefKey],
+          ip_subrole: prefs[prefKey] === "IP" ? prefs[roleKey] : null,
+          committee_id: committeeId,
+          co_delegate_name: isDelegate && isDoubleDelegation ? formData.coDelegateName : null,
+          co_delegate_email: isDelegate && isDoubleDelegation ? formData.coDelegateEmail : null,
+        };
+
         const { data: prefData, error: prefError } = await supabase
-          .from('user_preferences')
-          .insert({
-            user_id: user.id,
-            preference_order: i,
-            role: prefs[prefKey],
-            ip_subrole: prefs[prefKey] === 'IP' ? prefs[roleKey] : null,
-            committee_id: committeeId,
-            co_delegate_name: isDelegate && isDoubleDelegation ? formData.coDelegateName : null,
-            co_delegate_email: isDelegate && isDoubleDelegation ? formData.coDelegateEmail : null,
-          });
-    
+          .from("user_preferences")
+          .insert(userPrefSubmission);
+
         if (prefError) throw prefError;
-        
+
         if (prefs[prefKey] === 'delegate') {
           const countryPrefs = [];
           for (let j = 1; j <= 3; j++) {
@@ -854,7 +859,7 @@ const RegistrationForm = () => {
                 user_id: user.id,
                 preference_order: i,
                 country_order: j,
-                country_id: countryId
+                country_id: countryId,
               });
             }
           }
@@ -873,23 +878,23 @@ const RegistrationForm = () => {
             const isUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
             for (let j = 1; j <= 3; j++) {
-                const ipCommitteeId = formData[`ip_committee${i}_${j}` as keyof typeof formData] as string;
-                
-                if (ipCommitteeId && isUUID.test(ipCommitteeId)) {
-                    ipCommitteePrefs.push({
-                        user_id: user.id,
-                        preference_order: i,
-                        committee_order: j,
-                        committee_id: ipCommitteeId,
-                    });
-                }
+              const ipCommitteeId = formData[`ip_committee${i}_${j}` as keyof typeof formData] as string;
+              
+              if (ipCommitteeId && isUUID.test(ipCommitteeId)) {
+                ipCommitteePrefs.push({
+                  user_id: user.id,
+                  preference_order: i,
+                  committee_order: j,
+                  committee_id: ipCommitteeId,
+                });
+              }
             }
 
             if (ipCommitteePrefs.length > 0) {
-                const { error: ipCommitteeError } = await supabase
-                    .from('ip_committee_preferences')
-                    .insert(ipCommitteePrefs);
-                if (ipCommitteeError) throw ipCommitteeError;
+              const { error: ipCommitteeError } = await supabase
+                .from("ip_committee_preferences")
+                .insert(ipCommitteePrefs);
+              if (ipCommitteeError) throw ipCommitteeError;
             }
         }
       }
@@ -966,7 +971,7 @@ const RegistrationForm = () => {
           </div>
         </div>
 
-      <form onSubmit={handleSubmit} className="flex-grow flex flex-col justify-center mt-16 px-2 md:px-4">
+      <form onSubmit={handleSubmit} className="flex-grow flex flex-col justify-center mt-10 px-2 md:px-4">
         <AnimatePresence mode="wait">
           <motion.div
             key={currentStep}
