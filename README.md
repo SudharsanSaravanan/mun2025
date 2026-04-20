@@ -1,42 +1,44 @@
-# 🌐 Amrita - MUN2025 Website
+# Amrita-MUN '25 Website
 
-A responsive and interactive website for Amrita - Model United Nations 2025 built using Next.js, TypeScript, and Tailwind CSS.
+The Amrita MUN ’25 website was developed as the official registration and management portal for the event, scheduled from September 19 - 21, 2025, organised by the Amrita MUN Society (A-MUNSO).
 
-🚀 **Tech Stack**
+The platform handled the end-to-end delegate onboarding workflow, including user registration, preference submission for committees, roles, and country allocations. It also provided application status tracking for users. 
 
-* **Framework:** Next.js
-* **Language:** TypeScript (TSX)
-* **Styling:** Tailwind CSS
-* **Animations:** Framer Motion
+On the admin side, the system included a dashboard for monitoring registration stats, reviewing applications, and managing approvals and allocations.
 
-📦 **Getting Started**
+## Getting Started
 
-Follow the steps below to set up and run the project locally.
+Follow the steps below to set up and run the project locally:
 
 1.  **Clone the Repository**
     ```bash
-    git clone [https://github.com/SudharsanSaravanan/mun2025.git](https://github.com/SudharsanSaravanan/mun2025.git)
-    cd mun2025
+    git clone https://github.com/SudharsanSaravanan/amrita-mun-web-2025.git
+    cd amrita-mun-web-2025
     ```
 
 2.  **Install Dependencies**
 
-    This project uses `npm` for package management. Run the following commands in the project directory to install the necessary dependencies:
 
     ```bash
     npm install
     npm install react-tilt framer-motion --legacy-peer-deps
     ```
 
-    * `npm install`: Installs the core dependencies required for the Next.js project, including React, Next.js, and Tailwind CSS.
-    * `npm install react-tilt framer-motion --legacy-peer-deps`: Installs the `react-tilt` library for interactive tilt effects and `framer-motion` for animations. The `--legacy-peer-deps` flag is included to handle potential peer dependency conflicts that might arise with older versions of these libraries.
+3.  **Set Up Environment Variables**
+
+    Create a `.env` file in the root directory and add the following:
+
+    ```env
+    NEXT_PUBLIC_SUPABASE_URL=YOUR_SUPABASE_URL
+    NEXT_PUBLIC_SUPABASE_ANON_KEY=YOUR_SUPABASE_ANON_KEY
+    ```
 
 3.  **Run the Development Server**
 
-    Once the dependencies are installed, you can start the Next.js development server using the following command:
 
     ```bash
     npm run dev
     ```
 
-    This command will start the development server, and you can view the website in your browser, typically at `http://localhost:3000`. Changes you make to the code will be automatically reloaded in the browser.
+    Once the development server is running, you can view the website at `http://localhost:3000`.
+
