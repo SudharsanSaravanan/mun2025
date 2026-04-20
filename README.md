@@ -2,9 +2,9 @@
 
 The Amrita MUN ’25 website was developed as the official registration and management portal for the event, scheduled from September 19 - 21, 2025, organised by the Amrita MUN Society (A-MUNSO).
 
-The platform handled the end-to-end delegate onboarding workflow, including user registration, preference submission for committees, roles, and country allocations. It also provided application status tracking for users. 
+The platform handled the end-to-end delegate onboarding workflow, including user registration, preference submission for committees, roles, and country allocations. It also provided application status tracking for users. On the admin side, the system included a dashboard for monitoring registration stats, reviewing applications, and managing approvals and allocations.
 
-On the admin side, the system included a dashboard for monitoring registration stats, reviewing applications, and managing approvals and allocations.
+![image](https://github.com/user-attachments/assets/003f516e-6453-4395-bfb9-4084e14ab044)
 
 ## Getting Started
 
